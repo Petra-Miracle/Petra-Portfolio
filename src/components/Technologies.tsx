@@ -2,91 +2,114 @@
 
 import type { Technology } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
-import { Chip } from "@heroui/react";
-import { Bot, Layers } from "lucide-react";
+import {
+  Bot,
+  Database,
+  Globe,
+  Layers,
+  Server,
+  Smartphone,
+  Terminal,
+} from "lucide-react";
 
 interface TechnologiesProps {
   technologies: Technology[];
 }
 
+const ICON_MAP: Record<string, typeof Layers> = {
+  globe: Globe,
+  server: Server,
+  database: Database,
+  terminal: Terminal,
+  smartphone: Smartphone,
+  bot: Bot,
+  layers: Layers,
+};
+
+function getIcon(icon: string | null): typeof Layers {
+  if (!icon) return Layers;
+  return ICON_MAP[icon.toLowerCase()] ?? Layers;
+}
+
 export function Technologies({ technologies }: TechnologiesProps) {
-  const general = technologies.filter((t) => t.category === "GENERAL");
-  const ai = technologies.filter((t) => t.category === "AI");
+  const general = technologies
+    .filter((t) => t.category === "GENERAL")
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  const ai = technologies
+    .filter((t) => t.category === "AI")
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+
+  const isEmpty = general.length === 0 && ai.length === 0;
 
   return (
-    <section id="teknologi" className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <Reveal>
-        <h2 className="mb-2 text-3xl font-bold tracking-tight sm:text-4xl">
-          Teknologi yang Digunakan
-        </h2>
-        <p className="mb-10 text-foreground/70">
-          Data diambil langsung dari backend (API).
-        </p>
-      </Reveal>
+    <section id="teknologi" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <Reveal>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+            02 &mdash; Tech Stack
+          </p>
+          <h2 className="mt-4 mb-16 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Teknologi yang Digunakan
+          </h2>
+        </Reveal>
 
-      {general.length === 0 && ai.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="space-y-10">
-          {general.length > 0 && (
-            <TechGroup
-              title="Teknologi Umum"
-              description="Bahasa, framework, dan database."
-              icon={Layers}
-              items={general}
-            />
-          )}
-
-          {ai.length > 0 && (
-            <TechGroup
-              title="Teknologi AI"
-              description="Tools AI yang dipakai dalam workflow."
-              icon={Bot}
-              items={ai}
-            />
-          )}
-        </div>
-      )}
+        {isEmpty ? (
+          <EmptyState />
+        ) : (
+          <div className="space-y-16">
+            {general.length > 0 && (
+              <TechGroup
+                label="General"
+                description="Bahasa, framework, dan tools."
+                items={general}
+              />
+            )}
+            {ai.length > 0 && (
+              <TechGroup
+                label="AI"
+                description="Tools dan model AI."
+                items={ai}
+              />
+            )}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
 
 function TechGroup({
-  title,
+  label,
   description,
-  icon: Icon,
   items,
 }: {
-  title: string;
+  label: string;
   description: string;
-  icon: typeof Layers;
   items: Technology[];
 }) {
   return (
     <Reveal>
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
-        <div className="mb-6 flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
-            <Icon size={20} />
-          </span>
-          <div>
-            <h3 className="text-xl font-semibold">{title}</h3>
-            <p className="text-sm text-foreground/60">{description}</p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2.5">
-          {items.map((tech) => (
-            <Chip
+      <div className="mb-6 flex items-baseline gap-3">
+        <h3 className="text-lg font-semibold text-foreground">{label}</h3>
+        <span className="text-sm text-muted">{description}</span>
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {items.map((tech) => {
+          const Icon = getIcon(tech.icon);
+          return (
+            <div
               key={tech.id}
-              variant="soft"
-              size="sm"
-              className="bg-white/5 text-foreground/85"
+              className="group flex items-center gap-3 rounded-xl border border-border bg-surface p-4 transition-all hover:border-accent/30 hover:shadow-[0_2px_12px_rgba(0,102,255,0.06)]"
             >
-              {tech.name}
-            </Chip>
-          ))}
-        </div>
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-alt text-muted transition-colors group-hover:bg-accent/10 group-hover:text-accent">
+                <Icon size={18} strokeWidth={1.5} />
+              </span>
+              <span className="text-sm font-medium text-foreground">
+                {tech.name}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </Reveal>
   );
@@ -94,11 +117,12 @@ function TechGroup({
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl border border-dashed border-white/15 p-10 text-center text-foreground/50">
-      <p className="text-lg">Belum ada data teknologi.</p>
-      {/* TODO: Hapus catatan ini */}
-      <p className="mt-2 text-sm">
-        Hubungkan backend (NEXT_PUBLIC_API_URL) atau isi melalui sistem admin.
+    <div className="rounded-xl border border-dashed border-border-strong bg-surface p-12 text-center">
+      <p className="text-base font-medium text-foreground/70">
+        Belum ada data teknologi.
+      </p>
+      <p className="mt-2 text-sm text-muted">
+        Data akan muncul setelah ditambahkan melalui panel admin.
       </p>
     </div>
   );

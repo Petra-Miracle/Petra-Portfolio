@@ -6,6 +6,8 @@ export const siteConfig = {
     name: "Petra Lenggu",
     role: "Programmer",
     image: "/hero-profile.png",
+    // Ubah ke "Available" jika sedang open opportunities, atau null untuk sembunyikan
+    status: null as "Available" | null,
   },
   navLinks: [
     { label: "Beranda", href: "#beranda" },

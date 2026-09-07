@@ -1,20 +1,63 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+/* ============================================================
+   Design Tokens
+   ============================================================ */
 :root {
-  --background: #0a0a0f;
-  --foreground: #ededed;
+  /* Surface */
+  --background: #f5f5f0;
+  --foreground: #1a1a1a;
+  --surface: #ffffff;
+  --surface-alt: #eeeae2;
+  --muted: #8a8580;
+  --muted-light: #b5b0a8;
+  --border: rgba(26, 26, 26, 0.08);
+  --border-strong: rgba(26, 26, 26, 0.15);
+
+  /* Dark surface */
+  --dark: #1a1a1a;
+  --dark-surface: #242424;
+  --dark-muted: #7a756e;
+
+  /* Accent */
+  --accent: #0066ff;
+  --accent-hover: #0052cc;
+
+  /* Semantic */
+  --success: #2d8a4e;
+  --warning: #c67b1a;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.1);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-dark: var(--dark);
+  --color-dark-surface: var(--dark-surface);
+  --color-dark-muted: var(--dark-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* ============================================================
+   Base
+   ============================================================ */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -26,31 +69,43 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---- Text stroke / outline utilities ---- */
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* ============================================================
+   Text stroke / outline
+   ============================================================ */
 @layer utilities {
   .text-outline {
     -webkit-text-stroke: 1.5px var(--foreground);
+    color: transparent;
+  }
+  .text-outline-accent {
+    -webkit-text-stroke: 1.5px var(--accent);
     color: transparent;
   }
   .text-outline-thin {
     -webkit-text-stroke: 1px var(--foreground);
     color: transparent;
   }
-  .text-fill-transparent {
-    color: transparent;
-  }
 }
 
-/* ---- Scroll reveal animation (used by <Reveal />) ---- */
+/* ============================================================
+   Scroll reveal
+   ============================================================ */
 .reveal {
   opacity: 0;
-  transform: translateY(32px);
+  transform: translateY(24px);
   transition:
-    opacity 0.7s ease,
-    transform 0.7s ease;
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -61,10 +116,10 @@ body {
 
 .reveal .reveal-item {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(16px);
   transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -80,5 +135,94 @@ body {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* ============================================================
+   Page load animation
+   ============================================================ */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Mobile menu animation
+   ============================================================ */
+.mobile-menu-enter {
+  animation: menu-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-enter {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Marquee
+   ============================================================ */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll var(--marquee-duration, 25s) linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation-play-state: paused;
   }
 }

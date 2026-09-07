@@ -1,58 +1,76 @@
 import { Reveal } from "@/components/Reveal";
-import { Wrench, Target, Focus } from "lucide-react";
+import { Code2, Layers, Lightbulb } from "lucide-react";
 
-const highlightItems = [
+const highlights = [
   {
-    icon: Wrench,
-    title: "Keahlian",
+    icon: Code2,
+    label: "Keahlian",
     // TODO: Ganti dengan keahlian asli
-    description:
-      "[PLACEHOLDER: Tulis keahlian utama Anda, mis. Python, React, SQL, dsb.]",
+    text: "[PLACEHOLDER: Python, React, SQL, Node.js — daftar teknologi utama yang Anda kuasai.]",
   },
   {
-    icon: Focus,
-    title: "Fokus",
+    icon: Layers,
+    label: "Fokus",
     // TODO: Ganti dengan fokus asli
-    description:
-      "[PLACEHOLDER: Jelaskan area fokus Anda sebagai programmer, mis. full-stack web, data engineering, dsb.]",
+    text: "[PLACEHOLDER: Full-stack web development, data engineering, atau spesialisasi Anda.]",
   },
   {
-    icon: Target,
-    title: "Tujuan",
-    // TODO: Ganti dengan tujuan asli
-    description:
-      "[PLACEHOLDER: Tulis tujuan / value yang Anda bawa ke tim atau startup.]",
+    icon: Lightbulb,
+    label: "Value",
+    // TODO: Ganti dengan value yang dibawa
+    text: "[PLACEHOLDER: Apa yang Anda bawa ke tim — mis. problem-solving, ownership, atau pendekatan kerja.]",
   },
 ];
 
 export function About() {
   return (
-    <section id="tentang" className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-      <Reveal>
-        <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-          Tentang Saya
-        </h2>
-      </Reveal>
-
-      <Reveal delay={100}>
-        <p className="mb-10 max-w-3xl text-lg leading-relaxed text-foreground/70">
-          {/* TODO: Ganti dengan bio asli */}
-          [PLACEHOLDER: Tulis deskripsi singkat tentang diri Anda di sini —
-          latar belakang, pengalaman, dan apa yang Anda kerjakan sehari-hari
-          sebagai programmer.]
-        </p>
-      </Reveal>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        {highlightItems.map((item) => (
-          <Reveal key={item.title}>
-            <div className="h-full rounded-2xl border border-white/10 bg-white/5 p-6 transition-colors hover:bg-white/10">
-              <item.icon size={28} className="mb-4 text-blue-400" />
-              <h3 className="mb-2 text-lg font-semibold">{item.title}</h3>
-              <p className="text-sm text-foreground/70">{item.description}</p>
+    <section id="tentang" className="bg-dark py-24 sm:py-32">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-16 md:grid-cols-[1fr_2fr]">
+          {/* Left — label */}
+          <Reveal>
+            <div className="md:sticky md:top-32 md:self-start">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-dark-muted">
+                01 &mdash; Tentang
+              </p>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                Tentang Saya
+              </h2>
             </div>
           </Reveal>
-        ))}
+
+          {/* Right — content */}
+          <div className="space-y-12">
+            <Reveal delay={80}>
+              <p className="text-lg leading-relaxed text-white/70">
+                {/* TODO: Ganti dengan bio asli */}
+                [PLACEHOLDER: Deskripsi singkat tentang diri Anda — latar
+                belakang, pengalaman, dan apa yang Anda kerjakan sehari-hari
+                sebagai programmer. Tulis 2–3 kalimat yang langsung pada intinya.]
+              </p>
+            </Reveal>
+
+            <div className="grid gap-6 sm:grid-cols-3">
+              {highlights.map((item, i) => (
+                <Reveal key={item.label} delay={120 + i * 80}>
+                  <div className="group rounded-xl border border-white/[0.06] bg-white/[0.03] p-5 transition-colors hover:border-white/[0.12] hover:bg-white/[0.05]">
+                    <item.icon
+                      size={22}
+                      className="mb-3 text-accent"
+                      strokeWidth={1.5}
+                    />
+                    <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-white">
+                      {item.label}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-white/50">
+                      {item.text}
+                    </p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
