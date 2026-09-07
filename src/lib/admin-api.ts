@@ -6,8 +6,9 @@ import type {
   TechnologyInput,
 } from "@/lib/types";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+).replace(/\/+$/, "");
 
 const TOKEN_KEY = "petra_admin_token";
 

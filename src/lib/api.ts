@@ -1,7 +1,8 @@
 import type { Project, ProjectType, Technology } from "@/lib/types";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+).replace(/\/+$/, "");
 
 async function get<T>(path: string): Promise<T> {
   const controller = new AbortController();
