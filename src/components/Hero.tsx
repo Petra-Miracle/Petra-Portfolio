@@ -17,7 +17,7 @@ export function Hero() {
   return (
     <section
       id="beranda"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background"
+      className="relative flex min-h-screen items-end justify-center overflow-hidden bg-background"
     >
       {/* Marquee — behind the photo, z-0 */}
       <div className="pointer-events-none absolute inset-0 z-0 flex items-center">
@@ -37,7 +37,7 @@ export function Hero() {
       </div>
 
       {/* Portrait — centered, above marquee */}
-      <div className="animate-fade-in-up relative z-10 h-[24rem] w-[18rem] opacity-0 sm:h-[28rem] sm:w-[20rem] md:h-[34rem] md:w-[24rem]">
+      <div className="animate-fade-in-up relative z-10 h-[26rem] w-[19rem] opacity-0 sm:h-[34rem] sm:w-[24rem] md:h-[46rem] md:w-[30rem]">
         <Image
           src={siteConfig.author.image}
           alt={`Foto ${siteConfig.author.name}`}
