@@ -1,7 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import { Image as ImageIcon, Loader2, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
 import type { Project, ProjectType } from "@/lib/types";
 import {
   createProject,
@@ -10,6 +17,7 @@ import {
   handleUnauthorized,
   isUnauthorized,
   updateProject,
+  uploadImage,
 } from "@/lib/admin-api";
 import {
   Badge,
@@ -50,6 +58,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const loadItems = useCallback(async () => {
     const data = await getProjects(token);
     return [...data].sort(
@@ -86,6 +99,9 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
     setForm(EMPTY_FORM);
     setTechStack([]);
     setSubmitError(null);
+    setImagePreview(null);
+    setImageError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   function startEdit(project: Project) {
@@ -103,6 +119,42 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
     });
     setTechStack(project.techStack ?? []);
     setSubmitError(null);
+    setImagePreview(project.imageUrl ?? null);
+    setImageError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const localPreview = URL.createObjectURL(file);
+    setImagePreview(localPreview);
+    setImageError(null);
+    setUploadingImage(true);
+    try {
+      const { url } = await uploadImage(token, file);
+      setForm((f) => ({ ...f, imageUrl: url }));
+      setImagePreview(url);
+    } catch (err) {
+      if (isUnauthorized(err)) {
+        handleUnauthorized();
+        return;
+      }
+      setImageError(err instanceof Error ? err.message : "Upload gagal.");
+      setImagePreview(form.imageUrl.trim() === "" ? null : form.imageUrl);
+    } finally {
+      URL.revokeObjectURL(localPreview);
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function clearImage() {
+    setForm((f) => ({ ...f, imageUrl: "" }));
+    setImagePreview(null);
+    setImageError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   function addTech() {
@@ -122,6 +174,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (uploadingImage) return;
     setSaving(true);
     setSubmitError(null);
     const body = {
@@ -301,15 +354,57 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
             </Field>
           </div>
           <div className="sm:col-span-2">
-            <Field label="Image URL">
-              <TextInput
-                type="url"
-                value={form.imageUrl}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, imageUrl: e.target.value }))
-                }
-                placeholder="https://..."
-              />
+            <Field label="Foto Project">
+              <div className="flex items-center gap-3">
+                {imagePreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={imagePreview}
+                    alt="Preview foto project"
+                    className="h-16 w-16 shrink-0 rounded-lg object-cover ring-1 ring-white/10"
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-white/15 text-foreground/30">
+                    <ImageIcon size={20} />
+                  </div>
+                )}
+                <div className="flex flex-col items-start gap-1.5">
+                  <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-xs font-medium text-foreground/85 transition-colors hover:bg-white/10 hover:text-foreground">
+                    {uploadingImage ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Upload size={14} />
+                    )}
+                    {uploadingImage
+                      ? "Mengupload..."
+                      : imagePreview
+                        ? "Ganti Foto"
+                        : "Pilih Foto"}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingImage}
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                  {imagePreview ? (
+                    <button
+                      type="button"
+                      onClick={clearImage}
+                      className="text-xs text-foreground/50 transition-colors hover:text-red-300"
+                    >
+                      Hapus foto
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+              {imageError ? (
+                <span className="mt-1.5 block text-xs text-red-300">
+                  {imageError}
+                </span>
+              ) : null}
             </Field>
           </div>
 
@@ -353,7 +448,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 pt-1">
-          <SubmitButton loading={saving}>
+          <SubmitButton loading={saving || uploadingImage}>
             {editingId ? "Simpan Perubahan" : "Tambah Data"}
           </SubmitButton>
           {editingId ? (

@@ -185,3 +185,33 @@ export function deleteProject(token: string, id: string): Promise<void> {
     token,
   });
 }
+
+export async function uploadImage(
+  token: string,
+  file: File,
+): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API_URL}/api/uploads`, {
+    method: "POST",
+    // Jangan set Content-Type manual — browser yang set boundary multipart-nya.
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  if (res.status === 401) {
+    throw new ApiError("Sesi berakhir. Silakan login ulang.", 401);
+  }
+  if (!res.ok) {
+    let message = "Upload gagal.";
+    try {
+      const data = (await res.json()) as { error?: string };
+      if (data?.error) message = data.error;
+    } catch {
+      // ignore body parse failures
+    }
+    throw new ApiError(message, res.status);
+  }
+  return (await res.json()) as { url: string };
+}
