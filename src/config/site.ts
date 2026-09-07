@@ -3,8 +3,7 @@ export const siteConfig = {
   description:
     "Portfolio programmer — project, kompetisi, dan teknologi yang dikuasai.",
   author: {
-    // TODO: Ganti dengan nama asli
-    name: "[Nama Anda]",
+    name: "Petra Lenggu",
     role: "Programmer",
     image: "/hero-profile.png",
   },
