@@ -15,6 +15,7 @@ import {
   Badge,
   ErrorBanner,
   Field,
+  IconButton,
   SecondaryButton,
   SelectInput,
   SubmitButton,
@@ -262,22 +263,20 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
-                      <button
-                        type="button"
+                      <IconButton
+                        label="Edit"
+                        variant="outline"
                         onClick={() => startEdit(tech)}
-                        title="Edit"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-foreground/70 transition-colors hover:bg-white/10 hover:text-foreground"
                       >
                         <Pencil size={15} />
-                      </button>
-                      <button
-                        type="button"
+                      </IconButton>
+                      <IconButton
+                        label="Hapus"
+                        variant="danger-soft"
                         onClick={() => handleDelete(tech.id)}
-                        title="Hapus"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-foreground/70 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                       >
                         <Trash2 size={15} />
-                      </button>
+                      </IconButton>
                     </div>
                   </td>
                 </tr>

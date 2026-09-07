@@ -3,8 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError, getToken, login, setToken } from "@/lib/admin-api";
-import { ErrorBanner, TextInput } from "@/components/admin/ui";
-import { Loader2 } from "lucide-react";
+import { ErrorBanner, SubmitButton, TextInput } from "@/components/admin/ui";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -81,16 +80,9 @@ export default function AdminLoginPage() {
             />
           </label>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {loading ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : null}
+          <SubmitButton loading={loading} fullWidth>
             {loading ? "Menghubungkan..." : "Masuk"}
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </div>

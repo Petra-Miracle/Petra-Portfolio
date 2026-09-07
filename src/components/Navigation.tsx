@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Button } from "@heroui/react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
@@ -90,14 +91,16 @@ export function Navigation() {
             Hubungi Saya
           </a>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            isIconOnly
             aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-            onClick={() => setMobileOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface-alt md:hidden"
+            onPress={() => setMobileOpen((v) => !v)}
+            className="md:hidden"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          </Button>
         </div>
       </nav>
 

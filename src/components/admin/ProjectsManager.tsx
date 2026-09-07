@@ -8,6 +8,7 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from "react";
+import { Button } from "@heroui/react";
 import { Image as ImageIcon, Loader2, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
 import type { Project, ProjectType } from "@/lib/types";
 import {
@@ -23,6 +24,7 @@ import {
   Badge,
   ErrorBanner,
   Field,
+  IconButton,
   SecondaryButton,
   SelectInput,
   SubmitButton,
@@ -369,7 +371,21 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                   </div>
                 )}
                 <div className="flex flex-col items-start gap-1.5">
-                  <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-xs font-medium text-foreground/85 transition-colors hover:bg-white/10 hover:text-foreground">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploadingImage}
+                    onChange={handleImageChange}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    isDisabled={uploadingImage}
+                    onPress={() => fileInputRef.current?.click()}
+                  >
                     {uploadingImage ? (
                       <Loader2 size={14} className="animate-spin" />
                     ) : (
@@ -380,23 +396,16 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                       : imagePreview
                         ? "Ganti Foto"
                         : "Pilih Foto"}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      disabled={uploadingImage}
-                      onChange={handleImageChange}
-                    />
-                  </label>
+                  </Button>
                   {imagePreview ? (
-                    <button
+                    <Button
                       type="button"
-                      onClick={clearImage}
-                      className="text-xs text-foreground/50 transition-colors hover:text-red-300"
+                      variant="ghost"
+                      size="sm"
+                      onPress={clearImage}
                     >
                       Hapus foto
-                    </button>
+                    </Button>
                   ) : null}
                 </div>
               </div>
@@ -519,22 +528,20 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
-                      <button
-                        type="button"
+                      <IconButton
+                        label="Edit"
+                        variant="outline"
                         onClick={() => startEdit(project)}
-                        title="Edit"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-foreground/70 transition-colors hover:bg-white/10 hover:text-foreground"
                       >
                         <Pencil size={15} />
-                      </button>
-                      <button
-                        type="button"
+                      </IconButton>
+                      <IconButton
+                        label="Hapus"
+                        variant="danger-soft"
                         onClick={() => handleDelete(project.id)}
-                        title="Hapus"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-foreground/70 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                       >
                         <Trash2 size={15} />
-                      </button>
+                      </IconButton>
                     </div>
                   </td>
                 </tr>
