@@ -29,6 +29,21 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* ---- Text stroke / outline utilities ---- */
+@layer utilities {
+  .text-outline {
+    -webkit-text-stroke: 1.5px var(--foreground);
+    color: transparent;
+  }
+  .text-outline-thin {
+    -webkit-text-stroke: 1px var(--foreground);
+    color: transparent;
+  }
+  .text-fill-transparent {
+    color: transparent;
+  }
+}
+
 /* ---- Scroll reveal animation (used by <Reveal />) ---- */
 .reveal {
   opacity: 0;
