@@ -6,7 +6,7 @@ export const siteConfig = {
     // TODO: Ganti dengan nama asli
     name: "[Nama Anda]",
     role: "Programmer",
-    image: "/avatar-placeholder.svg",
+    image: "/hero-profile.png",
   },
   navLinks: [
     { label: "Beranda", href: "#beranda" },
