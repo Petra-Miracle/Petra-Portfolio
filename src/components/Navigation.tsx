@@ -1,25 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Button } from "@heroui/react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
 const SECTION_IDS = siteConfig.navLinks.map((l) => l.href.replace("#", ""));
 
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "P";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return `${first}${last}`.toUpperCase();
+}
+
 export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [active, setActive] = useState("#beranda");
-  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState("#tentang");
 
   /* ---- scroll spy ---- */
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 40);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-
   useEffect(() => {
     const sections = SECTION_IDS
       .map((id) => document.getElementById(id))
@@ -35,7 +33,7 @@ export function Navigation() {
           }
         }
       },
-      { rootMargin: "-20% 0px -70% 0px" },
+      { rootMargin: "-35% 0px -60% 0px" },
     );
 
     sections.forEach((s) => observer.observe(s));
@@ -44,37 +42,28 @@ export function Navigation() {
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
-  const firstName = siteConfig.author.name.split(" ")[0] ?? "P";
-
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-3 sm:px-6">
-      <nav
-        className={`mx-auto flex max-w-6xl items-center justify-between rounded-full border px-5 py-3 transition-all duration-300 ${
-          scrolled
-            ? "border-black/[0.06] bg-white/95 shadow-[0_2px_20px_rgba(0,0,0,0.06)] backdrop-blur-md"
-            : "border-transparent bg-white/70 backdrop-blur-sm"
-        }`}
-      >
-        {/* Logo + Name */}
-        <a href="#beranda" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-dark text-[11px] font-bold leading-none text-white">
-            {firstName[0]?.toUpperCase() ?? "P"}
-          </span>
-          <span className="hidden text-[13px] font-bold tracking-[0.14em] text-foreground sm:inline">
-            {siteConfig.author.name}
-          </span>
+    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
+      <nav className="mx-auto flex max-w-5xl items-center justify-between rounded-full bg-dark px-3 py-3 pl-6 shadow-[0_8px_40px_rgba(21,20,15,0.35)]">
+        {/* Logo — inisial + titik */}
+        <a
+          href="#beranda"
+          className="font-mono text-[15px] font-semibold leading-none tracking-tight text-accent"
+          style={{ fontFamily: "var(--font-mono-jb)" }}
+        >
+          {initials(siteConfig.author.name)}.
         </a>
 
         {/* Center nav links — desktop */}
-        <div className="hidden items-center gap-0.5 md:flex">
+        <div className="hidden items-center gap-6 md:flex">
           {siteConfig.navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className={`rounded-full px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] transition-colors ${
+              className={`text-sm font-medium transition-colors ${
                 active === link.href
-                  ? "bg-dark text-white"
-                  : "text-muted hover:bg-surface-alt hover:text-foreground"
+                  ? "text-background"
+                  : "text-dark-muted hover:text-background/80"
               }`}
             >
               {link.label}
@@ -83,52 +72,52 @@ export function Navigation() {
         </div>
 
         {/* Right: CTA + hamburger */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <a
             href="#kontak"
-            className="hidden rounded-full bg-dark px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-dark-surface sm:inline-block"
+            className="btn btn-primary btn-primary-sm hidden sm:inline-flex"
           >
             Hubungi Saya
           </a>
 
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            isIconOnly
+            onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-            onPress={() => setMobileOpen((v) => !v)}
-            className="md:hidden"
+            className="btn btn-icon btn-ghost btn-ghost-dark md:hidden"
+            style={{ width: 36, height: 36 }}
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </Button>
+          </button>
         </div>
       </nav>
 
       {/* Mobile dropdown */}
       {mobileOpen && (
-        <div className="mobile-menu-enter mx-auto mt-2 max-w-6xl overflow-hidden rounded-3xl border border-black/[0.06] bg-white p-3 shadow-lg md:hidden">
+        <div className="mx-auto mt-2 max-w-5xl space-y-1 rounded-3xl bg-dark p-3 shadow-[0_8px_40px_rgba(21,20,15,0.35)] md:hidden">
           {siteConfig.navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={closeMobile}
-              className={`block rounded-2xl px-4 py-3 text-sm font-medium transition-colors ${
+              className={`block rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                 active === link.href
-                  ? "bg-dark text-white"
-                  : "text-foreground/80 hover:bg-surface-alt hover:text-foreground"
+                  ? "bg-dark-surface text-background"
+                  : "text-dark-muted hover:bg-dark-surface/60 hover:text-background"
               }`}
             >
               {link.label}
             </a>
           ))}
-          <div className="my-2 border-t border-border" />
-          <a
-            href="#kontak"
-            onClick={closeMobile}
-            className="block rounded-2xl bg-dark px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-dark-surface"
-          >
-            Hubungi Saya
-          </a>
+          <div className="px-2 pt-1 pb-2">
+            <a
+              href="#kontak"
+              onClick={closeMobile}
+              className="btn btn-primary w-full"
+            >
+              Hubungi Saya
+            </a>
+          </div>
         </div>
       )}
     </header>

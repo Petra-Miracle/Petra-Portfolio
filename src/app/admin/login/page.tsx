@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError, getToken, login, setToken } from "@/lib/admin-api";
-import { ErrorBanner, SubmitButton, TextInput } from "@/components/admin/ui";
+import { ErrorBanner, Field, PrimaryButton, TextInput } from "@/components/admin/ui";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -38,53 +38,98 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8">
-        <h1 className="text-xl font-semibold">Login Admin</h1>
-        <p className="mt-1 text-sm text-foreground/60">
-          Masuk untuk mengelola data portfolio.
+    <div className="flex min-h-screen bg-background">
+      {/* ---- Brand panel (desktop) ---- */}
+      <aside className="hidden w-[560px] shrink-0 flex-col justify-between bg-dark p-14 md:flex lg:p-16">
+        <div className="flex items-center gap-2">
+          <span
+            className="font-mono text-[15px] font-semibold leading-none text-accent"
+            style={{ fontFamily: "var(--font-mono-jb)" }}
+          >
+            P.
+          </span>
+          <span className="text-sm font-semibold text-background">Admin</span>
+        </div>
+
+        <div>
+          <p
+            className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-dark-muted"
+            style={{ fontFamily: "var(--font-mono-jb)" }}
+          >
+            Panel Admin
+          </p>
+          <h1
+            className="mt-5 max-w-[15ch] font-display text-4xl font-semibold leading-tight tracking-tight text-background"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Kelola teknologi dan karya Anda di satu tempat.
+          </h1>
+        </div>
+
+        <p
+          className="font-mono text-[11px] text-dark-muted"
+          style={{ fontFamily: "var(--font-mono-jb)" }}
+        >
+          &copy; {new Date().getFullYear()} Petra Portfolio
         </p>
+      </aside>
 
-        {error ? (
-          <div className="mt-4">
-            <ErrorBanner>{error}</ErrorBanner>
+      {/* ---- Form panel ---- */}
+      <main className="flex flex-1 items-start justify-center px-6 pb-16 pt-12 sm:px-10 sm:pt-20 md:items-center md:py-12">
+        <div className="w-full max-w-sm">
+          {/* Brand (mobile only) */}
+          <div className="mb-10 flex items-center gap-2.5 md:hidden">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-accent font-mono text-[15px] font-semibold leading-none text-accent-ink">
+              P.
+            </span>
+            <span className="text-sm font-semibold text-foreground">Admin</span>
           </div>
-        ) : null}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-foreground/80">
-              Email
-            </span>
-            <TextInput
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
-            />
-          </label>
+          <h2
+            className="font-display text-[26px] font-semibold tracking-tight text-foreground"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Masuk ke Admin
+          </h2>
+          <p className="mt-2 text-[13px] text-muted">
+            Masuk untuk mengelola data portfolio.
+          </p>
 
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-foreground/80">
-              Password
-            </span>
-            <TextInput
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-          </label>
+          {error ? (
+            <div className="mt-5">
+              <ErrorBanner>{error}</ErrorBanner>
+            </div>
+          ) : null}
 
-          <SubmitButton loading={loading} fullWidth>
-            {loading ? "Menghubungkan..." : "Masuk"}
-          </SubmitButton>
-        </form>
-      </div>
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <Field label="Email">
+              <TextInput
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+              />
+            </Field>
+
+            <Field label="Password">
+              <TextInput
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </Field>
+
+            <PrimaryButton type="submit" loading={loading} fullWidth>
+              {loading ? "Menghubungkan..." : "Masuk"}
+            </PrimaryButton>
+          </form>
+        </div>
+      </main>
     </div>
   );
 }

@@ -1,75 +1,54 @@
-"use client";
-
 import type { Technology } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
-import {
-  Bot,
-  Database,
-  Globe,
-  Layers,
-  Server,
-  Smartphone,
-  Terminal,
-} from "lucide-react";
 
 interface TechnologiesProps {
   technologies: Technology[];
 }
 
-const ICON_MAP: Record<string, typeof Layers> = {
-  globe: Globe,
-  server: Server,
-  database: Database,
-  terminal: Terminal,
-  smartphone: Smartphone,
-  bot: Bot,
-  layers: Layers,
-};
-
-function getIcon(icon: string | null): typeof Layers {
-  if (!icon) return Layers;
-  return ICON_MAP[icon.toLowerCase()] ?? Layers;
-}
-
 export function Technologies({ technologies }: TechnologiesProps) {
-  const general = technologies
-    .filter((t) => t.category === "GENERAL")
-    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  const ai = technologies
-    .filter((t) => t.category === "AI")
-    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  const sorted = (cat: Technology["category"]) =>
+    technologies
+      .filter((t) => t.category === cat)
+      .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 
+  const general = sorted("GENERAL");
+  const ai = sorted("AI");
   const isEmpty = general.length === 0 && ai.length === 0;
 
   return (
-    <section id="teknologi" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section id="teknologi" className="bg-dark">
+      <div className="mx-auto max-w-[1280px] px-6 py-[120px] sm:px-10 lg:px-20">
         <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-            02 &mdash; Tech Stack
+          <p
+            className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-dark-muted"
+            style={{ fontFamily: "var(--font-mono-jb)" }}
+          >
+            Tumpukan Teknologi
           </p>
-          <h2 className="mt-4 mb-16 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2
+            className="mt-5 mb-16 font-display text-4xl font-semibold tracking-tight text-background"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
             Teknologi yang Digunakan
           </h2>
         </Reveal>
 
         {isEmpty ? (
-          <EmptyState />
+          <div className="rounded-[14px] border border-dashed border-border-strong p-12 text-center">
+            <p className="text-base font-medium text-background">
+              Belum ada data teknologi.
+            </p>
+            <p className="mt-2 text-sm text-dark-muted">
+              Data akan muncul setelah ditambahkan melalui panel admin.
+            </p>
+          </div>
         ) : (
           <div className="space-y-16">
             {general.length > 0 && (
-              <TechGroup
-                label="General"
-                description="Bahasa, framework, dan tools."
-                items={general}
-              />
+              <TechGroup label="GENERAL" items={general} tagVariant="dark" />
             )}
             {ai.length > 0 && (
-              <TechGroup
-                label="AI"
-                description="Tools dan model AI."
-                items={ai}
-              />
+              <TechGroup label="AI" items={ai} tagVariant="light" />
             )}
           </div>
         )}
@@ -80,50 +59,31 @@ export function Technologies({ technologies }: TechnologiesProps) {
 
 function TechGroup({
   label,
-  description,
   items,
+  tagVariant,
 }: {
   label: string;
-  description: string;
   items: Technology[];
+  tagVariant: "dark" | "light";
 }) {
   return (
     <Reveal>
-      <div className="mb-6 flex items-baseline gap-3">
-        <h3 className="text-lg font-semibold text-foreground">{label}</h3>
-        <span className="text-sm text-muted">{description}</span>
-      </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {items.map((tech) => {
-          const Icon = getIcon(tech.icon);
-          return (
-            <div
-              key={tech.id}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-surface p-4 transition-all hover:border-accent/30 hover:shadow-[0_2px_12px_rgba(0,102,255,0.06)]"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-alt text-muted transition-colors group-hover:bg-accent/10 group-hover:text-accent">
-                <Icon size={18} strokeWidth={1.5} />
-              </span>
-              <span className="text-sm font-medium text-foreground">
-                {tech.name}
-              </span>
-            </div>
-          );
-        })}
+      <h3
+        className="mb-6 font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-background/60"
+        style={{ fontFamily: "var(--font-mono-jb)" }}
+      >
+        {label}
+      </h3>
+      <div className="flex flex-wrap gap-3">
+        {items.map((tech) => (
+          <span
+            key={tech.id}
+            className={tagVariant === "dark" ? "tag tag-dark" : "tag tag-light"}
+          >
+            {tech.name}
+          </span>
+        ))}
       </div>
     </Reveal>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="rounded-xl border border-dashed border-border-strong bg-surface p-12 text-center">
-      <p className="text-base font-medium text-foreground/70">
-        Belum ada data teknologi.
-      </p>
-      <p className="mt-2 text-sm text-muted">
-        Data akan muncul setelah ditambahkan melalui panel admin.
-      </p>
-    </div>
   );
 }

@@ -1,64 +1,113 @@
 import Image from "next/image";
+import { ArrowDown, ArrowRight, Download, Sparkles } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
-function generateMarqueeItems(name: string, count: number) {
-  return Array.from({ length: count }, (_, i) => (
-    <span
-      key={i}
-      className="text-outline select-none whitespace-nowrap font-extrabold leading-none tracking-tighter text-foreground"
-      style={{ fontSize: "clamp(4rem, 12vw, 13rem)" }}
-    >
-      {name}
-    </span>
-  ));
-}
-
 export function Hero() {
+  const [firstName, ...rest] = siteConfig.author.name.trim().split(/\s+/);
+  const lastName = rest.join(" ");
+
   return (
     <section
       id="beranda"
-      className="relative flex min-h-screen items-end justify-center overflow-hidden bg-background"
+      className="relative overflow-hidden bg-dark"
+      style={{ minHeight: 760 }}
     >
-      {/* Marquee — behind the photo, z-0 */}
-      <div className="pointer-events-none absolute inset-0 z-0 flex items-center">
-        <div
-          className="animate-marquee flex items-center gap-8 whitespace-nowrap"
-          style={{
-            "--marquee-duration": "28s",
-            maskImage:
-              "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-          } as React.CSSProperties}
-        >
-          {generateMarqueeItems(siteConfig.author.name, 8)}
-          {generateMarqueeItems(siteConfig.author.name, 8)}
-        </div>
+      <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-6 pb-20 pt-[150px] sm:px-10 lg:grid-cols-[1fr_auto] lg:px-20 lg:pt-[148px]">
+        {/* ---- Kiri: tagline + headline + CTA ---- */}
+        <RevealWrapper>
+          <div className="space-y-8">
+            {/* Role tag */}
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-border-strong py-2 pl-3.5 pr-4">
+              <span className="size-1.5 rounded-full bg-accent" aria-hidden />
+              <span
+                className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-dark-muted"
+                style={{ fontFamily: "var(--font-mono-jb)" }}
+              >
+                {siteConfig.author.role}
+              </span>
+            </div>
+
+            {/* Headline */}
+            <h1
+              className="font-display text-[58px] font-semibold leading-[0.95] tracking-tight text-background sm:text-[108px] lg:text-[128px]"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {firstName}
+              <br />
+              {lastName}
+            </h1>
+
+            {/* Subhead */}
+            <p className="max-w-[46ch] text-lg leading-relaxed text-dark-muted">
+              {siteConfig.description}
+            </p>
+
+            {/* CTA row */}
+            <div className="flex flex-wrap gap-4">
+              <a href="#proyek" className="btn btn-primary">
+                Lihat Karya
+                <ArrowRight size={16} />
+              </a>
+              <a
+                href={siteConfig.cvUrl || undefined}
+                className="btn btn-on-dark"
+              >
+                Unduh CV
+                <Download size={16} />
+              </a>
+            </div>
+          </div>
+        </RevealWrapper>
+
+        {/* ---- Kanan: foto + frame lime + chip statistik ---- */}
+        <RevealWrapper>
+          <div className="relative mx-auto w-[300px] sm:w-[400px]">
+            {/* Lime frame (offset 24,24) */}
+            <div
+              aria-hidden
+              className="absolute left-6 top-6 h-[520px] w-[400px] rounded-[28px] bg-accent"
+            />
+            <div className="relative h-[520px] w-[300px] sm:w-[400px]">
+              <Image
+                src={siteConfig.author.image}
+                alt={`Foto ${siteConfig.author.name}`}
+                fill
+                priority
+                sizes="(max-width: 640px) 300px, 400px"
+                className="rounded-[28px] object-cover"
+              />
+            </div>
+
+            {/* Stat chip */}
+            <div className="absolute -bottom-6 -left-4 flex items-center gap-2.5 rounded-full border border-border-strong bg-background py-3 pl-3.5 pr-5 shadow-[0_16px_40px_rgba(21,20,15,0.35)] sm:-left-8">
+              <span className="flex size-8 items-center justify-center rounded-full bg-accent text-accent-ink">
+                <Sparkles size={15} />
+              </span>
+              <span
+                className="font-mono text-[11px] font-semibold text-foreground"
+                style={{ fontFamily: "var(--font-mono-jb)" }}
+              >
+                {siteConfig.stats.experience} {siteConfig.stats.experienceLabel}
+              </span>
+            </div>
+          </div>
+        </RevealWrapper>
       </div>
 
-      {/* Portrait — centered, above marquee */}
-      <div className="animate-fade-in-up relative z-10 h-[26rem] w-[19rem] opacity-0 sm:h-[34rem] sm:w-[24rem] md:h-[46rem] md:w-[30rem]">
-        <Image
-          src={siteConfig.author.image}
-          alt={`Foto ${siteConfig.author.name}`}
-          fill
-          priority
-          sizes="(max-width: 768px) 18rem, 24rem"
-          className="object-cover"
-        />
-      </div>
-
-      {/* Scroll indicator — right edge */}
-      <div className="absolute right-4 bottom-8 z-10 hidden flex-col items-center gap-3 sm:flex md:right-8">
+      {/* Scroll cue — kiri bawah */}
+      <div className="absolute bottom-8 left-10 hidden flex-col items-center gap-4 lg:flex">
         <span
-          aria-hidden
-          className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-light"
-          style={{ writingMode: "vertical-rl" }}
+          className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-dark-muted"
+          style={{ writingMode: "vertical-rl", fontFamily: "var(--font-mono-jb)" }}
         >
           Scroll
         </span>
-        <span className="block h-8 w-px bg-border-strong" />
+        <ArrowDown size={14} className="text-dark-muted" />
       </div>
     </section>
   );
+}
+
+function RevealWrapper({ children }: { children: React.ReactNode }) {
+  return <div className="animate-fade-in-up">{children}</div>;
 }

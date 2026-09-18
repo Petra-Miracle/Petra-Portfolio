@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Pencil, Trash2, X } from "lucide-react";
+import { Layers, Pencil, Plus, Trash2 } from "lucide-react";
 import type { Technology, TechnologyCategory } from "@/lib/types";
 import {
   createTechnology,
@@ -13,12 +13,15 @@ import {
 } from "@/lib/admin-api";
 import {
   Badge,
+  EmptyState,
   ErrorBanner,
   Field,
   IconButton,
-  SecondaryButton,
-  SelectInput,
-  SubmitButton,
+  Modal,
+  OutlineButton,
+  PageHeader,
+  PrimaryButton,
+  SegmentedControl,
   TextInput,
 } from "@/components/admin/ui";
 
@@ -38,6 +41,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
@@ -57,30 +61,31 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         if (cancelled) return;
         setItems(data);
         setError(null);
-        setLoading(false);
       })
       .catch((err) => {
         if (cancelled) return;
         if (isUnauthorized(err)) {
-          setLoading(false);
           handleUnauthorized();
           return;
         }
         setError(err instanceof Error ? err.message : "Gagal memuat data.");
-        setLoading(false);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
   }, [loadItems]);
 
-  function resetForm() {
+  function openCreate() {
     setEditingId(null);
     setForm(EMPTY_FORM);
     setSubmitError(null);
+    setModalOpen(true);
   }
 
-  function startEdit(tech: Technology) {
+  function openEdit(tech: Technology) {
     setEditingId(tech.id);
     setForm({
       name: tech.name,
@@ -88,6 +93,13 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
       icon: tech.icon ?? "",
       order: String(tech.order),
     });
+    setSubmitError(null);
+    setModalOpen(true);
+  }
+
+  function closeModal() {
+    if (saving) return;
+    setModalOpen(false);
     setSubmitError(null);
   }
 
@@ -107,7 +119,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
       } else {
         await createTechnology(token, body);
       }
-      resetForm();
+      setModalOpen(false);
       setItems(await loadItems());
     } catch (err) {
       if (isUnauthorized(err)) {
@@ -126,7 +138,6 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
     if (!window.confirm("Hapus teknologi ini?")) return;
     try {
       await deleteTechnology(token, id);
-      if (editingId === id) resetForm();
       setItems(await loadItems());
     } catch (err) {
       if (isUnauthorized(err)) {
@@ -140,139 +151,56 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5"
-      >
-        <h2 className="text-lg font-semibold">
-          {editingId ? "Edit Teknologi" : "Tambah Teknologi"}
-        </h2>
+    <div>
+      <PageHeader
+        title="Teknologi"
+        subtitle="Kelola daftar teknologi yang ditampilkan di halaman publik."
+        action={
+          <PrimaryButton onClick={openCreate}>
+            <Plus size={16} />
+            Tambah
+          </PrimaryButton>
+        }
+      />
 
-        {submitError ? <ErrorBanner>{submitError}</ErrorBanner> : null}
-
-        <div className="grid gap-4 sm:grid-cols-6">
-          <div className="sm:col-span-3">
-            <Field label="Nama *">
-              <TextInput
-                required
-                value={form.name}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value }))
-                }
-                placeholder="cth: React"
-              />
-            </Field>
-          </div>
-          <div className="sm:col-span-2">
-            <Field label="Kategori">
-              <SelectInput
-                value={form.category}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    category: e.target.value as TechnologyCategory,
-                  }))
-                }
-              >
-                <option value="GENERAL">GENERAL</option>
-                <option value="AI">AI</option>
-              </SelectInput>
-            </Field>
-          </div>
-          <div className="sm:col-span-1">
-            <Field label="Urutan">
-              <TextInput
-                type="number"
-                inputMode="numeric"
-                value={form.order}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, order: e.target.value }))
-                }
-                placeholder="0"
-              />
-            </Field>
-          </div>
-          <div className="sm:col-span-6">
-            <Field label="Icon (opsional)">
-              <TextInput
-                value={form.icon}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, icon: e.target.value }))
-                }
-                placeholder="nama icon atau URL gambar"
-              />
-            </Field>
-          </div>
+      {error ? (
+        <div className="mb-6">
+          <ErrorBanner>{error}</ErrorBanner>
         </div>
+      ) : null}
 
-        <div className="flex flex-wrap items-center gap-3 pt-1">
-          <SubmitButton loading={saving}>
-            {editingId ? "Simpan Perubahan" : "Tambah Data"}
-          </SubmitButton>
-          {editingId ? (
-            <SecondaryButton onClick={resetForm}>
-              <X size={14} />
-              Batal
-            </SecondaryButton>
-          ) : null}
-        </div>
-      </form>
-
-      <div className="overflow-hidden rounded-2xl border border-white/10">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-white/5 text-xs uppercase tracking-wider text-foreground/55">
-            <tr>
-              <th className="px-4 py-3">Nama</th>
-              <th className="px-4 py-3">Kategori</th>
-              <th className="px-4 py-3 text-center">Urutan</th>
-              <th className="px-4 py-3 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {loading ? (
+      {/* ---- Tabel ---- */}
+      {!loading && items.length > 0 ? (
+        <div className="hidden overflow-hidden rounded-[14px] border border-border sm:block">
+          <table className="w-full text-left">
+            <thead className="border-b border-border bg-surface">
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-foreground/50">
-                  Memuat data...
-                </td>
+                <Th>Nama</Th>
+                <Th>Kategori</Th>
+                <Th className="text-center">Urutan</Th>
+                <Th className="text-right">Aksi</Th>
               </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-foreground/50">
-                  Belum ada data. Tambahkan lewat form di atas.
-                </td>
-              </tr>
-            ) : (
-              items.map((tech) => (
-                <tr
-                  key={tech.id}
-                  className={
-                    editingId === tech.id
-                      ? "bg-blue-500/5"
-                      : "hover:bg-white/[0.03]"
-                  }
-                >
-                  <td className="px-4 py-3 font-medium">{tech.name}</td>
-                  <td className="px-4 py-3">
-                    <Badge tone={tech.category === "AI" ? "purple" : "green"}>
-                      {tech.category}
-                    </Badge>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {items.map((tech) => (
+                <tr key={tech.id} className="transition-colors hover:bg-surface-alt/60">
+                  <td className="px-5 py-[14px] text-sm font-medium text-foreground">
+                    {tech.name}
                   </td>
-                  <td className="px-4 py-3 text-center text-foreground/60">
+                  <td className="px-5 py-[14px]">
+                    <Badge variant={tech.category === "AI" ? "ai" : "general"}>{tech.category}</Badge>
+                  </td>
+                  <td className="px-5 py-[14px] text-center text-sm text-muted">
                     {tech.order}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-5 py-[14px]">
                     <div className="flex justify-end gap-2">
-                      <IconButton
-                        label="Edit"
-                        variant="outline"
-                        onClick={() => startEdit(tech)}
-                      >
+                      <IconButton label="Edit" onClick={() => openEdit(tech)}>
                         <Pencil size={15} />
                       </IconButton>
                       <IconButton
                         label="Hapus"
-                        variant="danger-soft"
+                        variant="danger"
                         onClick={() => handleDelete(tech.id)}
                       >
                         <Trash2 size={15} />
@@ -280,13 +208,143 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
                     </div>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : loading ? (
+        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
+          Memuat data...
+        </div>
+      ) : null}
+
+      {/* ---- Mobile list ---- */}
+      <div className="space-y-3 sm:hidden">
+        {loading ? (
+          <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
+        ) : items.length > 0 ? (
+          items.map((tech) => (
+            <div key={tech.id} className="card flex items-center justify-between gap-3 p-4">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{tech.name}</p>
+                <div className="mt-1.5">
+                  <Badge variant={tech.category === "AI" ? "ai" : "general"}>{tech.category}</Badge>
+                </div>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <IconButton label="Edit" onClick={() => openEdit(tech)}>
+                  <Pencil size={15} />
+                </IconButton>
+                <IconButton
+                  label="Hapus"
+                  variant="danger"
+                  onClick={() => handleDelete(tech.id)}
+                >
+                  <Trash2 size={15} />
+                </IconButton>
+              </div>
+            </div>
+          ))
+        ) : null}
       </div>
 
-      {error ? <ErrorBanner>{error}</ErrorBanner> : null}
+      {/* ---- Empty state (tabel kosong) ---- */}
+      {!loading && items.length === 0 && (
+        <div className="mt-6">
+          <EmptyState
+            icon={<Layers size={22} />}
+            title="Belum ada data teknologi."
+            description="Data teknologi Anda akan tampil di sini setelah ditambahkan."
+            action={
+              <PrimaryButton onClick={openCreate}>
+                <Plus size={16} />
+                Tambah Teknologi
+              </PrimaryButton>
+            }
+          />
+        </div>
+      )}
+
+      {/* ---- Modal form ---- */}
+      <Modal
+        open={modalOpen}
+        onClose={closeModal}
+        title={editingId ? "Edit Teknologi" : "Tambah Teknologi"}
+        footer={
+          <>
+            <OutlineButton onClick={closeModal}>Batal</OutlineButton>
+            <PrimaryButton form="technology-form" type="submit" loading={saving}>
+              {editingId ? "Simpan Perubahan" : "Simpan"}
+            </PrimaryButton>
+          </>
+        }
+      >
+        {submitError ? (
+          <div className="mb-4">
+            <ErrorBanner>{submitError}</ErrorBanner>
+          </div>
+        ) : null}
+
+        <form id="technology-form" onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Nama *" className="sm:col-span-2">
+              <TextInput
+                required
+                autoFocus
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="cth: React"
+              />
+            </Field>
+
+            <Field label="Kategori" className="sm:col-span-2">
+              <SegmentedControl
+                value={form.category}
+                onChange={(v) => setForm((f) => ({ ...f, category: v }))}
+                options={[
+                  { value: "GENERAL", label: "GENERAL" },
+                  { value: "AI", label: "AI" },
+                ]}
+              />
+            </Field>
+
+            <Field label="Urutan">
+              <TextInput
+                type="number"
+                inputMode="numeric"
+                value={form.order}
+                onChange={(e) => setForm((f) => ({ ...f, order: e.target.value }))}
+                placeholder="0"
+              />
+            </Field>
+          </div>
+
+          <Field label="Icon (opsional)" hint="Nama icon atau URL gambar.">
+            <TextInput
+              value={form.icon}
+              onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))}
+              placeholder="cth: globe"
+            />
+          </Field>
+        </form>
+      </Modal>
     </div>
+  );
+}
+
+function Th({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <th
+      className={`px-5 py-[14px] font-mono text-[11px] font-semibold uppercase tracking-wider text-muted ${className}`}
+      style={{ fontFamily: "var(--font-mono-jb)" }}
+    >
+      {children}
+    </th>
   );
 }

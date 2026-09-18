@@ -8,8 +8,16 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from "react";
-import { Button } from "@heroui/react";
-import { Image as ImageIcon, Loader2, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
+import {
+  FolderGit2,
+  Image as ImageIcon,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import type { Project, ProjectType } from "@/lib/types";
 import {
   createProject,
@@ -21,13 +29,15 @@ import {
   uploadImage,
 } from "@/lib/admin-api";
 import {
-  Badge,
+  EmptyState,
   ErrorBanner,
   Field,
   IconButton,
-  SecondaryButton,
-  SelectInput,
-  SubmitButton,
+  Modal,
+  OutlineButton,
+  PageHeader,
+  PrimaryButton,
+  SegmentedControl,
   TextArea,
   TextInput,
 } from "@/components/admin/ui";
@@ -53,6 +63,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [techStack, setTechStack] = useState<string[]>([]);
@@ -79,24 +90,24 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         if (cancelled) return;
         setItems(data);
         setError(null);
-        setLoading(false);
       })
       .catch((err) => {
         if (cancelled) return;
         if (isUnauthorized(err)) {
-          setLoading(false);
           handleUnauthorized();
           return;
         }
         setError(err instanceof Error ? err.message : "Gagal memuat data.");
-        setLoading(false);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
   }, [loadItems]);
 
-  function resetForm() {
+  function openCreate() {
     setEditingId(null);
     setForm(EMPTY_FORM);
     setTechStack([]);
@@ -104,9 +115,10 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
     setImagePreview(null);
     setImageError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    setModalOpen(true);
   }
 
-  function startEdit(project: Project) {
+  function openEdit(project: Project) {
     setEditingId(project.id);
     setForm({
       title: project.title,
@@ -116,7 +128,10 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
       repoUrl: project.repoUrl ?? "",
       imageUrl: project.imageUrl ?? "",
       result: project.result ?? "",
-      year: project.year === null || project.year === undefined ? "" : String(project.year),
+      year:
+        project.year === null || project.year === undefined
+          ? ""
+          : String(project.year),
       order: String(project.order),
     });
     setTechStack(project.techStack ?? []);
@@ -124,6 +139,13 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
     setImagePreview(project.imageUrl ?? null);
     setImageError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    setModalOpen(true);
+  }
+
+  function closeModal() {
+    if (saving || uploadingImage) return;
+    setModalOpen(false);
+    setSubmitError(null);
   }
 
   async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
@@ -197,7 +219,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
       } else {
         await createProject(token, body);
       }
-      resetForm();
+      setModalOpen(false);
       setItems(await loadItems());
     } catch (err) {
       if (isUnauthorized(err)) {
@@ -216,7 +238,6 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
     if (!window.confirm("Hapus data ini?")) return;
     try {
       await deleteProject(token, id);
-      if (editingId === id) resetForm();
       setItems(await loadItems());
     } catch (err) {
       if (isUnauthorized(err)) {
@@ -229,23 +250,174 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
     }
   }
 
+  const sortKey = (p: Project) => p.order;
+
   return (
-    <div className="space-y-6">
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5"
+    <div>
+      <PageHeader
+        title="Project & Kompetisi"
+        subtitle="Kelola karya yang ditampilkan di halaman publik."
+        action={
+          <PrimaryButton onClick={openCreate}>
+            <Plus size={16} />
+            Tambah
+          </PrimaryButton>
+        }
+      />
+
+      {error ? (
+        <div className="mb-6">
+          <ErrorBanner>{error}</ErrorBanner>
+        </div>
+      ) : null}
+
+      {/* ---- Tabel (desktop) ---- */}
+      {!loading && items.length > 0 ? (
+        <div className="hidden overflow-hidden rounded-[14px] border border-border sm:block">
+          <table className="w-full text-left">
+            <thead className="border-b border-border bg-surface">
+              <tr>
+                <Th>Foto</Th>
+                <Th>Judul</Th>
+                <Th>Tipe</Th>
+                <Th className="text-center">Tahun</Th>
+                <Th className="text-right">Aksi</Th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {[...items]
+                .sort((a, b) => sortKey(a) - sortKey(b))
+                .map((project) => (
+                  <tr key={project.id} className="transition-colors hover:bg-surface-alt/60">
+                    <td className="px-5 py-[14px]">
+                      <Thumb project={project} />
+                    </td>
+                    <td className="px-5 py-[14px]">
+                      <p className="text-sm font-medium text-foreground">
+                        {project.title}
+                      </p>
+                      {project.techStack.length > 0 ? (
+                        <p className="mt-1 truncate text-xs text-muted">
+                          {project.techStack.join(" · ")}
+                        </p>
+                      ) : null}
+                    </td>
+                    <td className="px-5 py-[14px]">
+                      <TypeTag type={project.type} />
+                    </td>
+                    <td className="px-5 py-[14px] text-center text-sm text-muted">
+                      {project.year ?? "—"}
+                    </td>
+                    <td className="px-5 py-[14px]">
+                      <div className="flex justify-end gap-2">
+                        <IconButton label="Edit" onClick={() => openEdit(project)}>
+                          <Pencil size={15} />
+                        </IconButton>
+                        <IconButton
+                          label="Hapus"
+                          variant="danger"
+                          onClick={() => handleDelete(project.id)}
+                        >
+                          <Trash2 size={15} />
+                        </IconButton>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      ) : loading ? (
+        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
+          Memuat data...
+        </div>
+      ) : null}
+
+      {/* ---- Mobile list ---- */}
+      <div className="space-y-3 sm:hidden">
+        {loading ? (
+          <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
+        ) : items.length > 0 ? (
+          items.map((project) => (
+            <div key={project.id} className="card p-4">
+              <div className="flex items-start gap-3">
+                <Thumb project={project} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {project.title}
+                  </p>
+                  <div className="mt-1.5">
+                    <TypeTag type={project.type} />
+                  </div>
+                  {project.year ? (
+                    <p className="mt-1 text-xs text-muted">{project.year}</p>
+                  ) : null}
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <IconButton label="Edit" onClick={() => openEdit(project)}>
+                    <Pencil size={15} />
+                  </IconButton>
+                  <IconButton
+                    label="Hapus"
+                    variant="danger"
+                    onClick={() => handleDelete(project.id)}
+                  >
+                    <Trash2 size={15} />
+                  </IconButton>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : null}
+      </div>
+
+      {/* ---- Empty state ---- */}
+      {!loading && items.length === 0 && (
+        <div className="mt-6">
+          <EmptyState
+            icon={<FolderGit2 size={22} />}
+            title="Belum ada data project."
+            description="Data project dan kompetisi Anda akan tampil di sini setelah ditambahkan."
+            action={
+              <PrimaryButton onClick={openCreate}>
+                <Plus size={16} />
+                Tambah Project
+              </PrimaryButton>
+            }
+          />
+        </div>
+      )}
+
+      {/* ---- Modal form ---- */}
+      <Modal
+        open={modalOpen}
+        onClose={closeModal}
+        title={editingId ? "Edit Project" : "Tambah Project"}
+        footer={
+          <>
+            <OutlineButton onClick={closeModal}>Batal</OutlineButton>
+            <PrimaryButton
+              form="project-form"
+              type="submit"
+              loading={saving || uploadingImage}
+            >
+              {editingId ? "Simpan Perubahan" : "Simpan"}
+            </PrimaryButton>
+          </>
+        }
       >
-        <h2 className="text-lg font-semibold">
-          {editingId ? "Edit Data" : "Tambah Data"}
-        </h2>
+        {submitError ? (
+          <div className="mb-4">
+            <ErrorBanner>{submitError}</ErrorBanner>
+          </div>
+        ) : null}
 
-        {submitError ? <ErrorBanner>{submitError}</ErrorBanner> : null}
-
-        <div className="grid gap-4 sm:grid-cols-6">
-          <div className="sm:col-span-4">
-            <Field label="Judul *">
+        <form id="project-form" onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Judul *" className="sm:col-span-2">
               <TextInput
                 required
+                autoFocus
                 value={form.title}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, title: e.target.value }))
@@ -253,26 +425,19 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 placeholder="cth: Aplikasi Absensi"
               />
             </Field>
-          </div>
-          <div className="sm:col-span-2">
-            <Field label="Tipe">
-              <SelectInput
-                value={form.type}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    type: e.target.value as ProjectType,
-                  }))
-                }
-              >
-                <option value="PROJECT">PROJECT</option>
-                <option value="COMPETITION">COMPETITION</option>
-              </SelectInput>
-            </Field>
-          </div>
 
-          <div className="sm:col-span-6">
-            <Field label="Deskripsi *">
+            <Field label="Tipe" className="sm:col-span-2">
+              <SegmentedControl
+                value={form.type}
+                onChange={(v) => setForm((f) => ({ ...f, type: v }))}
+                options={[
+                  { value: "PROJECT", label: "Project" },
+                  { value: "COMPETITION", label: "Kompetisi" },
+                ]}
+              />
+            </Field>
+
+            <Field label="Deskripsi *" className="sm:col-span-2">
               <TextArea
                 required
                 rows={3}
@@ -283,10 +448,8 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 placeholder="Deskripsi singkat"
               />
             </Field>
-          </div>
 
-          <div className="sm:col-span-6">
-            <Field label="Tech Stack">
+            <Field label="Tech Stack" className="sm:col-span-2">
               <div className="flex gap-2">
                 <TextInput
                   value={techInput}
@@ -299,39 +462,33 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                   }}
                   placeholder="cth: React, lalu tekan Enter"
                 />
-                <SecondaryButton
-                  type="button"
-                  onClick={addTech}
-                  className="shrink-0"
-                >
+                <OutlineButton type="button" onClick={addTech} className="shrink-0">
                   <Plus size={15} />
                   Tambah
-                </SecondaryButton>
+                </OutlineButton>
               </div>
-            </Field>
-            {techStack.length > 0 ? (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {techStack.map((tech, i) => (
-                  <span
-                    key={`${tech}-${i}`}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1 text-xs text-foreground/75 ring-1 ring-white/10"
-                  >
-                    {tech}
-                    <button
-                      type="button"
-                      onClick={() => removeTech(i)}
-                      className="text-foreground/50 transition-colors hover:text-red-300"
-                      aria-label={`Hapus ${tech}`}
+              {techStack.length > 0 ? (
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  {techStack.map((tech, i) => (
+                    <span
+                      key={`${tech}-${i}`}
+                      className="tag tag-light"
                     >
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : null}
-          </div>
+                      {tech}
+                      <button
+                        type="button"
+                        onClick={() => removeTech(i)}
+                        className="ml-1.5 text-muted transition-colors hover:text-danger"
+                        aria-label={`Hapus ${tech}`}
+                      >
+                        <X size={11} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </Field>
 
-          <div className="sm:col-span-2">
             <Field label="Demo URL">
               <TextInput
                 type="url"
@@ -342,8 +499,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 placeholder="https://..."
               />
             </Field>
-          </div>
-          <div className="sm:col-span-2">
+
             <Field label="Repo URL">
               <TextInput
                 type="url"
@@ -354,23 +510,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 placeholder="https://..."
               />
             </Field>
-          </div>
-          <div className="sm:col-span-2">
+
             <Field label="Foto Project">
-              <div className="flex items-center gap-3">
-                {imagePreview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={imagePreview}
-                    alt="Preview foto project"
-                    className="h-16 w-16 shrink-0 rounded-lg object-cover ring-1 ring-white/10"
-                  />
-                ) : (
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-white/15 text-foreground/30">
-                    <ImageIcon size={20} />
-                  </div>
-                )}
-                <div className="flex flex-col items-start gap-1.5">
+              <div className="flex items-center gap-4">
+                <Thumb project={{ imageUrl: imagePreview }} />
+                <div className="flex flex-col items-start gap-2">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -379,12 +523,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                     disabled={uploadingImage}
                     onChange={handleImageChange}
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="outline"
-                    size="sm"
-                    isDisabled={uploadingImage}
-                    onPress={() => fileInputRef.current?.click()}
+                    className="btn btn-outline btn-sm"
+                    disabled={uploadingImage}
+                    onClick={() => fileInputRef.current?.click()}
                   >
                     {uploadingImage ? (
                       <Loader2 size={14} className="animate-spin" />
@@ -396,28 +539,25 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                       : imagePreview
                         ? "Ganti Foto"
                         : "Pilih Foto"}
-                  </Button>
+                  </button>
                   {imagePreview ? (
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
-                      onPress={clearImage}
+                      className="btn btn-ghost btn-sm text-danger"
+                      onClick={clearImage}
                     >
                       Hapus foto
-                    </Button>
+                    </button>
                   ) : null}
                 </div>
               </div>
               {imageError ? (
-                <span className="mt-1.5 block text-xs text-red-300">
+                <span className="mt-2 block text-xs text-danger">
                   {imageError}
                 </span>
               ) : null}
             </Field>
-          </div>
 
-          <div className="sm:col-span-3">
             <Field label="Hasil (khusus kompetisi)">
               <TextInput
                 value={form.result}
@@ -427,8 +567,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 placeholder="cth: Juara 1"
               />
             </Field>
-          </div>
-          <div className="sm:col-span-2">
+
             <Field label="Tahun">
               <TextInput
                 type="number"
@@ -440,8 +579,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 placeholder="cth: 2026"
               />
             </Field>
-          </div>
-          <div className="sm:col-span-1">
+
             <Field label="Urutan">
               <TextInput
                 type="number"
@@ -454,104 +592,54 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               />
             </Field>
           </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 pt-1">
-          <SubmitButton loading={saving || uploadingImage}>
-            {editingId ? "Simpan Perubahan" : "Tambah Data"}
-          </SubmitButton>
-          {editingId ? (
-            <SecondaryButton onClick={resetForm}>
-              <X size={14} />
-              Batal
-            </SecondaryButton>
-          ) : null}
-        </div>
-      </form>
-
-      <div className="overflow-hidden rounded-2xl border border-white/10">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-white/5 text-xs uppercase tracking-wider text-foreground/55">
-            <tr>
-              <th className="px-4 py-3">Judul</th>
-              <th className="px-4 py-3">Tipe</th>
-              <th className="px-4 py-3 text-center">Tahun</th>
-              <th className="px-4 py-3 text-center">Urutan</th>
-              <th className="px-4 py-3 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {loading ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-foreground/50">
-                  Memuat data...
-                </td>
-              </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-foreground/50">
-                  Belum ada data. Tambahkan lewat form di atas.
-                </td>
-              </tr>
-            ) : (
-              items.map((project) => (
-                <tr
-                  key={project.id}
-                  className={
-                    editingId === project.id
-                      ? "bg-blue-500/5"
-                      : "hover:bg-white/[0.03]"
-                  }
-                >
-                  <td className="px-4 py-3">
-                    <span className="font-medium">{project.title}</span>
-                    {project.result ? (
-                      <span className="mt-0.5 block text-xs text-blue-300">
-                        {project.result}
-                      </span>
-                    ) : null}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      tone={
-                        project.type === "COMPETITION" ? "purple" : "blue"
-                      }
-                    >
-                      {project.type}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-center text-foreground/60">
-                    {project.year ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-center text-foreground/60">
-                    {project.order}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-2">
-                      <IconButton
-                        label="Edit"
-                        variant="outline"
-                        onClick={() => startEdit(project)}
-                      >
-                        <Pencil size={15} />
-                      </IconButton>
-                      <IconButton
-                        label="Hapus"
-                        variant="danger-soft"
-                        onClick={() => handleDelete(project.id)}
-                      >
-                        <Trash2 size={15} />
-                      </IconButton>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {error ? <ErrorBanner>{error}</ErrorBanner> : null}
+        </form>
+      </Modal>
     </div>
   );
+}
+
+/* ------------------------------------------------------------------
+   Helpers
+------------------------------------------------------------------- */
+
+function Th({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <th
+      className={`px-5 py-[14px] font-mono text-[11px] font-semibold uppercase tracking-wider text-muted ${className}`}
+      style={{ fontFamily: "var(--font-mono-jb)" }}
+    >
+      {children}
+    </th>
+  );
+}
+
+function Thumb({ project }: { project: { imageUrl: string | null } }) {
+  if (project.imageUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={project.imageUrl}
+        alt=""
+        className="size-11 shrink-0 rounded-[8px] border border-border object-cover"
+      />
+    );
+  }
+  return (
+    <span className="flex size-11 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface-alt text-muted">
+      <ImageIcon size={16} />
+    </span>
+  );
+}
+
+function TypeTag({ type }: { type: ProjectType }) {
+  if (type === "COMPETITION") {
+    return <span className="badge-success">KOMPETISI</span>;
+  }
+  return <span className="badge-neutral">PROJECT</span>;
 }
