@@ -5,7 +5,7 @@ import Image from "next/image";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { MarqueeRow } from "@/components/MarqueeRow";
-import { ExternalLink, Trophy, X } from "lucide-react";
+import { ExternalLink, FolderGit2, Trophy, X } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 
 interface ProjectsProps {
@@ -68,11 +68,13 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 }
 
 /* ------------------------------------------------------------------
-   Project card — 300x354, paper-dim
+   Project card — 300x400, paper-dim
 ------------------------------------------------------------------- */
 
 function ProjectCard({ project }: { project: Project }) {
   const [detailOpen, setDetailOpen] = useState(false);
+  const visibleTags = project.techStack.slice(0, 3);
+  const extra = project.techStack.length - visibleTags.length;
 
   return (
     <>
@@ -87,7 +89,7 @@ function ProjectCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="mr-6 flex h-[354px] w-[300px] shrink-0 cursor-pointer flex-col overflow-hidden rounded-[14px] border border-border bg-surface-alt transition-shadow hover:shadow-[0_16px_40px_rgba(21,20,15,0.12)]"
+        className="mr-6 flex h-[400px] w-[300px] shrink-0 cursor-pointer flex-col overflow-hidden rounded-[14px] border border-border bg-surface-alt transition-shadow hover:shadow-[0_16px_40px_rgba(21,20,15,0.12)]"
       >
         {/* Foto 170px */}
         <div className="relative h-[170px] shrink-0 overflow-hidden">
@@ -114,11 +116,33 @@ function ProjectCard({ project }: { project: Project }) {
           >
             {project.title}
           </h3>
-          <p className="mt-2 line-clamp-3 flex-1 text-[13px] leading-relaxed text-muted">
+          <p className="mt-2 line-clamp-2 shrink-0 text-[13px] leading-relaxed text-muted">
             {project.description}
           </p>
 
-          <div className="mt-4 flex items-center gap-2.5">
+          {visibleTags.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {visibleTags.map((tech, i) => (
+                <span
+                  key={`${project.id}-${i}`}
+                  className="rounded-[6px] border border-border bg-surface px-2 py-1 font-mono text-[11px] text-muted"
+                  style={{ fontFamily: "var(--font-mono-jb)" }}
+                >
+                  {tech}
+                </span>
+              ))}
+              {extra > 0 ? (
+                <span
+                  className="rounded-[6px] border border-border bg-surface px-2 py-1 font-mono text-[11px] text-muted"
+                  style={{ fontFamily: "var(--font-mono-jb)" }}
+                >
+                  +{extra}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="mt-auto flex items-center gap-2.5 pt-4">
             {project.demoUrl ? (
               <a
                 href={project.demoUrl}
@@ -157,12 +181,12 @@ function ProjectCard({ project }: { project: Project }) {
 }
 
 /* ------------------------------------------------------------------
-   Competition card — 300x210, ink-soft
+   Competition card — 300x230, ink-soft
 ------------------------------------------------------------------- */
 
 function CompetitionCard({ project }: { project: Project }) {
   const [detailOpen, setDetailOpen] = useState(false);
-  const visibleTags = project.techStack.slice(0, 3);
+  const visibleTags = project.techStack.slice(0, 2);
   const extra = project.techStack.length - visibleTags.length;
 
   return (
@@ -178,7 +202,7 @@ function CompetitionCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="mr-6 flex h-[210px] w-[300px] shrink-0 cursor-pointer flex-col rounded-[14px] bg-dark-surface p-5 transition-shadow hover:shadow-[0_16px_40px_rgba(0,0,0,0.35)]"
+        className="mr-6 flex h-[230px] w-[300px] shrink-0 cursor-pointer flex-col rounded-[14px] bg-dark-surface p-5 transition-shadow hover:shadow-[0_16px_40px_rgba(0,0,0,0.35)]"
       >
         <div className="flex items-center justify-between">
           <span className="flex size-10 items-center justify-center rounded-[10px] bg-dark text-accent">
@@ -262,6 +286,13 @@ function ProjectDetailModal({
     };
   }, [onClose]);
 
+  const isCompetition = project.type === "COMPETITION";
+  const HeaderIcon = isCompetition ? Trophy : FolderGit2;
+  const metaParts = [
+    project.year ? String(project.year) : null,
+    project.result,
+  ].filter(Boolean);
+
   return (
     <div
       className="modal-scrim"
@@ -271,55 +302,54 @@ function ProjectDetailModal({
       onClick={onClose}
     >
       <div
-        className="modal-panel max-w-[600px]"
+        className="modal-panel max-w-[420px] rounded-[28px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative h-[240px] w-full shrink-0 overflow-hidden bg-surface sm:h-[320px]">
-          {project.imageUrl ? (
-            <Image
-              src={project.imageUrl}
-              alt={project.title}
-              fill
-              sizes="600px"
-              className="object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <Trophy size={32} className="text-muted" strokeWidth={1} />
+        {/* Header — icon + heading, close trigger */}
+        <div className="flex items-start justify-between gap-4 p-6 pb-0">
+          <div className="flex items-center gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-surface-alt text-foreground">
+              <HeaderIcon size={18} />
+            </span>
+            <div>
+              <h3
+                className="font-display text-lg font-semibold leading-snug tracking-tight text-foreground"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {project.title}
+              </h3>
+              {metaParts.length > 0 ? (
+                <p
+                  className="mt-0.5 font-mono text-xs text-muted"
+                  style={{ fontFamily: "var(--font-mono-jb)" }}
+                >
+                  {metaParts.join(" · ")}
+                </p>
+              ) : null}
             </div>
-          )}
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="btn btn-icon btn-ghost absolute right-3 top-3 bg-background/90"
+            className="btn btn-icon btn-ghost shrink-0"
           >
             <X size={16} />
           </button>
         </div>
 
-        <div className="p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <h3
-              className="font-display text-xl font-semibold tracking-tight text-foreground"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              {project.title}
-            </h3>
-            {project.result ? (
-              <span className="badge-success shrink-0">
-                <Trophy size={12} />
-                {project.result}
-              </span>
-            ) : null}
-          </div>
-          {project.year ? (
-            <p
-              className="mt-1 font-mono text-xs text-muted"
-              style={{ fontFamily: "var(--font-mono-jb)" }}
-            >
-              {project.year}
-            </p>
+        {/* Body */}
+        <div className="px-6 pt-4">
+          {project.imageUrl ? (
+            <div className="relative h-[190px] w-full overflow-hidden rounded-[16px] bg-surface">
+              <Image
+                src={project.imageUrl}
+                alt={project.title}
+                fill
+                sizes="420px"
+                className="object-cover"
+              />
+            </div>
           ) : null}
 
           <p className="mt-4 text-sm leading-relaxed text-muted">
@@ -335,34 +365,37 @@ function ProjectDetailModal({
               ))}
             </div>
           ) : null}
-
-          {project.demoUrl || project.repoUrl ? (
-            <div className="mt-6 flex flex-wrap gap-3">
-              {project.demoUrl ? (
-                <a
-                  href={project.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary btn-sm"
-                >
-                  <ExternalLink size={14} />
-                  Buka Demo
-                </a>
-              ) : null}
-              {project.repoUrl ? (
-                <a
-                  href={project.repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline btn-sm"
-                >
-                  <SocialIcon name="github" className="size-3.5" />
-                  Lihat Repo
-                </a>
-              ) : null}
-            </div>
-          ) : null}
         </div>
+
+        {/* Footer */}
+        {project.demoUrl || project.repoUrl ? (
+          <div className="flex flex-col gap-2 p-6 pt-5">
+            {project.demoUrl ? (
+              <a
+                href={project.demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary w-full"
+              >
+                <ExternalLink size={14} />
+                Buka Demo
+              </a>
+            ) : null}
+            {project.repoUrl ? (
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline w-full"
+              >
+                <SocialIcon name="github" className="size-3.5" />
+                Lihat Repo
+              </a>
+            ) : null}
+          </div>
+        ) : (
+          <div className="pb-6" />
+        )}
       </div>
     </div>
   );
