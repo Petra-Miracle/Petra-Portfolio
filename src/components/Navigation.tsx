@@ -43,35 +43,36 @@ export function Navigation() {
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between rounded-full bg-dark px-3 py-3 pl-6 shadow-[0_8px_40px_rgba(21,20,15,0.35)]">
-        {/* Logo — inisial + titik */}
-        <a
-          href="#beranda"
-          className="font-mono text-[15px] font-semibold leading-none tracking-tight text-accent"
-          style={{ fontFamily: "var(--font-mono-jb)" }}
-        >
-          {initials(siteConfig.author.name)}.
-        </a>
+    <header className="fixed inset-x-0 top-0 z-50 bg-dark">
+      <nav className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-6 sm:px-10 lg:px-20">
+        {/* Left: logo + nav links */}
+        <div className="flex items-center gap-10">
+          <a
+            href="#beranda"
+            className="font-mono text-[15px] font-semibold leading-none tracking-tight text-accent"
+            style={{ fontFamily: "var(--font-mono-jb)" }}
+          >
+            {initials(siteConfig.author.name)}.
+          </a>
 
-        {/* Center nav links — desktop */}
-        <div className="hidden items-center gap-6 md:flex">
-          {siteConfig.navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className={`text-sm font-medium transition-colors ${
-                active === link.href
-                  ? "text-background"
-                  : "text-dark-muted hover:text-background/80"
-              }`}
-            >
-              {link.label}
-            </a>
-          ))}
+          <div className="hidden items-center gap-8 md:flex">
+            {siteConfig.navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium transition-colors ${
+                  active === link.href
+                    ? "text-background"
+                    : "text-dark-muted hover:text-background/80"
+                }`}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
 
-        {/* Right: CTA + hamburger */}
+        {/* Right: CTA (desktop) + hamburger (mobile) */}
         <div className="flex items-center gap-1">
           <a
             href="#kontak"
@@ -94,22 +95,24 @@ export function Navigation() {
 
       {/* Mobile dropdown */}
       {mobileOpen && (
-        <div className="mx-auto mt-2 max-w-5xl space-y-1 rounded-3xl bg-dark p-3 shadow-[0_8px_40px_rgba(21,20,15,0.35)] md:hidden">
-          {siteConfig.navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={closeMobile}
-              className={`block rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                active === link.href
-                  ? "bg-dark-surface text-background"
-                  : "text-dark-muted hover:bg-dark-surface/60 hover:text-background"
-              }`}
-            >
-              {link.label}
-            </a>
-          ))}
-          <div className="px-2 pt-1 pb-2">
+        <div className="border-t border-border-strong bg-dark px-6 py-4 md:hidden">
+          <div className="space-y-1">
+            {siteConfig.navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={closeMobile}
+                className={`block rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+                  active === link.href
+                    ? "bg-dark-surface text-background"
+                    : "text-dark-muted hover:bg-dark-surface/60 hover:text-background"
+                }`}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+          <div className="pt-3">
             <a
               href="#kontak"
               onClick={closeMobile}

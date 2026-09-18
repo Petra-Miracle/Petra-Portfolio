@@ -266,6 +266,7 @@ body {
 /* ============================================================
    Buttons
    ============================================================ */
+@layer components {
 .btn {
   display: inline-flex;
   align-items: center;
@@ -664,4 +665,5 @@ body {
   background: var(--dark);
   border-color: var(--dark);
   color: var(--background);
+}
 }
