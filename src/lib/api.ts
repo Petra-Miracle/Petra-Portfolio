@@ -1,4 +1,4 @@
-import type { Project, ProjectType, Technology } from "@/lib/types";
+import type { Project, ProjectType, SiteSettings, Technology } from "@/lib/types";
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
@@ -64,4 +64,12 @@ export async function fetchAllProjects(): Promise<{
     fetchProjects("COMPETITION"),
   ]);
   return { projects, competitions };
+}
+
+export async function fetchSiteSettings(): Promise<SiteSettings> {
+  try {
+    return await get<SiteSettings>("/api/settings");
+  } catch {
+    return { cvUrl: null };
+  }
 }

@@ -2,16 +2,25 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ExternalLink, FolderGit2, Layers, LogOut, Menu, X } from "lucide-react";
+import {
+  ExternalLink,
+  FolderGit2,
+  Layers,
+  LogOut,
+  Menu,
+  Settings,
+  X,
+} from "lucide-react";
 import { getToken } from "@/lib/admin-api";
 import { TechnologiesManager } from "@/components/admin/TechnologiesManager";
 import { ProjectsManager } from "@/components/admin/ProjectsManager";
+import { SettingsManager } from "@/components/admin/SettingsManager";
 
 interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type SectionKey = "technologies" | "projects";
+type SectionKey = "technologies" | "projects" | "settings";
 
 const initial = "P";
 
@@ -22,6 +31,7 @@ const NAV_ITEMS: {
 }[] = [
   { key: "technologies", label: "Teknologi", icon: Layers },
   { key: "projects", label: "Project & Kompetisi", icon: FolderGit2 },
+  { key: "settings", label: "Pengaturan", icon: Settings },
 ];
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
@@ -106,8 +116,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       <main className="min-w-0 flex-1 px-4 pt-6 pb-16 sm:px-8 md:px-10">
         {section === "technologies" ? (
           <TechnologiesManager token={token} />
-        ) : (
+        ) : section === "projects" ? (
           <ProjectsManager token={token} />
+        ) : (
+          <SettingsManager token={token} />
         )}
       </main>
     </div>

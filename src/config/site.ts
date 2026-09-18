@@ -14,8 +14,7 @@ export const siteConfig = {
     experience: "5+",
     experienceLabel: "TAHUN PENGALAMAN",
   },
-  email: "petra@example.com",
-  cvUrl: "#", // TODO: Ganti dengan link file CV asli
+  email: "petra221106@gmail.com",
   navLinks: [
     { label: "Tentang", href: "#tentang" },
     { label: "Teknologi", href: "#teknologi" },

@@ -2,17 +2,20 @@ import Image from "next/image";
 import { ArrowDown, ArrowRight, Download, Sparkles } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
-export function Hero() {
+interface HeroProps {
+  cvUrl: string | null;
+}
+
+export function Hero({ cvUrl }: HeroProps) {
   const [firstName, ...rest] = siteConfig.author.name.trim().split(/\s+/);
   const lastName = rest.join(" ");
 
   return (
     <section
       id="beranda"
-      className="relative overflow-hidden bg-dark"
-      style={{ minHeight: 760 }}
+      className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-dark"
     >
-      <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-6 pb-20 pt-[150px] sm:px-10 lg:grid-cols-[1fr_auto] lg:px-20 lg:pt-[148px]">
+      <div className="mx-auto grid w-full max-w-[1280px] items-center gap-10 px-6 py-28 sm:px-10 lg:grid-cols-[1fr_auto] lg:px-20">
         {/* ---- Kiri: tagline + headline + CTA ---- */}
         <RevealWrapper>
           <div className="space-y-8">
@@ -48,13 +51,18 @@ export function Hero() {
                 Lihat Karya
                 <ArrowRight size={16} />
               </a>
-              <a
-                href={siteConfig.cvUrl || undefined}
-                className="btn btn-on-dark"
-              >
-                Unduh CV
-                <Download size={16} />
-              </a>
+              {cvUrl ? (
+                <a
+                  href={cvUrl}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-on-dark"
+                >
+                  Unduh CV
+                  <Download size={16} />
+                </a>
+              ) : null}
             </div>
           </div>
         </RevealWrapper>
@@ -95,15 +103,22 @@ export function Hero() {
       </div>
 
       {/* Scroll cue — kiri bawah */}
-      <div className="absolute bottom-8 left-10 hidden flex-col items-center gap-4 lg:flex">
+      <a
+        href="#tentang"
+        aria-label="Scroll ke bagian Tentang"
+        className="group absolute bottom-8 left-10 hidden flex-col items-center gap-4 lg:flex"
+      >
         <span
-          className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-dark-muted"
+          className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-dark-muted transition-colors group-hover:text-background"
           style={{ writingMode: "vertical-rl", fontFamily: "var(--font-mono-jb)" }}
         >
           Scroll
         </span>
-        <ArrowDown size={14} className="text-dark-muted" />
-      </div>
+        <ArrowDown
+          size={14}
+          className="text-dark-muted transition-colors group-hover:text-background animate-bounce"
+        />
+      </a>
     </section>
   );
 }

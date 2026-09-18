@@ -48,3 +48,7 @@ export interface AdminUser {
   id: string;
   email: string;
 }
+
+export interface SiteSettings {
+  cvUrl: string | null;
+}

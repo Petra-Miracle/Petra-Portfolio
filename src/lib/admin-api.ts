@@ -2,6 +2,7 @@ import type {
   AdminUser,
   Project,
   ProjectInput,
+  SiteSettings,
   Technology,
   TechnologyInput,
 } from "@/lib/types";
@@ -184,6 +185,17 @@ export function deleteProject(token: string, id: string): Promise<void> {
   return authedRequest<void>(`/api/projects/${id}`, {
     method: "DELETE",
     token,
+  });
+}
+
+export function updateSiteSettings(
+  token: string,
+  body: { cvUrl: string | null },
+): Promise<SiteSettings> {
+  return authedRequest<SiteSettings>("/api/settings", {
+    method: "PUT",
+    token,
+    body,
   });
 }
 

@@ -13,50 +13,71 @@ interface MarqueeRowProps {
 
 /**
  * Edge-fade + infinite scroll only make sense once the row's content is
- * actually wider than its container. With too few cards to overflow, we
- * fall back to a plain static row instead of fading/duplicating content
- * that has nowhere to scroll.
+ * actually wider than the page's content column — otherwise there's
+ * nothing to scroll and it just looks like a stray/duplicated card.
+ * Below that, cards render as a plain static row aligned to the same
+ * column as the section heading instead of a full-bleed one stuck in
+ * the corner.
+ *
+ * Overflow is measured against a fixed-width sizer (not the actual
+ * container, whose own width changes between the two modes) so the
+ * decision can't flip-flop once it switches.
  */
 export function MarqueeRow({ children, reversed = false }: MarqueeRowProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sizerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [shouldLoop, setShouldLoop] = useState(false);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const sizer = sizerRef.current;
     const content = contentRef.current;
-    if (!container || !content) return;
+    if (!sizer || !content) return;
 
     const check = () => {
-      setShouldLoop(content.scrollWidth > container.clientWidth);
+      setShouldLoop(content.scrollWidth > sizer.clientWidth);
     };
     check();
 
     const ro = new ResizeObserver(check);
-    ro.observe(container);
+    ro.observe(sizer);
     ro.observe(content);
     return () => ro.disconnect();
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="marquee-pause overflow-hidden py-2"
-      style={shouldLoop ? { maskImage: MASK, WebkitMaskImage: MASK } : undefined}
-    >
+    <>
+      {/* Invisible, fixed-width reference matching the heading's content column. */}
       <div
-        className={`flex w-max ${shouldLoop ? (reversed ? "animate-marquee-reverse" : "animate-marquee") : ""}`}
-        style={{ "--marquee-duration": MARQUEE_DURATION } as React.CSSProperties}
+        ref={sizerRef}
+        aria-hidden
+        className="mx-auto h-0 max-w-[1280px] overflow-hidden px-6 sm:px-10 lg:px-20"
+      />
+      <div
+        className={
+          shouldLoop
+            ? "marquee-pause overflow-hidden py-2"
+            : "mx-auto max-w-[1280px] overflow-hidden px-6 py-2 sm:px-10 lg:px-20"
+        }
+        style={shouldLoop ? { maskImage: MASK, WebkitMaskImage: MASK } : undefined}
       >
-        <div ref={contentRef} className="flex w-max">
-          {children}
-        </div>
-        {shouldLoop ? (
-          <div className="flex w-max" aria-hidden>
+        <div
+          className={`flex w-max ${shouldLoop ? (reversed ? "animate-marquee-reverse" : "animate-marquee") : ""}`}
+          style={
+            shouldLoop
+              ? ({ "--marquee-duration": MARQUEE_DURATION } as React.CSSProperties)
+              : undefined
+          }
+        >
+          <div ref={contentRef} className="flex w-max">
             {children}
           </div>
-        ) : null}
+          {shouldLoop ? (
+            <div className="flex w-max" aria-hidden>
+              {children}
+            </div>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

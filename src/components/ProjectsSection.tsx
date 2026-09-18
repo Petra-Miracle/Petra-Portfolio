@@ -15,24 +15,19 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
     <section id="proyek" className="overflow-hidden bg-background">
       <div className="mx-auto max-w-[1280px] px-6 pb-[80px] pt-[140px] sm:px-10 lg:px-20">
         <Reveal>
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p
-                className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-muted"
-                style={{ fontFamily: "var(--font-mono-jb)" }}
-              >
-                Karya &amp; Kompetisi
-              </p>
-              <h2
-                className="mt-5 font-display text-4xl font-semibold tracking-tight text-foreground"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                Hasil Karya Terbaik
-              </h2>
-            </div>
-            <span className="text-[13px] text-muted">
-              ◂ berjalan otomatis, tanpa jeda
-            </span>
+          <div>
+            <p
+              className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-muted"
+              style={{ fontFamily: "var(--font-mono-jb)" }}
+            >
+              Karya &amp; Kompetisi
+            </p>
+            <h2
+              className="mt-5 font-display text-4xl font-semibold tracking-tight text-foreground"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              Hasil Karya Terbaik
+            </h2>
           </div>
         </Reveal>
       </div>
