@@ -5,7 +5,7 @@ import type {
   TextareaHTMLAttributes,
 } from "react";
 import { useEffect } from "react";
-import { Loader2, X } from "lucide-react";
+import { ChevronDown, Loader2, X } from "lucide-react";
 
 /* ------------------------------------------------------------------
    Buttons
@@ -173,6 +173,44 @@ export function SegmentedControl<T extends string>({
           {opt.label}
         </button>
       ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------
+   Dropdown select
+------------------------------------------------------------------- */
+
+interface SelectProps<T extends string> {
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (value: T) => void;
+  className?: string;
+  "aria-label"?: string;
+}
+
+export function Select<T extends string>({
+  value,
+  options,
+  onChange,
+  className = "",
+  "aria-label": ariaLabel,
+}: SelectProps<T>) {
+  return (
+    <div className={`select-wrap ${className}`}>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
+        aria-label={ariaLabel}
+        className="select"
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown size={15} className="select-chevron" aria-hidden="true" />
     </div>
   );
 }

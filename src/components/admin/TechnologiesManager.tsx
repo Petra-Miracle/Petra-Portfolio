@@ -22,8 +22,11 @@ import {
   PageHeader,
   PrimaryButton,
   SegmentedControl,
+  Select,
   TextInput,
 } from "@/components/admin/ui";
+
+type CategoryFilter = "ALL" | TechnologyCategory;
 
 interface TechnologiesManagerProps {
   token: string;
@@ -40,6 +43,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
   const [items, setItems] = useState<Technology[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("ALL");
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -150,6 +154,11 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
     }
   }
 
+  const filteredItems =
+    categoryFilter === "ALL"
+      ? items
+      : items.filter((tech) => tech.category === categoryFilter);
+
   return (
     <div>
       <PageHeader
@@ -169,8 +178,28 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         </div>
       ) : null}
 
-      {/* ---- Tabel ---- */}
+      {/* ---- Filter kategori ---- */}
       {!loading && items.length > 0 ? (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <Select
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            aria-label="Filter kategori"
+            className="w-[170px]"
+            options={[
+              { value: "ALL", label: "Semua Kategori" },
+              { value: "GENERAL", label: "General" },
+              { value: "AI", label: "AI" },
+            ]}
+          />
+          <span className="text-xs text-muted">
+            {filteredItems.length} teknologi
+          </span>
+        </div>
+      ) : null}
+
+      {/* ---- Tabel ---- */}
+      {!loading && filteredItems.length > 0 ? (
         <div className="hidden overflow-hidden rounded-[14px] border border-border sm:block">
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
@@ -182,7 +211,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {items.map((tech) => (
+              {filteredItems.map((tech) => (
                 <tr key={tech.id} className="transition-colors hover:bg-surface-alt/60">
                   <td className="px-5 py-[14px] text-sm font-medium text-foreground">
                     {tech.name}
@@ -216,14 +245,18 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         <div className="card hidden p-8 text-center text-sm text-muted sm:block">
           Memuat data...
         </div>
+      ) : items.length > 0 ? (
+        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
+          Tidak ada teknologi pada kategori ini.
+        </div>
       ) : null}
 
       {/* ---- Mobile list ---- */}
       <div className="space-y-3 sm:hidden">
         {loading ? (
           <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
-        ) : items.length > 0 ? (
-          items.map((tech) => (
+        ) : filteredItems.length > 0 ? (
+          filteredItems.map((tech) => (
             <div key={tech.id} className="card flex items-center justify-between gap-3 p-4">
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">{tech.name}</p>
@@ -245,6 +278,10 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
               </div>
             </div>
           ))
+        ) : items.length > 0 ? (
+          <div className="card p-8 text-center text-sm text-muted">
+            Tidak ada teknologi pada kategori ini.
+          </div>
         ) : null}
       </div>
 

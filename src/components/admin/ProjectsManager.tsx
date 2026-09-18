@@ -38,6 +38,7 @@ import {
   PageHeader,
   PrimaryButton,
   SegmentedControl,
+  Select,
   TextArea,
   TextInput,
 } from "@/components/admin/ui";
@@ -45,6 +46,8 @@ import {
 interface ProjectsManagerProps {
   token: string;
 }
+
+type TypeFilter = "ALL" | ProjectType;
 
 const EMPTY_FORM = {
   title: "",
@@ -62,6 +65,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
   const [items, setItems] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -252,6 +256,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
 
   const sortKey = (p: Project) => p.order;
 
+  const filteredItems =
+    typeFilter === "ALL"
+      ? items
+      : items.filter((project) => project.type === typeFilter);
+
   return (
     <div>
       <PageHeader
@@ -271,8 +280,28 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         </div>
       ) : null}
 
-      {/* ---- Tabel (desktop) ---- */}
+      {/* ---- Filter tipe ---- */}
       {!loading && items.length > 0 ? (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <Select
+            value={typeFilter}
+            onChange={setTypeFilter}
+            aria-label="Filter tipe"
+            className="w-[170px]"
+            options={[
+              { value: "ALL", label: "Semua Tipe" },
+              { value: "PROJECT", label: "Project" },
+              { value: "COMPETITION", label: "Kompetisi" },
+            ]}
+          />
+          <span className="text-xs text-muted">
+            {filteredItems.length} item
+          </span>
+        </div>
+      ) : null}
+
+      {/* ---- Tabel (desktop) ---- */}
+      {!loading && filteredItems.length > 0 ? (
         <div className="hidden overflow-hidden rounded-[14px] border border-border sm:block">
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
@@ -285,7 +314,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {[...items]
+              {[...filteredItems]
                 .sort((a, b) => sortKey(a) - sortKey(b))
                 .map((project) => (
                   <tr key={project.id} className="transition-colors hover:bg-surface-alt/60">
@@ -331,14 +360,18 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         <div className="card hidden p-8 text-center text-sm text-muted sm:block">
           Memuat data...
         </div>
+      ) : items.length > 0 ? (
+        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
+          Tidak ada data pada tipe ini.
+        </div>
       ) : null}
 
       {/* ---- Mobile list ---- */}
       <div className="space-y-3 sm:hidden">
         {loading ? (
           <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
-        ) : items.length > 0 ? (
-          items.map((project) => (
+        ) : filteredItems.length > 0 ? (
+          filteredItems.map((project) => (
             <div key={project.id} className="card p-4">
               <div className="flex items-start gap-3">
                 <Thumb project={project} />
@@ -368,6 +401,10 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               </div>
             </div>
           ))
+        ) : items.length > 0 ? (
+          <div className="card p-8 text-center text-sm text-muted">
+            Tidak ada data pada tipe ini.
+          </div>
         ) : null}
       </div>
 
