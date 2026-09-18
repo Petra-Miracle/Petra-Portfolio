@@ -543,10 +543,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                   {imagePreview ? (
                     <button
                       type="button"
-                      className="btn btn-ghost btn-sm text-danger"
+                      className="btn btn-outline btn-sm border-danger text-danger hover:bg-danger-soft"
                       onClick={clearImage}
                     >
-                      Hapus foto
+                      <Trash2 size={14} />
+                      Hapus Foto
                     </button>
                   ) : null}
                 </div>
