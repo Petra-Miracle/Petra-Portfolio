@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "@heroui/styles";
 
 /* ============================================================
    Design Tokens
@@ -352,6 +351,14 @@ body {
   height: 30px;
   padding: 0;
   border-radius: var(--radius-s);
+}
+
+/* Bigger touch targets on mobile — 30px is too small to tap reliably. */
+@media (max-width: 640px) {
+  .btn-icon {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .btn-sm {

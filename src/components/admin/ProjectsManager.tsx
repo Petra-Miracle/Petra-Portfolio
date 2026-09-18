@@ -511,47 +511,68 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               />
             </Field>
 
-            <Field label="Foto Project">
-              <div className="flex items-center gap-4">
-                <Thumb project={{ imageUrl: imagePreview }} />
-                <div className="flex flex-col items-start gap-2">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    disabled={uploadingImage}
-                    onChange={handleImageChange}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-outline btn-sm"
-                    disabled={uploadingImage}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
+            <Field label="Foto Project" className="sm:col-span-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploadingImage}
+                onChange={handleImageChange}
+              />
+              {imagePreview ? (
+                <div className="space-y-3">
+                  <div className="relative h-[160px] w-full overflow-hidden rounded-[14px] border border-border bg-surface">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={imagePreview}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
                     {uploadingImage ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/70">
+                        <Loader2 size={20} className="animate-spin text-foreground" />
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      disabled={uploadingImage}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
                       <Upload size={14} />
-                    )}
-                    {uploadingImage
-                      ? "Mengupload..."
-                      : imagePreview
-                        ? "Ganti Foto"
-                        : "Pilih Foto"}
-                  </button>
-                  {imagePreview ? (
+                      Ganti Foto
+                    </button>
                     <button
                       type="button"
                       className="btn btn-outline btn-sm border-danger text-danger hover:bg-danger-soft"
+                      disabled={uploadingImage}
                       onClick={clearImage}
                     >
                       <Trash2 size={14} />
                       Hapus Foto
                     </button>
-                  ) : null}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <button
+                  type="button"
+                  disabled={uploadingImage}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-border-strong bg-surface-alt text-muted transition-colors hover:border-foreground hover:text-foreground disabled:opacity-60"
+                >
+                  {uploadingImage ? (
+                    <Loader2 size={22} className="animate-spin" />
+                  ) : (
+                    <ImageIcon size={22} />
+                  )}
+                  <span className="text-sm font-medium">
+                    {uploadingImage ? "Mengupload..." : "Ketuk untuk unggah foto"}
+                  </span>
+                </button>
+              )}
               {imageError ? (
                 <span className="mt-2 block text-xs text-danger">
                   {imageError}

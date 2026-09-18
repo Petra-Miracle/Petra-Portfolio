@@ -38,7 +38,29 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen flex-col bg-background md:flex-row">
+      {/* ---- Brand header (mobile) — mirrors the desktop brand panel below ---- */}
+      <div className="bg-dark px-6 pb-10 pt-12 sm:px-10 md:hidden">
+        <div className="flex items-center gap-2">
+          <span
+            className="font-mono text-[15px] font-semibold leading-none text-accent"
+            style={{ fontFamily: "var(--font-mono-jb)" }}
+          >
+            P.
+          </span>
+          <span className="text-sm font-semibold text-background">Admin</span>
+        </div>
+        <h1
+          className="mt-8 font-display text-[28px] font-semibold leading-tight tracking-tight text-background"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          Masuk ke Admin
+        </h1>
+        <p className="mt-2 text-[13px] text-dark-muted">
+          Kelola teknologi dan karya Anda.
+        </p>
+      </div>
+
       {/* ---- Brand panel (desktop) ---- */}
       <aside className="hidden w-[560px] shrink-0 flex-col justify-between bg-dark p-14 md:flex lg:p-16">
         <div className="flex items-center gap-2">
@@ -75,33 +97,28 @@ export default function AdminLoginPage() {
       </aside>
 
       {/* ---- Form panel ---- */}
-      <main className="flex flex-1 items-start justify-center px-6 pb-16 pt-12 sm:px-10 sm:pt-20 md:items-center md:py-12">
+      <main className="flex flex-1 items-start justify-center px-6 pb-16 pt-8 sm:px-10 md:items-center md:py-12 md:pt-12">
         <div className="w-full max-w-sm">
-          {/* Brand (mobile only) */}
-          <div className="mb-10 flex items-center gap-2.5 md:hidden">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-accent font-mono text-[15px] font-semibold leading-none text-accent-ink">
-              P.
-            </span>
-            <span className="text-sm font-semibold text-foreground">Admin</span>
+          {/* Heading (desktop only — mobile shows it in the dark header above) */}
+          <div className="hidden md:block">
+            <h2
+              className="font-display text-[26px] font-semibold tracking-tight text-foreground"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              Masuk ke Admin
+            </h2>
+            <p className="mt-2 text-[13px] text-muted">
+              Masuk untuk mengelola data portfolio.
+            </p>
           </div>
 
-          <h2
-            className="font-display text-[26px] font-semibold tracking-tight text-foreground"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Masuk ke Admin
-          </h2>
-          <p className="mt-2 text-[13px] text-muted">
-            Masuk untuk mengelola data portfolio.
-          </p>
-
           {error ? (
-            <div className="mt-5">
+            <div className="mt-6 md:mt-5">
               <ErrorBanner>{error}</ErrorBanner>
             </div>
           ) : null}
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-5 md:mt-8">
             <Field label="Email">
               <TextInput
                 type="email"

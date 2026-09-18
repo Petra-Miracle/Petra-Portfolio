@@ -273,7 +273,7 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
   return (
     <div className="modal-scrim" role="dialog" aria-modal="true" aria-label={title}>
       <div className="modal-panel">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-6 py-4">
           <h2
             className="font-display text-lg font-semibold text-foreground"
             style={{ fontFamily: "var(--font-display)" }}
@@ -291,7 +291,7 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
         </div>
         <div className="px-6 py-6">{children}</div>
         {footer ? (
-          <div className="flex items-center justify-end gap-3 border-t border-border px-6 py-4">
+          <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-2.5 border-t border-border bg-background px-6 py-4 [&>*]:w-full sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:[&>*]:w-auto">
             {footer}
           </div>
         ) : null}
