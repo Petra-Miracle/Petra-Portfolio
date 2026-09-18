@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
+import { MarqueeRow } from "@/components/MarqueeRow";
 import { ExternalLink, Trophy } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 
@@ -8,8 +9,6 @@ interface ProjectsProps {
   projects: Project[];
   competitions: Project[];
 }
-
-const MARQUEE_DURATION = "45s";
 
 export function ProjectsSection({ projects, competitions }: ProjectsProps) {
   return (
@@ -40,7 +39,7 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 
       {projects.length > 0 && (
         <Reveal className="mb-10">
-          <MarqueeRow count={projects.length}>
+          <MarqueeRow>
             {projects.map((p) => (
               <ProjectCard key={p.id} project={p} />
             ))}
@@ -50,7 +49,7 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 
       {competitions.length > 0 && (
         <Reveal className="mb-[80px]">
-          <MarqueeRow count={competitions.length} reversed>
+          <MarqueeRow reversed>
             {competitions.map((p) => (
               <CompetitionCard key={p.id} project={p} />
             ))}
@@ -67,45 +66,6 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
         </Reveal>
       )}
     </section>
-  );
-}
-
-/* ------------------------------------------------------------------
-   Marquee helpers
-------------------------------------------------------------------- */
-
-function MarqueeRow({
-  children,
-  count,
-  reversed = false,
-}: {
-  children: React.ReactNode;
-  count: number;
-  reversed?: boolean;
-}) {
-  // Duplicating the row is what makes the scroll loop seamless, but with
-  // only one card there's nothing to loop — it would just look like a
-  // duplicate entry. Only loop once there's more than one card.
-  const shouldLoop = count > 1;
-  const mask =
-    "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)";
-  return (
-    <div
-      className="marquee-pause overflow-hidden py-2"
-      style={{ maskImage: mask, WebkitMaskImage: mask }}
-    >
-      <div
-        className={`flex w-max ${shouldLoop ? (reversed ? "animate-marquee-reverse" : "animate-marquee") : ""}`}
-        style={{ "--marquee-duration": MARQUEE_DURATION } as React.CSSProperties}
-      >
-        <div className="flex w-max">{children}</div>
-        {shouldLoop ? (
-          <div className="flex w-max" aria-hidden>
-            {children}
-          </div>
-        ) : null}
-      </div>
-    </div>
   );
 }
 
