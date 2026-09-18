@@ -40,7 +40,7 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 
       {projects.length > 0 && (
         <Reveal className="mb-10">
-          <MarqueeRow>
+          <MarqueeRow count={projects.length}>
             {projects.map((p) => (
               <ProjectCard key={p.id} project={p} />
             ))}
@@ -50,7 +50,7 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 
       {competitions.length > 0 && (
         <Reveal className="mb-[80px]">
-          <MarqueeRow reversed>
+          <MarqueeRow count={competitions.length} reversed>
             {competitions.map((p) => (
               <CompetitionCard key={p.id} project={p} />
             ))}
@@ -76,11 +76,17 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 
 function MarqueeRow({
   children,
+  count,
   reversed = false,
 }: {
   children: React.ReactNode;
+  count: number;
   reversed?: boolean;
 }) {
+  // Duplicating the row is what makes the scroll loop seamless, but with
+  // only one card there's nothing to loop — it would just look like a
+  // duplicate entry. Only loop once there's more than one card.
+  const shouldLoop = count > 1;
   const mask =
     "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)";
   return (
@@ -89,13 +95,15 @@ function MarqueeRow({
       style={{ maskImage: mask, WebkitMaskImage: mask }}
     >
       <div
-        className={`flex w-max ${reversed ? "animate-marquee-reverse" : "animate-marquee"}`}
+        className={`flex w-max ${shouldLoop ? (reversed ? "animate-marquee-reverse" : "animate-marquee") : ""}`}
         style={{ "--marquee-duration": MARQUEE_DURATION } as React.CSSProperties}
       >
         <div className="flex w-max">{children}</div>
-        <div className="flex w-max" aria-hidden>
-          {children}
-        </div>
+        {shouldLoop ? (
+          <div className="flex w-max" aria-hidden>
+            {children}
+          </div>
+        ) : null}
       </div>
     </div>
   );
