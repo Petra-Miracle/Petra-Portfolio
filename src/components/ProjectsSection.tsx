@@ -302,25 +302,25 @@ function ProjectDetailModal({
       onClick={onClose}
     >
       <div
-        className="modal-panel max-w-[420px] rounded-[28px]"
+        className="modal-panel max-w-[380px] rounded-[24px] border-border shadow-[0_24px_64px_rgba(21,20,15,0.22)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header — icon + heading, close trigger */}
-        <div className="flex items-start justify-between gap-4 p-6 pb-0">
-          <div className="flex items-center gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-surface-alt text-foreground">
-              <HeaderIcon size={18} />
+        <div className="flex items-start justify-between gap-3 p-6 pb-0">
+          <div className="flex items-center gap-3.5">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-[16px] border border-border bg-surface text-foreground shadow-[0_2px_6px_rgba(21,20,15,0.06)]">
+              <HeaderIcon size={19} />
             </span>
             <div>
               <h3
-                className="font-display text-lg font-semibold leading-snug tracking-tight text-foreground"
+                className="font-display text-[17px] font-semibold leading-snug tracking-tight text-foreground"
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 {project.title}
               </h3>
               {metaParts.length > 0 ? (
                 <p
-                  className="mt-0.5 font-mono text-xs text-muted"
+                  className="mt-1 font-mono text-[11px] font-medium uppercase tracking-wide text-muted"
                   style={{ fontFamily: "var(--font-mono-jb)" }}
                 >
                   {metaParts.join(" · ")}
@@ -332,27 +332,27 @@ function ProjectDetailModal({
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="btn btn-icon btn-ghost shrink-0"
+            className="btn btn-icon btn-outline shrink-0"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 pt-4">
+        <div className="px-6 pt-5">
           {project.imageUrl ? (
-            <div className="relative h-[190px] w-full overflow-hidden rounded-[16px] bg-surface">
+            <div className="relative h-[200px] w-full overflow-hidden rounded-[18px] border border-border bg-surface">
               <Image
                 src={project.imageUrl}
                 alt={project.title}
                 fill
-                sizes="420px"
+                sizes="380px"
                 className="object-cover"
               />
             </div>
           ) : null}
 
-          <p className="mt-4 text-sm leading-relaxed text-muted">
+          <p className="mt-5 text-sm leading-relaxed text-muted">
             {project.description}
           </p>
 
@@ -369,7 +369,7 @@ function ProjectDetailModal({
 
         {/* Footer */}
         {project.demoUrl || project.repoUrl ? (
-          <div className="flex flex-col gap-2 p-6 pt-5">
+          <div className="mt-6 flex flex-col gap-2.5 border-t border-border p-6">
             {project.demoUrl ? (
               <a
                 href={project.demoUrl}
