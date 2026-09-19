@@ -25,22 +25,27 @@ studio desain profesional. Scope-nya mencakup **seluruh halaman publik DAN panel
 ## Scope 1 — Halaman Publik (single-page, scroll, urutan section tetap)
 
 ### Hero (layar pertama)
+
 Foto + nama sebagai fokus utama, ini first impression yang paling menentukan. Perlu terasa
 seperti pembuka portfolio studio desain kelas atas, bukan template generik "foto bulat + nama
+
 + tagline". Boleh eksplorasi: tipografi ekspresif, layout foto tidak konvensional, interaksi
-scroll/parallax halus.
+  scroll/parallax halus.
 
 ### Pengenalan / Tentang
+
 Bio singkat + highlight keahlian (3 poin: keahlian teknis, fokus kerja, value yang dibawa).
 Desain ulang supaya terasa personal, bukan sekadar card grid template.
 
 ### Teknologi
+
 Menampilkan daftar teknologi yang dikuasai, dikelompokkan jadi dua: teknologi umum
 (bahasa/DB/framework) dan teknologi AI (tools AI yang dipakai sehari-hari). Data ini
 dynamic/berubah-ubah (dikelola lewat admin panel), jadi desainnya harus tetap kuat baik saat
 datanya banyak maupun sedikit (termasuk desain empty state kalau belum ada data).
 
 ### Project & Kompetisi
+
 Daftar project dan daftar kompetisi/lomba yang pernah diikuti, masing-masing dengan deskripsi,
 badge tech stack yang dipakai, link demo, link repo, dan untuk kompetisi ada info hasil (mis.
 "Juara 1") dan tahun. Ini section paling penting untuk "menjual" kemampuan — desain card/list-nya
@@ -49,6 +54,7 @@ data-driven (dikelola dari admin), jadi rancang untuk kondisi 1 item sampai pulu
 untuk kondisi kosong.
 
 ### Footer
+
 Ajakan kontak/kolaborasi, link sosial media/profesional, copyright. Ini juga jadi closing
 impression, jangan didesain sebagai afterthought.
 

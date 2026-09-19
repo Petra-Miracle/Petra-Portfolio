@@ -71,7 +71,6 @@ export function Footer() {
             className="font-mono text-[12px] text-dark-muted"
             style={{ fontFamily: "var(--font-mono-jb)" }}
           >
-            Dibangun dengan Next.js &amp; Tailwind CSS
           </p>
         </div>
       </div>

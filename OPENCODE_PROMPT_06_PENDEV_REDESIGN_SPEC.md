@@ -51,13 +51,13 @@ Pertahankan pola ini, jangan disamakan semua terang.
 
 ### Button (5 variant) — cornerRadius 6 semua
 
-| Variant | fill | text/icon | stroke |
-|---|---|---|---|
-| Primary | `accent` #C7F23C | `accent-ink` #15140F, weight 600 | - |
-| Secondary | `ink` #15140F | `paper` #F7F3E9, weight 600 | - |
-| Outline | transparent | `ink` #15140F, weight 600 | `ink-line` #3A382C, 1px |
-| Ghost | transparent | `muted-on-paper` #726C57, weight 600 | - |
-| Destructive | `danger` #D6482F | `paper` #F7F3E9, weight 600 | - |
+| Variant     | fill               | text/icon                              | stroke                    |
+| ----------- | ------------------ | -------------------------------------- | ------------------------- |
+| Primary     | `accent` #C7F23C | `accent-ink` #15140F, weight 600     | -                         |
+| Secondary   | `ink` #15140F    | `paper` #F7F3E9, weight 600          | -                         |
+| Outline     | transparent        | `ink` #15140F, weight 600            | `ink-line` #3A382C, 1px |
+| Ghost       | transparent        | `muted-on-paper` #726C57, weight 600 | -                         |
+| Destructive | `danger` #D6482F | `paper` #F7F3E9, weight 600          | -                         |
 
 Padding: Primary/Secondary/Destructive `12px 22px`, Outline `11px 21px`, Ghost `10px 14px`.
 Semua Inter 14px, gap icon-label 8px (Ghost 6px). Icon 16x16 (lucide).
@@ -94,6 +94,7 @@ helper text jadi `danger` + warna value jadi `ink`.
 
 Pill mengambang, fill `ink` (#15140F, gelap — solid bukan glassmorphism), radius penuh (pill),
 padding `12px 12px 12px 24px`, gap 32.
+
 - Logo: inisial + titik dalam JetBrains Mono 15/600 warna `accent` (contoh mockup "RA." → punya kita jadi sesuai `siteConfig`, hitung inisial dari nama).
 - Nav links: Inter 14/500 warna `muted-on-ink` (#A29C87), gap 24. Label: Tentang, Teknologi, Karya (map ke "Project & Kompetisi"), Kontak.
 - CTA kanan: Button Primary "Hubungi Saya", padding `10px 18px`, tanpa icon.
@@ -179,16 +180,18 @@ Primary "Tambah Teknologi"/"Tambah Karya" dengan icon plus (kanan).
 `14px 20px` atau `12px 20px` untuk row dengan foto). Kolom Teknologi: Nama, Kategori (badge),
 Icon, Urutan, Aksi. Kolom Project: Foto (thumbnail 44x44 rounded), Judul (+ tech stack kecil di
 bawahnya), Tipe (badge), Tahun, Aksi. Aksi = 2 icon-button 30x30: edit (outline, icon pencil `ink`)
+
 + hapus (outline warna `danger`, stroke+icon `danger`, icon trash-2).
 
 **Modal** (overlay fill `paper`, stroke `paper-line`, radius 14 — dengan scrim gelap di belakang):
 header (judul Bricolage 18/600 + tombol close 'x'), body (padding 24, gap 18, field-field sesuai
 form yang sudah ada — untuk Project modal termasuk: Tipe (segmented control 2 pilihan seperti
 Kategori di Modal Teknologi), Judul, Deskripsi (textarea fill `paper-dim`), **Foto** (preview 72x72
+
 + tombol "Ganti Foto"/"Hapus" — ini sudah sama persis dengan yang kamu implementasi sebelumnya di
-`ProjectsManager.tsx`, cuma dipindah ke dalam modal), Tech Stack (tag input dengan chip
-removable), Link Demo, Link Repo, Hasil Kompetisi, Tahun, Urutan), footer (padding 24, gap 12:
-Button Outline "Batal" + Button Primary "Simpan").
+  `ProjectsManager.tsx`, cuma dipindah ke dalam modal), Tech Stack (tag input dengan chip
+  removable), Link Demo, Link Repo, Hasil Kompetisi, Tahun, Urutan), footer (padding 24, gap 12:
+  Button Outline "Batal" + Button Primary "Simpan").
 
 Field kategori/tipe pakai **segmented control** (2 opsi bersebelahan, opsi aktif fill `ink` teks
 `paper`, opsi tidak aktif stroke `paper-line` teks muted) — ganti dari `<select>` dropdown yang

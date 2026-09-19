@@ -1,7 +1,7 @@
 export const siteConfig = {
   title: "Petra Portfolio",
   description:
-    "Portfolio programmer — project, kompetisi, dan teknologi yang dikuasai.",
+    "Portfolio programmer project, kompetisi, dan teknologi yang dikuasai.",
   author: {
     name: "Petra Lenggu",
     role: "Full-Stack Developer",
@@ -23,9 +23,9 @@ export const siteConfig = {
   ],
   socials: [
     // TODO: Ganti dengan link asli
-    { label: "GitHub", href: "https://github.com/", icon: "github" },
-    { label: "LinkedIn", href: "https://linkedin.com/", icon: "linkedin" },
-    { label: "Twitter / X", href: "https://x.com/", icon: "twitter" },
+    { label: "GitHub", href: "https://github.com/Petra-Miracle", icon: "github" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/petra-lenggu-538226319/", icon: "linkedin" },
+    { label: "Twitter / X", href: "https://x.com/SmkindEzz", icon: "twitter" },
     { label: "Instagram", href: "https://instagram.com/", icon: "instagram" },
   ],
 } as const;
