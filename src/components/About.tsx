@@ -33,7 +33,7 @@ export function About() {
               Tentang
             </p>
             <h2
-              className="mt-5 font-display text-4xl font-semibold tracking-tight text-foreground"
+              className="mt-5 font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
               Siapa di balik karya ini?
@@ -52,16 +52,18 @@ export function About() {
         <div>
           {highlights.map((item, i) => (
             <Reveal key={item.title} delay={i * 90}>
-              <div className="flex gap-6 border-t border-border py-6 first:border-t first:pt-6">
+              <div className="group flex gap-6 border-t border-border py-6 transition-colors first:border-t first:pt-6 hover:border-border-strong">
                 <span
-                  className="font-mono text-sm font-medium text-accent-hover"
+                  className="font-mono text-sm font-medium text-accent-hover transition-transform duration-300 group-hover:translate-x-0.5"
                   style={{ fontFamily: "var(--font-mono-jb)" }}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2.5">
-                    <item.icon size={18} className="text-foreground" strokeWidth={1.5} />
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface-alt text-foreground transition-colors group-hover:border-border-strong group-hover:bg-accent group-hover:text-accent-ink">
+                      <item.icon size={15} strokeWidth={1.5} />
+                    </span>
                     <h3
                       className="text-[17px] font-semibold tracking-tight text-foreground"
                       style={{ fontFamily: "var(--font-display)" }}
@@ -69,7 +71,7 @@ export function About() {
                       {item.title}
                     </h3>
                   </div>
-                  <p className="mt-2 text-[14px] leading-relaxed text-muted">
+                  <p className="mt-2 max-w-[42ch] text-[14px] leading-relaxed text-muted">
                     {item.text}
                   </p>
                 </div>

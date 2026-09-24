@@ -5,7 +5,7 @@ export const siteConfig = {
   author: {
     name: "Petra Lenggu",
     role: "Full-Stack Developer",
-    image: "/hero-profile.png",
+    image: "/img/hero-profile.png",
     // Ubah ke "Available" jika sedang open opportunities, atau null untuk sembunyikan
     status: null as "Available" | null,
   },

@@ -15,7 +15,26 @@ export function Hero({ cvUrl }: HeroProps) {
       id="beranda"
       className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-dark"
     >
-      <div className="mx-auto grid w-full max-w-[1280px] items-center gap-10 px-6 py-28 sm:px-10 lg:grid-cols-[1fr_auto] lg:px-20">
+      {/* Subtle depth — faint accent glow + grid texture, kept restrained */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 82% 22%, rgba(199,242,60,0.10), transparent 45%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--background) 1px, transparent 1px), linear-gradient(to bottom, var(--background) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+        }}
+      />
+
+      <div className="relative mx-auto grid w-full max-w-[1280px] items-center gap-10 px-6 py-28 sm:px-10 lg:grid-cols-[1fr_auto] lg:px-20">
         {/* ---- Kiri: tagline + headline + CTA ---- */}
         <RevealWrapper>
           <div className="space-y-8">

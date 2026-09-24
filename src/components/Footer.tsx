@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Mail } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { Reveal } from "@/components/Reveal";
 import { SocialIcon } from "@/components/SocialIcon";
@@ -8,6 +8,23 @@ export function Footer() {
     <footer id="kontak" className="bg-dark">
       <div className="mx-auto max-w-[1280px] px-6 pt-[120px] pb-12 sm:px-10 lg:px-20">
         <Reveal>
+          {siteConfig.author.status ? (
+            <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-border-strong py-2 pl-3.5 pr-4">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-accent" />
+              </span>
+              <span
+                className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-dark-muted"
+                style={{ fontFamily: "var(--font-mono-jb)" }}
+              >
+                {siteConfig.author.status === "Available"
+                  ? "Tersedia untuk proyek baru"
+                  : siteConfig.author.status}
+              </span>
+            </div>
+          ) : null}
+
           <p
             className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-dark-muted"
             style={{ fontFamily: "var(--font-mono-jb)" }}
@@ -16,24 +33,40 @@ export function Footer() {
           </p>
 
           <h2
-            className="mt-6 max-w-[16ch] font-display text-4xl font-semibold leading-[1.05] tracking-tight text-background sm:text-[56px]"
+            className="mt-6 max-w-[18ch] font-display text-4xl font-semibold leading-[1.05] tracking-tight text-background sm:text-[64px]"
             style={{ fontFamily: "var(--font-display)" }}
           >
             Punya proyek yang ingin dibangun?
           </h2>
 
-          {/* Email CTA */}
-          <a
-            href={`mailto:${siteConfig.email}`}
-            className="group mt-10 inline-flex items-center gap-3 font-display text-xl font-medium text-accent underline decoration-accent/50 underline-offset-8 transition-colors hover:text-accent-hover sm:text-[26px]"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            {siteConfig.email}
-            <ArrowUpRight
-              size={26}
-              className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
-            />
-          </a>
+          <p className="mt-6 max-w-[46ch] text-[16px] leading-relaxed text-dark-muted">
+            Selalu terbuka untuk diskusi peluang kerja sama, proyek baru,
+            atau sekadar bertukar ide. Kirim pesan — biasanya saya balas
+            dalam 1&ndash;2 hari kerja.
+          </p>
+
+          {/* CTA row */}
+          <div className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <a
+              href={`mailto:${siteConfig.email}`}
+              className="btn btn-primary"
+            >
+              <Mail size={16} />
+              Kirim Email
+            </a>
+
+            <a
+              href={`mailto:${siteConfig.email}`}
+              className="group inline-flex items-center gap-2 font-mono text-[13px] text-dark-muted transition-colors hover:text-background"
+              style={{ fontFamily: "var(--font-mono-jb)" }}
+            >
+              {siteConfig.email}
+              <ArrowUpRight
+                size={14}
+                className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </a>
+          </div>
         </Reveal>
 
         {/* Social pills */}
@@ -59,7 +92,7 @@ export function Footer() {
         <div className="mt-14 h-px bg-border-strong" />
 
         {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-3 pt-8 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 pt-8 sm:flex-row">
           <p
             className="font-mono text-[12px] text-dark-muted"
             style={{ fontFamily: "var(--font-mono-jb)" }}
@@ -67,11 +100,16 @@ export function Footer() {
             &copy; {new Date().getFullYear()} {siteConfig.author.name}. Semua hak
             dilindungi.
           </p>
-          <p
-            className="font-mono text-[12px] text-dark-muted"
+          <a
+            href="#beranda"
+            className="group inline-flex items-center gap-2 font-mono text-[12px] text-dark-muted transition-colors hover:text-background"
             style={{ fontFamily: "var(--font-mono-jb)" }}
           >
-          </p>
+            Kembali ke atas
+            <span className="flex size-6 items-center justify-center rounded-full border border-border-strong transition-colors group-hover:border-background/40">
+              <ArrowUp size={12} />
+            </span>
+          </a>
         </div>
       </div>
     </footer>

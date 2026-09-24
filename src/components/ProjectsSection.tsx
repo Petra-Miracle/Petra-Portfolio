@@ -90,23 +90,27 @@ function ProjectCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="mr-6 flex h-[400px] w-[300px] shrink-0 cursor-pointer flex-col overflow-hidden rounded-[14px] border border-border bg-surface-alt transition-shadow hover:shadow-[0_16px_40px_rgba(21,20,15,0.12)]"
+        className="group mr-6 flex h-[400px] w-[300px] shrink-0 cursor-pointer flex-col overflow-hidden rounded-[14px] border border-border bg-surface-alt transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-[0_24px_56px_rgba(21,20,15,0.16)]"
       >
-        {/* Foto 170px */}
-        <div className="relative h-[170px] shrink-0 overflow-hidden">
+        {/* Foto */}
+        <div className="relative h-[190px] shrink-0 overflow-hidden bg-surface">
           {project.imageUrl ? (
             <Image
               src={project.imageUrl}
               alt={project.title}
               fill
               sizes="300px"
-              className="object-cover"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
             />
           ) : (
-            <div className="flex h-full items-center justify-center bg-surface">
+            <div className="flex h-full items-center justify-center">
               <Trophy size={24} className="text-muted" strokeWidth={1} />
             </div>
           )}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          />
         </div>
 
         {/* Body */}
@@ -203,10 +207,10 @@ function CompetitionCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="mr-6 flex h-[230px] w-[300px] shrink-0 cursor-pointer flex-col rounded-[14px] bg-dark-surface p-5 transition-shadow hover:shadow-[0_16px_40px_rgba(0,0,0,0.35)]"
+        className="group mr-6 flex h-[230px] w-[300px] shrink-0 cursor-pointer flex-col rounded-[14px] border border-transparent bg-dark-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/25 hover:shadow-[0_24px_56px_rgba(0,0,0,0.4)]"
       >
         <div className="flex items-center justify-between">
-          <span className="flex size-10 items-center justify-center rounded-[10px] bg-dark text-accent">
+          <span className="flex size-10 items-center justify-center rounded-[10px] bg-dark text-accent transition-transform duration-300 group-hover:scale-105">
             <Trophy size={18} />
           </span>
           {project.result ? (
