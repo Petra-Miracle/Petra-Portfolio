@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
@@ -273,7 +274,10 @@ function ProjectDetailModal({
   project: Project;
   onClose: () => void;
 }) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
+    closeButtonRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -288,94 +292,135 @@ function ProjectDetailModal({
 
   const isCompetition = project.type === "COMPETITION";
   const HeaderIcon = isCompetition ? Trophy : FolderGit2;
-  const metaParts = [
-    project.year ? String(project.year) : null,
-    project.result,
-  ].filter(Boolean);
+  const typeLabel = isCompetition ? "Kompetisi" : "Project";
+  const hasLinks = Boolean(project.demoUrl || project.repoUrl);
 
-  return (
+  return createPortal(
     <div
-      className="modal-scrim"
+      className="modal-scrim items-center p-4 sm:p-6"
       role="dialog"
       aria-modal="true"
-      aria-label={project.title}
+      aria-labelledby="project-modal-title"
       onClick={onClose}
     >
       <div
-        className="modal-panel max-w-[380px] rounded-[24px] border-border shadow-[0_24px_64px_rgba(21,20,15,0.22)]"
+        className="modal-panel flex w-full max-w-[460px] flex-col overflow-hidden rounded-[28px] border border-border shadow-[0_32px_80px_rgba(21,20,15,0.28)]"
+        style={{ maxHeight: "88vh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header — icon + heading, close trigger */}
-        <div className="flex items-start justify-between gap-3 p-6 pb-0">
-          <div className="flex items-center gap-3.5">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-[16px] border border-border bg-surface text-foreground shadow-[0_2px_6px_rgba(21,20,15,0.06)]">
-              <HeaderIcon size={19} />
-            </span>
-            <div>
-              <h3
-                className="font-display text-[17px] font-semibold leading-snug tracking-tight text-foreground"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                {project.title}
-              </h3>
-              {metaParts.length > 0 ? (
-                <p
-                  className="mt-1 font-mono text-[11px] font-medium uppercase tracking-wide text-muted"
-                  style={{ fontFamily: "var(--font-mono-jb)" }}
-                >
-                  {metaParts.join(" · ")}
-                </p>
-              ) : null}
+        {/* Media header — visual proof of work comes first */}
+        <div className="relative h-[200px] w-full shrink-0 overflow-hidden sm:h-[240px]">
+          {project.imageUrl ? (
+            <Image
+              src={project.imageUrl}
+              alt={project.title}
+              fill
+              sizes="(max-width: 640px) 100vw, 460px"
+              className="object-cover"
+            />
+          ) : (
+            <div
+              className={`flex h-full items-center justify-center ${
+                isCompetition ? "bg-dark-surface" : "bg-surface-alt"
+              }`}
+            >
+              <HeaderIcon
+                size={32}
+                strokeWidth={1.25}
+                className={isCompetition ? "text-accent" : "text-muted"}
+              />
             </div>
-          </div>
+          )}
+
+          {/* Legibility gradient for the overlaid pill + close button */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(21,20,15,0.45), rgba(21,20,15,0) 55%)",
+            }}
+          />
+
+          <span
+            className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-dark/80 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-background backdrop-blur-sm"
+            style={{ fontFamily: "var(--font-mono-jb)" }}
+          >
+            <HeaderIcon size={11} />
+            {typeLabel}
+          </span>
+
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="btn btn-icon btn-outline shrink-0"
+            className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-full bg-background/90 text-foreground shadow-[0_4px_14px_rgba(21,20,15,0.25)] backdrop-blur-sm transition-all duration-150 hover:scale-105 hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
           >
             <X size={15} />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="px-6 pt-5">
-          {project.imageUrl ? (
-            <div className="relative h-[200px] w-full overflow-hidden rounded-[18px] border border-border bg-surface">
-              <Image
-                src={project.imageUrl}
-                alt={project.title}
-                fill
-                sizes="380px"
-                className="object-cover"
-              />
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-7">
+          <h3
+            id="project-modal-title"
+            className="font-display text-[20px] font-semibold leading-snug tracking-tight text-foreground"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            {project.title}
+          </h3>
+
+          {project.result || project.year ? (
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              {project.result ? (
+                <span className="badge-success">
+                  <Trophy size={12} />
+                  {project.result}
+                </span>
+              ) : null}
+              {project.year ? (
+                <span
+                  className="font-mono text-[12px] text-muted"
+                  style={{ fontFamily: "var(--font-mono-jb)" }}
+                >
+                  {project.year}
+                </span>
+              ) : null}
             </div>
           ) : null}
 
-          <p className="mt-5 text-sm leading-relaxed text-muted">
+          <p className="mt-4 text-[14px] leading-relaxed text-muted">
             {project.description}
           </p>
 
           {project.techStack.length > 0 ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {project.techStack.map((tech, i) => (
-                <span key={`${tech}-${i}`} className="tag tag-light">
-                  {tech}
-                </span>
-              ))}
+            <div className="mt-5">
+              <p
+                className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-light"
+                style={{ fontFamily: "var(--font-mono-jb)" }}
+              >
+                Tech Stack
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                {project.techStack.map((tech, i) => (
+                  <span key={`${tech}-${i}`} className="tag tag-light">
+                    {tech}
+                  </span>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>
 
-        {/* Footer */}
-        {project.demoUrl || project.repoUrl ? (
-          <div className="mt-6 flex flex-col gap-2.5 border-t border-border p-6">
+        {/* Sticky CTA footer — primary action stays visually dominant */}
+        {hasLinks ? (
+          <div className="flex shrink-0 gap-2.5 border-t border-border bg-background p-5 sm:px-7">
             {project.demoUrl ? (
               <a
                 href={project.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary w-full"
+                className={`btn btn-primary ${project.repoUrl ? "flex-1" : "w-full"}`}
               >
                 <ExternalLink size={14} />
                 Buka Demo
@@ -386,18 +431,17 @@ function ProjectDetailModal({
                 href={project.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-outline w-full"
+                className={`btn btn-outline ${project.demoUrl ? "flex-1" : "w-full"}`}
               >
                 <SocialIcon name="github" className="size-3.5" />
                 Lihat Repo
               </a>
             ) : null}
           </div>
-        ) : (
-          <div className="pb-6" />
-        )}
+        ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
