@@ -11,7 +11,7 @@ export const siteConfig = {
   },
   // TODO: Ganti dengan angka & email asli
   stats: {
-    experience: "5+",
+    experience: "2+",
     experienceLabel: "TAHUN PENGALAMAN",
   },
   email: "petra221106@gmail.com",
