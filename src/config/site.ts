@@ -18,6 +18,7 @@ export const siteConfig = {
   navLinks: [
     { label: "Tentang", href: "#tentang" },
     { label: "Teknologi", href: "#teknologi" },
+    { label: "Sertifikat", href: "#sertifikat" },
     { label: "Karya", href: "#proyek" },
     { label: "Kontak", href: "#kontak" },
   ],

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  Award,
   ExternalLink,
   FolderGit2,
   Layers,
@@ -14,13 +15,14 @@ import {
 import { getToken } from "@/lib/admin-api";
 import { TechnologiesManager } from "@/components/admin/TechnologiesManager";
 import { ProjectsManager } from "@/components/admin/ProjectsManager";
+import { CertificatesManager } from "@/components/admin/CertificatesManager";
 import { SettingsManager } from "@/components/admin/SettingsManager";
 
 interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type SectionKey = "technologies" | "projects" | "settings";
+type SectionKey = "technologies" | "projects" | "certificates" | "settings";
 
 const initial = "P";
 
@@ -31,6 +33,7 @@ const NAV_ITEMS: {
 }[] = [
   { key: "technologies", label: "Teknologi", icon: Layers },
   { key: "projects", label: "Project & Kompetisi", icon: FolderGit2 },
+  { key: "certificates", label: "Sertifikat", icon: Award },
   { key: "settings", label: "Pengaturan", icon: Settings },
 ];
 
@@ -118,6 +121,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <TechnologiesManager token={token} />
         ) : section === "projects" ? (
           <ProjectsManager token={token} />
+        ) : section === "certificates" ? (
+          <CertificatesManager token={token} />
         ) : (
           <SettingsManager token={token} />
         )}

@@ -44,6 +44,25 @@ export interface ProjectInput {
   order?: number;
 }
 
+export interface Certificate {
+  id: string;
+  title: string;
+  issuer: string;
+  year: number | null;
+  credentialUrl: string | null;
+  imageUrl: string | null;
+  order: number;
+}
+
+export interface CertificateInput {
+  title: string;
+  issuer: string;
+  year?: number | null;
+  credentialUrl?: string | null;
+  imageUrl?: string | null;
+  order?: number;
+}
+
 export interface AdminUser {
   id: string;
   email: string;

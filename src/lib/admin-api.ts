@@ -1,5 +1,7 @@
 import type {
   AdminUser,
+  Certificate,
+  CertificateInput,
   Project,
   ProjectInput,
   SiteSettings,
@@ -183,6 +185,51 @@ export function updateProject(
 
 export function deleteProject(token: string, id: string): Promise<void> {
   return authedRequest<void>(`/api/projects/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function getCertificates(token: string): Promise<Certificate[]> {
+  return authedRequest<Certificate[]>("/api/certificates", { token });
+}
+
+export function createCertificate(
+  token: string,
+  body: CertificateInput,
+): Promise<Certificate> {
+  return authedRequest<Certificate>("/api/certificates", {
+    method: "POST",
+    token,
+    body,
+  });
+}
+
+export function createCertificatesBulk(
+  token: string,
+  items: CertificateInput[],
+): Promise<Certificate[]> {
+  return authedRequest<Certificate[]>("/api/certificates/bulk", {
+    method: "POST",
+    token,
+    body: { items },
+  });
+}
+
+export function updateCertificate(
+  token: string,
+  id: string,
+  body: Partial<CertificateInput>,
+): Promise<Certificate> {
+  return authedRequest<Certificate>(`/api/certificates/${id}`, {
+    method: "PUT",
+    token,
+    body,
+  });
+}
+
+export function deleteCertificate(token: string, id: string): Promise<void> {
+  return authedRequest<void>(`/api/certificates/${id}`, {
     method: "DELETE",
     token,
   });
