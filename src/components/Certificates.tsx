@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Award, ExternalLink } from "lucide-react";
 import type { Certificate } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
+import { AtmosphereBg } from "@/components/AtmosphereBg";
 
 interface CertificatesProps {
   certificates: Certificate[];
@@ -11,8 +12,12 @@ export function Certificates({ certificates }: CertificatesProps) {
   const isEmpty = certificates.length === 0;
 
   return (
-    <section id="sertifikat" className="border-t border-border-strong/40 bg-dark">
-      <div className="mx-auto max-w-[1280px] px-6 py-[120px] sm:px-10 lg:px-20">
+    <section
+      id="sertifikat"
+      className="relative overflow-hidden border-t border-border-strong/40 bg-dark"
+    >
+      <AtmosphereBg glowPosition="85% 80%" />
+      <div className="relative mx-auto max-w-[1280px] px-6 py-[120px] sm:px-10 lg:px-20">
         <Reveal>
           <p
             className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-dark-muted"

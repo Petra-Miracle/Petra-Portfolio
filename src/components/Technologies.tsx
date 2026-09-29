@@ -1,6 +1,7 @@
 import type { Technology } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { TechIcon } from "@/components/TechIcon";
+import { AtmosphereBg } from "@/components/AtmosphereBg";
 
 interface TechnologiesProps {
   technologies: Technology[];
@@ -17,8 +18,9 @@ export function Technologies({ technologies }: TechnologiesProps) {
   const isEmpty = general.length === 0 && ai.length === 0;
 
   return (
-    <section id="teknologi" className="bg-dark">
-      <div className="mx-auto max-w-[1280px] px-6 py-[120px] sm:px-10 lg:px-20">
+    <section id="teknologi" className="relative overflow-hidden bg-dark">
+      <AtmosphereBg glowPosition="15% 15%" />
+      <div className="relative mx-auto max-w-[1280px] px-6 py-[120px] sm:px-10 lg:px-20">
         <Reveal>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>

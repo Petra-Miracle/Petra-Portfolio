@@ -2,11 +2,13 @@ import { ArrowUp, ArrowUpRight, Mail } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { Reveal } from "@/components/Reveal";
 import { SocialIcon } from "@/components/SocialIcon";
+import { AtmosphereBg } from "@/components/AtmosphereBg";
 
 export function Footer() {
   return (
-    <footer id="kontak" className="bg-dark">
-      <div className="mx-auto max-w-[1280px] px-6 pt-[120px] pb-12 sm:px-10 lg:px-20">
+    <footer id="kontak" className="relative overflow-hidden bg-dark">
+      <AtmosphereBg glowPosition="50% 0%" />
+      <div className="relative mx-auto max-w-[1280px] px-6 pt-[120px] pb-12 sm:px-10 lg:px-20">
         <Reveal>
           {siteConfig.author.status ? (
             <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-border-strong py-2 pl-3.5 pr-4">

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ArrowDown, ArrowRight, Download, Sparkles } from "lucide-react";
 import { siteConfig } from "@/config/site";
+import { AtmosphereBg } from "@/components/AtmosphereBg";
 
 interface HeroProps {
   cvUrl: string | null;
@@ -15,24 +16,7 @@ export function Hero({ cvUrl }: HeroProps) {
       id="beranda"
       className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-dark"
     >
-      {/* Subtle depth — faint accent glow + grid texture, kept restrained */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 82% 22%, rgba(199,242,60,0.10), transparent 45%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, var(--background) 1px, transparent 1px), linear-gradient(to bottom, var(--background) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-        }}
-      />
+      <AtmosphereBg />
 
       <div className="relative mx-auto grid w-full max-w-[1280px] items-center gap-10 px-6 py-28 sm:px-10 lg:grid-cols-[1fr_auto] lg:px-20">
         {/* ---- Kiri: tagline + headline + CTA ---- */}
@@ -108,12 +92,12 @@ export function Hero({ cvUrl }: HeroProps) {
         {/* ---- Kanan: foto + frame lime + chip statistik ---- */}
         <RevealWrapper>
           <div className="relative mx-auto w-[300px] sm:w-[400px]">
-            {/* Lime frame (offset 24,24) */}
+            {/* Lime frame (offset 24,24) — ambient accent glow grounds the composition */}
             <div
               aria-hidden
-              className="absolute left-6 top-6 h-[520px] w-[400px] rounded-[28px] bg-accent"
+              className="absolute left-6 top-6 h-[520px] w-[400px] rounded-[28px] bg-accent shadow-[0_40px_80px_-20px_rgba(199,242,60,0.4)]"
             />
-            <div className="relative h-[520px] w-[300px] sm:w-[400px]">
+            <div className="relative h-[520px] w-[300px] sm:w-[400px] shadow-[0_30px_70px_rgba(0,0,0,0.4)] rounded-[28px]">
               <Image
                 src={siteConfig.author.image}
                 alt={`Foto ${siteConfig.author.name}`}
