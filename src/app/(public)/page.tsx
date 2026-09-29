@@ -5,6 +5,7 @@ import {
   fetchTechnologies,
 } from "@/lib/api";
 import { Hero } from "@/components/Hero";
+import { Stats } from "@/components/Stats";
 import { About } from "@/components/About";
 import { Technologies } from "@/components/Technologies";
 import { Certificates } from "@/components/Certificates";
@@ -24,6 +25,11 @@ export default async function Home() {
   return (
     <main>
       <Hero cvUrl={settings.cvUrl} />
+      <Stats
+        projects={projects}
+        competitions={competitions}
+        technologies={technologies}
+      />
       <About />
       <Technologies technologies={technologies} />
       <Certificates certificates={certificates} />

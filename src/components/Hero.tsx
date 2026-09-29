@@ -38,15 +38,34 @@ export function Hero({ cvUrl }: HeroProps) {
         {/* ---- Kiri: tagline + headline + CTA ---- */}
         <RevealWrapper>
           <div className="space-y-8">
-            {/* Role tag */}
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-border-strong py-2 pl-3.5 pr-4">
-              <span className="size-1.5 rounded-full bg-accent" aria-hidden />
-              <span
-                className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-dark-muted"
-                style={{ fontFamily: "var(--font-mono-jb)" }}
-              >
-                {siteConfig.author.role}
-              </span>
+            {/* Role tag + availability */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-border-strong py-2 pl-3.5 pr-4">
+                <span className="size-1.5 rounded-full bg-accent" aria-hidden />
+                <span
+                  className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-dark-muted"
+                  style={{ fontFamily: "var(--font-mono-jb)" }}
+                >
+                  {siteConfig.author.role}
+                </span>
+              </div>
+
+              {siteConfig.author.status ? (
+                <div className="inline-flex items-center gap-2.5 rounded-full border border-accent/40 bg-accent/10 py-2 pl-3 pr-4">
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+                    <span className="relative inline-flex size-2 rounded-full bg-accent" />
+                  </span>
+                  <span
+                    className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-accent"
+                    style={{ fontFamily: "var(--font-mono-jb)" }}
+                  >
+                    {siteConfig.author.status === "Available"
+                      ? "Tersedia untuk proyek baru"
+                      : siteConfig.author.status}
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             {/* Headline */}

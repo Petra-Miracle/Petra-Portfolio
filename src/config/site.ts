@@ -1,13 +1,13 @@
 export const siteConfig = {
   title: "Petra Portfolio",
   description:
-    "Portfolio programmer project, kompetisi, dan teknologi yang dikuasai.",
+    "Full-Stack Developer yang membangun aplikasi web nyata — dari perencanaan, pengembangan, hingga rilis produksi.",
   author: {
     name: "Petra Lenggu",
     role: "Full-Stack Developer",
     image: "/img/hero-profile.png",
-    // Ubah ke "Available" jika sedang open opportunities, atau null untuk sembunyikan
-    status: null as "Available" | null,
+    // Ubah ke null untuk sembunyikan badge ketersediaan di Hero & Footer
+    status: "Available" as "Available" | null,
   },
   // TODO: Ganti dengan angka & email asli
   stats: {
