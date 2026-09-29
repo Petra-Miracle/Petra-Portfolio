@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Layers, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Image as ImageIcon,
+  Layers,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import type { Technology, TechnologyCategory } from "@/lib/types";
 import {
   createTechnology,
@@ -10,6 +17,7 @@ import {
   handleUnauthorized,
   isUnauthorized,
   updateTechnology,
+  uploadImage,
 } from "@/lib/admin-api";
 import {
   Badge,
@@ -25,6 +33,7 @@ import {
   Select,
   TextInput,
 } from "@/components/admin/ui";
+import { TechIcon } from "@/components/TechIcon";
 
 type CategoryFilter = "ALL" | TechnologyCategory;
 
@@ -50,6 +59,10 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const [iconPreview, setIconPreview] = useState<string | null>(null);
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const [iconError, setIconError] = useState<string | null>(null);
 
   const loadItems = useCallback(async () => {
     const data = await getTechnologies(token);
@@ -86,6 +99,8 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
     setEditingId(null);
     setForm(EMPTY_FORM);
     setSubmitError(null);
+    setIconPreview(null);
+    setIconError(null);
     setModalOpen(true);
   }
 
@@ -98,17 +113,52 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
       order: String(tech.order),
     });
     setSubmitError(null);
+    setIconPreview(
+      tech.icon && (tech.icon.startsWith("http") || tech.icon.startsWith("/"))
+        ? tech.icon
+        : null,
+    );
+    setIconError(null);
     setModalOpen(true);
   }
 
   function closeModal() {
-    if (saving) return;
+    if (saving || uploadingIcon) return;
     setModalOpen(false);
     setSubmitError(null);
   }
 
+  async function handleIconChange(file: File) {
+    const localPreview = URL.createObjectURL(file);
+    setIconPreview(localPreview);
+    setIconError(null);
+    setUploadingIcon(true);
+    try {
+      const { url } = await uploadImage(token, file);
+      setForm((f) => ({ ...f, icon: url }));
+      setIconPreview(url);
+    } catch (err) {
+      if (isUnauthorized(err)) {
+        handleUnauthorized();
+        return;
+      }
+      setIconError(err instanceof Error ? err.message : "Upload gagal.");
+      setIconPreview(form.icon.trim() === "" ? null : form.icon);
+    } finally {
+      URL.revokeObjectURL(localPreview);
+      setUploadingIcon(false);
+    }
+  }
+
+  function clearIcon() {
+    setForm((f) => ({ ...f, icon: "" }));
+    setIconPreview(null);
+    setIconError(null);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (uploadingIcon) return;
     setSaving(true);
     setSubmitError(null);
     const body = {
@@ -204,6 +254,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
               <tr>
+                <Th>Icon</Th>
                 <Th>Nama</Th>
                 <Th>Kategori</Th>
                 <Th className="text-center">Urutan</Th>
@@ -213,6 +264,11 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
             <tbody className="divide-y divide-border">
               {filteredItems.map((tech) => (
                 <tr key={tech.id} className="transition-colors hover:bg-surface-alt/60">
+                  <td className="px-5 py-[14px]">
+                    <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-surface-alt text-foreground">
+                      <TechIcon icon={tech.icon} name={tech.name} />
+                    </span>
+                  </td>
                   <td className="px-5 py-[14px] text-sm font-medium text-foreground">
                     {tech.name}
                   </td>
@@ -258,10 +314,15 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         ) : filteredItems.length > 0 ? (
           filteredItems.map((tech) => (
             <div key={tech.id} className="card flex items-center justify-between gap-3 p-4">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-foreground">{tech.name}</p>
-                <div className="mt-1.5">
-                  <Badge variant={tech.category === "AI" ? "ai" : "general"}>{tech.category}</Badge>
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-surface-alt text-foreground">
+                  <TechIcon icon={tech.icon} name={tech.name} />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-foreground">{tech.name}</p>
+                  <div className="mt-1.5">
+                    <Badge variant={tech.category === "AI" ? "ai" : "general"}>{tech.category}</Badge>
+                  </div>
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -310,7 +371,11 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         footer={
           <>
             <OutlineButton onClick={closeModal}>Batal</OutlineButton>
-            <PrimaryButton form="technology-form" type="submit" loading={saving}>
+            <PrimaryButton
+              form="technology-form"
+              type="submit"
+              loading={saving || uploadingIcon}
+            >
               {editingId ? "Simpan Perubahan" : "Simpan"}
             </PrimaryButton>
           </>
@@ -356,12 +421,56 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
             </Field>
           </div>
 
-          <Field label="Icon (opsional)" hint="Nama icon atau URL gambar.">
-            <TextInput
-              value={form.icon}
-              onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))}
-              placeholder="cth: globe"
-            />
+          <Field
+            label="Icon (opsional)"
+            hint="Logo teknologi. Jika kosong, akan ditampilkan sebagai inisial."
+          >
+            <label
+              className={`flex h-[96px] w-full items-center gap-3 overflow-hidden rounded-[12px] border border-dashed border-border-strong bg-surface px-4 text-muted transition-colors hover:border-foreground hover:text-foreground ${
+                uploadingIcon ? "pointer-events-none opacity-60" : "cursor-pointer"
+              }`}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploadingIcon}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleIconChange(file);
+                  e.target.value = "";
+                }}
+              />
+              <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-surface-alt">
+                {iconPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={iconPreview} alt="" className="h-full w-full object-contain p-1.5" />
+                ) : uploadingIcon ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <ImageIcon size={18} />
+                )}
+              </span>
+              <span className="text-sm font-medium">
+                {uploadingIcon
+                  ? "Mengupload..."
+                  : iconPreview
+                    ? "Ganti icon"
+                    : "Ketuk untuk unggah icon"}
+              </span>
+            </label>
+            {iconPreview && !uploadingIcon ? (
+              <button
+                type="button"
+                onClick={clearIcon}
+                className="mt-2 text-xs font-medium text-danger transition-colors hover:text-danger/80"
+              >
+                Hapus icon
+              </button>
+            ) : null}
+            {iconError ? (
+              <span className="mt-2 block text-xs text-danger">{iconError}</span>
+            ) : null}
           </Field>
         </form>
       </Modal>
