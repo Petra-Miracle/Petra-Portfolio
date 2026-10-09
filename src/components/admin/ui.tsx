@@ -1,11 +1,16 @@
+"use client";
+
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   ReactNode,
   TextareaHTMLAttributes,
 } from "react";
-import { useEffect } from "react";
-import { ChevronDown, Loader2, X } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, Loader2, TriangleAlert, X } from "lucide-react";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 /* ------------------------------------------------------------------
    Buttons
@@ -44,7 +49,10 @@ export function OutlineButton({
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button {...rest} className={`btn btn-outline ${className}`}>
+    <button
+      {...rest}
+      className={`btn btn-outline transition-all hover:-translate-y-0.5 ${className}`}
+    >
       {children}
     </button>
   );
@@ -73,26 +81,17 @@ export function IconButton({
   variant?: "outline" | "danger" | "ghost";
   children: ReactNode;
 }) {
+  const base =
+    "flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95";
   const cls =
     variant === "danger"
-      ? "btn btn-outline btn-icon"
+      ? `${base} border-danger/30 bg-surface text-danger hover:border-danger hover:bg-danger hover:text-white hover:shadow-[0_8px_20px_rgba(214,72,47,0.35)]`
       : variant === "ghost"
-        ? "btn btn-ghost btn-icon"
-        : "btn btn-outline btn-icon";
-
-  const colorCls =
-    variant === "danger"
-      ? "text-danger border-danger hover:bg-danger-soft"
-      : "text-foreground";
+        ? `${base} border-transparent text-muted hover:bg-surface-alt hover:text-foreground`
+        : `${base} border-border bg-surface text-foreground hover:border-border-strong hover:bg-dark hover:text-accent hover:shadow-[0_8px_20px_rgba(21,20,15,0.2)]`;
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className={`${cls} ${colorCls}`}
-    >
+    <button type="button" onClick={onClick} aria-label={label} title={label} className={cls}>
       {children}
     </button>
   );
@@ -121,7 +120,7 @@ export function Field({
 }) {
   return (
     <label className={`block ${className}`}>
-      <span className="field-label">{label}</span>
+      <span className="field-label text-[13px] font-semibold">{label}</span>
       <div className="mt-2">{children}</div>
       {error ? (
         <span className="field-helper field-helper-error">{error}</span>
@@ -262,25 +261,34 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
       <div>
+        <p
+          className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-muted"
+          style={{ fontFamily: "var(--font-mono-jb)" }}
+        >
+          <span className="mr-2 inline-block h-[7px] w-[7px] rounded-full bg-accent align-middle shadow-[0_0_10px_var(--accent-glow)]" />
+          Panel Admin
+        </p>
         <h1
-          className="font-display text-2xl font-semibold tracking-tight text-foreground"
+          className="mt-2.5 font-display text-[30px] font-semibold tracking-tight text-foreground sm:text-[34px]"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {title}
         </h1>
         {subtitle ? (
-          <p className="mt-1 text-[13px] text-muted">{subtitle}</p>
+          <p className="mt-1.5 max-w-[60ch] text-[13.5px] leading-relaxed text-muted">{subtitle}</p>
         ) : null}
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action ? (
+        <div className="shrink-0 [&_.btn]:shadow-[0_10px_28px_rgba(199,242,60,0.35)]">{action}</div>
+      ) : null}
     </div>
   );
 }
 
 /* ------------------------------------------------------------------
-   Modal
+   Modal — spring entrance, blurred backdrop
 ------------------------------------------------------------------- */
 
 interface ModalProps {
@@ -292,8 +300,11 @@ interface ModalProps {
 }
 
 export function Modal({ open, onClose, title, children, footer }: ModalProps) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (!open) return;
+    closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -306,35 +317,60 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
     };
   }, [open, onClose]);
 
-  if (!open) return null;
-
   return (
-    <div className="modal-scrim" role="dialog" aria-modal="true" aria-label={title}>
-      <div className="modal-panel">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-6 py-4">
-          <h2
-            className="font-display text-lg font-semibold text-foreground"
-            style={{ fontFamily: "var(--font-display)" }}
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          className="modal-scrim"
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div
+            className="modal-panel"
+            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.97 }}
+            transition={{ duration: 0.35, ease: EASE }}
           >
-            {title}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Tutup"
-            className="btn btn-ghost btn-icon"
-          >
-            <X size={16} />
-          </button>
-        </div>
-        <div className="px-6 py-6">{children}</div>
-        {footer ? (
-          <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-2.5 border-t border-border bg-background px-6 py-4 [&>*]:w-full sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:[&>*]:w-auto">
-            {footer}
-          </div>
-        ) : null}
-      </div>
-    </div>
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-background px-6 py-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-dark font-display text-[15px] font-bold text-accent" style={{ fontFamily: "var(--font-display)" }}>
+                  {title.charAt(0)}
+                </span>
+                <h2
+                  className="truncate font-display text-[18px] font-semibold tracking-tight text-foreground"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {title}
+                </h2>
+              </div>
+              <button
+                ref={closeRef}
+                type="button"
+                onClick={onClose}
+                aria-label="Tutup"
+                className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border text-muted transition-all duration-150 hover:rotate-90 hover:border-danger/40 hover:text-danger"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="px-6 py-6">{children}</div>
+            {footer ? (
+              <div className="sticky bottom-0 z-10 flex flex-col-reverse gap-2.5 rounded-b-[24px] border-t border-border bg-surface px-6 py-4 [&>*]:w-full sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:[&>*]:w-auto">
+                {footer}
+              </div>
+            ) : null}
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
 
@@ -354,11 +390,15 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="empty-state">
-      {icon ? <div className="empty-state-icon">{icon}</div> : null}
-      <p className="empty-state-title">{title}</p>
+    <div className="empty-state gap-3 rounded-[24px] border-dashed border-muted-light bg-surface p-12 shadow-[0_16px_40px_rgba(21,20,15,0.06)]">
+      {icon ? (
+        <div className="empty-state-icon size-14 rounded-2xl bg-dark text-accent shadow-[0_10px_28px_rgba(21,20,15,0.25)]">
+          {icon}
+        </div>
+      ) : null}
+      <p className="empty-state-title mt-2 text-[17px]">{title}</p>
       {description ? <p className="empty-state-desc">{description}</p> : null}
-      {action ? <div className="mt-2">{action}</div> : null}
+      {action ? <div className="mt-3">{action}</div> : null}
     </div>
   );
 }
@@ -366,10 +406,68 @@ export function EmptyState({
 export function ErrorBanner({ children }: { children: ReactNode }) {
   return (
     <div
-      className="rounded-[6px] border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger"
+      className="flex items-start gap-3 rounded-2xl border border-danger/25 bg-danger-soft px-4 py-3.5 text-[13.5px] font-medium leading-relaxed text-danger shadow-[0_8px_24px_rgba(214,72,47,0.12)]"
       role="alert"
     >
-      {children}
+      <TriangleAlert size={17} className="mt-0.5 shrink-0" />
+      <span>{children}</span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------
+   Skeleton loaders
+------------------------------------------------------------------- */
+
+export function TableSkeleton({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="admin-table-wrap hidden sm:block" aria-hidden>
+      <div className="space-y-0 p-3">
+        <div className="skeleton mb-2 h-11 rounded-xl" />
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 border-b border-border/60 px-3 py-3.5 last:border-0">
+            <div className="skeleton size-11 shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="skeleton h-3.5 w-2/5" />
+              <div className="skeleton h-3 w-1/4 opacity-70" />
+            </div>
+            <div className="skeleton hidden h-6 w-20 rounded-full md:block" />
+            <div className="flex gap-2">
+              <div className="skeleton size-9" />
+              <div className="skeleton size-9" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function GridSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="space-y-2.5">
+          <div className="skeleton aspect-[4/5] rounded-[20px]" />
+          <div className="skeleton h-3 w-4/5" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ListSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div className="space-y-3 sm:hidden" aria-hidden>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="card flex items-center gap-3 p-4">
+          <div className="skeleton size-11 shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="skeleton h-3.5 w-3/5" />
+            <div className="skeleton h-3 w-2/5 opacity-70" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

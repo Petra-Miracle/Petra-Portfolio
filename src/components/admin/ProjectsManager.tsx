@@ -33,12 +33,14 @@ import {
   ErrorBanner,
   Field,
   IconButton,
+  ListSkeleton,
   Modal,
   OutlineButton,
   PageHeader,
   PrimaryButton,
   SegmentedControl,
   Select,
+  TableSkeleton,
   TextArea,
   TextInput,
 } from "@/components/admin/ui";
@@ -282,7 +284,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
 
       {/* ---- Filter tipe ---- */}
       {!loading && items.length > 0 ? (
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="admin-filterbar">
           <Select
             value={typeFilter}
             onChange={setTypeFilter}
@@ -294,15 +296,15 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               { value: "COMPETITION", label: "Kompetisi" },
             ]}
           />
-          <span className="text-xs text-muted">
-            {filteredItems.length} item
+          <span className="admin-count-chip">
+            <strong>{filteredItems.length}</strong> item
           </span>
         </div>
       ) : null}
 
       {/* ---- Tabel (desktop) ---- */}
       {!loading && filteredItems.length > 0 ? (
-        <div className="hidden overflow-hidden rounded-[14px] border border-border sm:block">
+        <div className="admin-table-wrap hidden sm:block">
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
               <tr>
@@ -357,11 +359,9 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
           </table>
         </div>
       ) : loading ? (
-        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
-          Memuat data...
-        </div>
+        <TableSkeleton />
       ) : items.length > 0 ? (
-        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
+        <div className="admin-table-wrap hidden p-10 text-center text-sm text-muted sm:block">
           Tidak ada data pada tipe ini.
         </div>
       ) : null}
@@ -369,7 +369,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
       {/* ---- Mobile list ---- */}
       <div className="space-y-3 sm:hidden">
         {loading ? (
-          <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
+          <ListSkeleton />
         ) : filteredItems.length > 0 ? (
           filteredItems.map((project) => (
             <div key={project.id} className="card p-4">
@@ -559,7 +559,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               />
               {imagePreview ? (
                 <div className="space-y-3">
-                  <div className="relative h-[160px] w-full overflow-hidden rounded-[14px] border border-border bg-surface">
+                  <div className="relative h-[180px] w-full overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imagePreview}
@@ -575,7 +575,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
-                      className="btn btn-outline btn-sm"
+                      className="btn btn-outline btn-sm rounded-full"
                       disabled={uploadingImage}
                       onClick={() => fileInputRef.current?.click()}
                     >
@@ -584,7 +584,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-outline btn-sm border-danger text-danger hover:bg-danger-soft"
+                      className="btn btn-outline btn-sm rounded-full border-danger/40 text-danger hover:bg-danger hover:text-white"
                       disabled={uploadingImage}
                       onClick={clearImage}
                     >
@@ -598,7 +598,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                   type="button"
                   disabled={uploadingImage}
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-border-strong bg-surface-alt text-muted transition-colors hover:border-foreground hover:text-foreground disabled:opacity-60"
+                  className="flex h-[150px] w-full flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-muted-light bg-surface text-muted transition-all hover:border-accent-hover hover:bg-accent/[0.05] hover:text-foreground disabled:opacity-60"
                 >
                   {uploadingImage ? (
                     <Loader2 size={22} className="animate-spin" />
@@ -685,13 +685,13 @@ function Thumb({ project }: { project: { imageUrl: string | null } }) {
       <img
         src={project.imageUrl}
         alt=""
-        className="size-11 shrink-0 rounded-[8px] border border-border object-cover"
+        className="h-11 w-11 shrink-0 rounded-xl border border-border object-cover shadow-sm"
       />
     );
   }
   return (
-    <span className="flex size-11 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface-alt text-muted">
-      <ImageIcon size={16} />
+    <span className="admin-thumb">
+      <ImageIcon size={17} />
     </span>
   );
 }

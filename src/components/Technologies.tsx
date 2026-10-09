@@ -1,7 +1,9 @@
 import type { Technology } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
+import { SectionHeading } from "@/components/SectionHeading";
 import { TechIcon } from "@/components/TechIcon";
 import { AtmosphereBg } from "@/components/AtmosphereBg";
+import { Bot, Boxes, PackageOpen } from "lucide-react";
 
 interface TechnologiesProps {
   technologies: Technology[];
@@ -18,50 +20,36 @@ export function Technologies({ technologies }: TechnologiesProps) {
   const isEmpty = general.length === 0 && ai.length === 0;
 
   return (
-    <section id="teknologi" className="relative overflow-hidden bg-dark">
-      <AtmosphereBg glowPosition="15% 15%" />
-      <div className="relative mx-auto max-w-[1280px] px-6 py-[120px] sm:px-10 lg:px-20">
-        <Reveal>
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p
-                className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-dark-muted"
-                style={{ fontFamily: "var(--font-mono-jb)" }}
-              >
-                Tumpukan Teknologi
-              </p>
-              <h2
-                className="mt-5 font-display text-4xl font-semibold tracking-tight text-background sm:text-5xl"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                Teknologi yang Digunakan
-              </h2>
-            </div>
-            {!isEmpty ? (
-              <p className="max-w-[36ch] text-[14px] leading-relaxed text-dark-muted">
-                Perangkat inti yang saya percaya untuk membangun produk —
-                dari fondasi umum hingga tooling AI sehari-hari.
-              </p>
-            ) : null}
-          </div>
-        </Reveal>
+    <section id="teknologi" className="noise relative overflow-hidden bg-dark">
+      <AtmosphereBg glowPosition="12% 12%" />
+      <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
+        <SectionHeading
+          dark
+          index="02"
+          eyebrow="Tumpukan Teknologi"
+          title="Senjata yang saya percaya"
+          description="Perangkat inti untuk membangun produk — dari fondasi umum hingga tooling AI sehari-hari."
+        />
 
         {isEmpty ? (
-          <div className="mt-16 rounded-[14px] border border-dashed border-border-strong p-12 text-center">
-            <p className="text-base font-medium text-background">
-              Belum ada data teknologi.
-            </p>
-            <p className="mt-2 text-sm text-dark-muted">
-              Data akan muncul setelah ditambahkan melalui panel admin.
-            </p>
-          </div>
+          <Reveal>
+            <div className="mt-14 flex flex-col items-center gap-4 rounded-3xl border border-dashed border-white/15 bg-white/[0.02] p-14 text-center">
+              <span className="flex size-14 items-center justify-center rounded-2xl bg-white/[0.05] text-dark-muted">
+                <PackageOpen size={24} strokeWidth={1.5} />
+              </span>
+              <p className="text-base font-semibold text-background">Belum ada data teknologi.</p>
+              <p className="max-w-[40ch] text-sm leading-relaxed text-dark-muted">
+                Data akan muncul otomatis setelah ditambahkan melalui panel admin.
+              </p>
+            </div>
+          </Reveal>
         ) : (
-          <div className="mt-16 space-y-14">
+          <div className="mt-14 space-y-12">
             {general.length > 0 && (
-              <TechGroup label="General" items={general} />
+              <TechGroup label="General" hint="Bahasa · Database · Framework" icon={Boxes} items={general} />
             )}
             {ai.length > 0 && (
-              <TechGroup label="AI" items={ai} accent />
+              <TechGroup label="AI" hint="Asisten & tooling harian" icon={Bot} items={ai} accent />
             )}
           </div>
         )}
@@ -72,54 +60,70 @@ export function Technologies({ technologies }: TechnologiesProps) {
 
 function TechGroup({
   label,
+  hint,
+  icon: Icon,
   items,
   accent = false,
 }: {
   label: string;
+  hint: string;
+  icon: React.ElementType;
   items: Technology[];
   accent?: boolean;
 }) {
   return (
-    <Reveal>
-      <div className="mb-6 flex items-center gap-3">
-        <h3
-          className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-background/60"
-          style={{ fontFamily: "var(--font-mono-jb)" }}
-        >
-          {label}
-        </h3>
-        <span className="h-px flex-1 bg-border-strong/60" aria-hidden />
-        <span
-          className="font-mono text-[11px] text-dark-muted"
-          style={{ fontFamily: "var(--font-mono-jb)" }}
-        >
-          {String(items.length).padStart(2, "0")}
-        </span>
-      </div>
+    <div>
+      <Reveal>
+        <div className="mb-6 flex items-center gap-4">
+          <span className={`flex size-10 items-center justify-center rounded-xl ${accent ? "bg-accent text-accent-ink shadow-[0_8px_28px_rgba(199,242,60,0.35)]" : "border border-white/10 bg-white/[0.05] text-accent"}`}>
+            <Icon size={18} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h3 className="font-mono text-[13px] font-bold uppercase tracking-[0.2em] text-background" style={{ fontFamily: "var(--font-mono-jb)" }}>
+              {label} <span className="text-accent">· {String(items.length).padStart(2, "0")}</span>
+            </h3>
+            <p className="mt-0.5 text-[12.5px] text-dark-muted">{hint}</p>
+          </div>
+          <span className="ml-2 h-px flex-1 bg-gradient-to-r from-white/15 to-transparent" aria-hidden />
+        </div>
+      </Reveal>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {items.map((tech) => (
-          <div
-            key={tech.id}
-            className={`group flex min-w-0 items-center gap-3 rounded-2xl border bg-dark-surface px-4 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(0,0,0,0.35)] ${
-              accent
-                ? "border-accent/25 hover:border-accent/60"
-                : "border-border-strong hover:border-background/30"
-            }`}
-          >
-            <span
-              className={`flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl ${
-                accent ? "bg-accent text-accent-ink" : "bg-dark text-accent"
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        {items.map((tech, i) => (
+          <Reveal key={tech.id} delay={Math.min(i, 7) * 60}>
+            <div
+              className={`group relative flex min-w-0 items-center gap-3.5 overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 ${
+                accent
+                  ? "gradient-border hover:shadow-[0_20px_50px_rgba(199,242,60,0.15)]"
+                  : "border-white/[0.08] bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06] hover:shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
               }`}
             >
-              <TechIcon icon={tech.icon} name={tech.name} />
-            </span>
-            <span className="min-w-0 text-[14px] font-medium leading-snug text-background">
-              {tech.name}
-            </span>
-          </div>
+              {/* hover sheen */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-white/[0.07] to-transparent transition-transform duration-700 group-hover:translate-x-[100%]"
+              />
+              <span
+                className={`relative flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${
+                  accent
+                    ? "bg-accent text-accent-ink shadow-[0_6px_20px_rgba(199,242,60,0.35)]"
+                    : "bg-gradient-to-br from-white/[0.09] to-white/[0.02] text-accent ring-1 ring-white/10"
+                }`}
+              >
+                <TechIcon icon={tech.icon} name={tech.name} />
+              </span>
+              <span className="relative min-w-0">
+                <span className="block truncate text-[14.5px] font-semibold leading-snug text-background">
+                  {tech.name}
+                </span>
+                <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                  {accent ? "AI tool" : "Stack"}
+                </span>
+              </span>
+            </div>
+          </Reveal>
         ))}
       </div>
-    </Reveal>
+    </div>
   );
 }

@@ -23,6 +23,7 @@ import {
   EmptyState,
   ErrorBanner,
   Field,
+  GridSkeleton,
   IconButton,
   Modal,
   OutlineButton,
@@ -312,14 +313,15 @@ export function GalleryManager({ token }: GalleryManagerProps) {
       {!loading && items.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item) => (
-            <div key={item.id} className="card overflow-hidden">
+            <div key={item.id} className="card group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(21,20,15,0.16)]">
               <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface-alt">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.imageUrl}
                   alt=""
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
                 />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               </div>
               <div className="p-3">
                 <p className="line-clamp-2 text-[13px] font-medium text-foreground">
@@ -345,7 +347,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
           ))}
         </div>
       ) : loading ? (
-        <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
+        <GridSkeleton />
       ) : null}
 
       {/* ---- Empty state ---- */}
@@ -389,7 +391,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
           {rows.map((row, i) => (
             <div
               key={row.key}
-              className="rounded-[14px] border border-border bg-surface-alt/60 p-4"
+              className="admin-row-card"
             >
               <div className="mb-3 flex items-center justify-between">
                 <span
@@ -413,8 +415,8 @@ export function GalleryManager({ token }: GalleryManagerProps) {
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Foto *" className="sm:col-span-2">
                   <label
-                    className={`flex h-[110px] w-full items-center gap-3 overflow-hidden rounded-[12px] border border-dashed border-border-strong bg-surface px-4 text-muted transition-colors hover:border-foreground hover:text-foreground ${
-                      row.uploadingImage ? "pointer-events-none opacity-60" : "cursor-pointer"
+                    className={`admin-dropzone ${
+                      row.uploadingImage ? "pointer-events-none opacity-60" : ""
                     }`}
                   >
                     <input
@@ -433,10 +435,10 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                       <img
                         src={row.imagePreview}
                         alt=""
-                        className="h-[86px] w-[86px] shrink-0 rounded-[8px] border border-border object-cover"
+                        className="h-[86px] w-[86px] shrink-0 rounded-xl border border-border object-cover shadow-sm"
                       />
                     ) : (
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface-alt">
+                      <span className="admin-thumb h-9 w-9">
                         {row.uploadingImage ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : (
@@ -514,7 +516,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Foto *" className="sm:col-span-2">
               <label
-                className={`flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-border-strong bg-surface-alt text-muted transition-colors hover:border-foreground hover:text-foreground ${
+                className={`flex min-h-[150px] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-[1.5px] border-dashed border-muted-light bg-surface text-muted transition-all hover:border-accent-hover hover:bg-accent/[0.05] hover:text-foreground ${
                   editUploading ? "pointer-events-none opacity-60" : "cursor-pointer"
                 }`}
               >
@@ -530,7 +532,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                   }}
                 />
                 {editImagePreview ? (
-                  <div className="relative h-full w-full overflow-hidden rounded-[14px]">
+                  <div className="relative h-full min-h-[150px] w-full overflow-hidden rounded-2xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={editImagePreview}

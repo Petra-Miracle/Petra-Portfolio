@@ -25,12 +25,14 @@ import {
   ErrorBanner,
   Field,
   IconButton,
+  ListSkeleton,
   Modal,
   OutlineButton,
   PageHeader,
   PrimaryButton,
   SegmentedControl,
   Select,
+  TableSkeleton,
   TextInput,
 } from "@/components/admin/ui";
 import { TechIcon } from "@/components/TechIcon";
@@ -230,7 +232,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
 
       {/* ---- Filter kategori ---- */}
       {!loading && items.length > 0 ? (
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="admin-filterbar">
           <Select
             value={categoryFilter}
             onChange={setCategoryFilter}
@@ -242,15 +244,15 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
               { value: "AI", label: "AI" },
             ]}
           />
-          <span className="text-xs text-muted">
-            {filteredItems.length} teknologi
+          <span className="admin-count-chip">
+            <strong>{filteredItems.length}</strong> teknologi
           </span>
         </div>
       ) : null}
 
       {/* ---- Tabel ---- */}
       {!loading && filteredItems.length > 0 ? (
-        <div className="hidden overflow-hidden rounded-[14px] border border-border sm:block">
+        <div className="admin-table-wrap hidden sm:block">
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
               <tr>
@@ -265,7 +267,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
               {filteredItems.map((tech) => (
                 <tr key={tech.id} className="transition-colors hover:bg-surface-alt/60">
                   <td className="px-5 py-[14px]">
-                    <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-surface-alt text-foreground">
+                    <span className="admin-thumb">
                       <TechIcon icon={tech.icon} name={tech.name} />
                     </span>
                   </td>
@@ -298,11 +300,9 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
           </table>
         </div>
       ) : loading ? (
-        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
-          Memuat data...
-        </div>
+        <TableSkeleton />
       ) : items.length > 0 ? (
-        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
+        <div className="admin-table-wrap hidden p-10 text-center text-sm text-muted sm:block">
           Tidak ada teknologi pada kategori ini.
         </div>
       ) : null}
@@ -310,12 +310,12 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
       {/* ---- Mobile list ---- */}
       <div className="space-y-3 sm:hidden">
         {loading ? (
-          <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
+          <ListSkeleton />
         ) : filteredItems.length > 0 ? (
           filteredItems.map((tech) => (
             <div key={tech.id} className="card flex items-center justify-between gap-3 p-4">
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-surface-alt text-foreground">
+                <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-surface-alt text-foreground">
                   <TechIcon icon={tech.icon} name={tech.name} />
                 </span>
                 <div className="min-w-0">
@@ -426,8 +426,8 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
             hint="Logo teknologi. Jika kosong, akan ditampilkan sebagai inisial."
           >
             <label
-              className={`flex h-[96px] w-full items-center gap-3 overflow-hidden rounded-[12px] border border-dashed border-border-strong bg-surface px-4 text-muted transition-colors hover:border-foreground hover:text-foreground ${
-                uploadingIcon ? "pointer-events-none opacity-60" : "cursor-pointer"
+              className={`admin-dropzone min-h-[96px] ${
+                uploadingIcon ? "pointer-events-none opacity-60" : ""
               }`}
             >
               <input
@@ -441,7 +441,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
                   e.target.value = "";
                 }}
               />
-              <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-surface-alt">
+              <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-surface-alt">
                 {iconPreview ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={iconPreview} alt="" className="h-full w-full object-contain p-1.5" />

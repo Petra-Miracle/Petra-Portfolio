@@ -1,86 +1,104 @@
 import { Reveal } from "@/components/Reveal";
-import { Brain, Palette, Wrench } from "lucide-react";
+import { SectionHeading } from "@/components/SectionHeading";
+import { ArrowUpRight, Brain, Palette, Wrench } from "lucide-react";
+import { siteConfig } from "@/config/site";
 
 const highlights = [
   {
     icon: Wrench,
     title: "Pengalaman bertahun",
-    text: "Bertahun-tahun mengerjakan proyek nyata lintas skala — dari prototipe hingga sistem produksi.",
+    text: "Mengerjakan proyek nyata lintas skala — dari prototipe cepat hingga sistem produksi yang dipakai harian.",
+    tag: "Engineering",
   },
   {
     icon: Palette,
     title: "Desain yang rapi dan kuat",
-    text: "Kombinasi estetika dan rekayasa: antarmuka yang indah dengan arsitektur yang solid.",
+    text: "Estetika dan rekayasa jalan bareng: antarmuka indah di atas arsitektur yang solid dan mudah dirawat.",
+    tag: "Craft",
   },
   {
     icon: Brain,
     title: "Pemikiran mendalam",
-    text: "Memahami masalah sebelum menulis kode, memilih solusi yang tepat, bukan yang tercepat.",
+    text: "Memahami masalah sebelum menulis kode — memilih solusi yang tepat, bukan yang tercepat.",
+    tag: "Mindset",
   },
 ];
 
 export function About() {
   return (
-    <section id="tentang" className="bg-background">
-      <div className="mx-auto grid max-w-[1280px] gap-16 px-6 py-[120px] sm:px-10 lg:grid-cols-[1.1fr_1fr] lg:px-20">
-        {/* Kiri — eyebrow + headline + bio */}
-        <Reveal>
-          <div>
-            <p
-              className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-muted"
-              style={{ fontFamily: "var(--font-mono-jb)" }}
-            >
-              Tentang
-            </p>
-            <h2
-              className="mt-5 font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Siapa di balik karya ini?
-            </h2>
-            <p className="mt-6 max-w-[52ch] text-[17px] leading-relaxed text-muted">
-              Saya adalah programmer yang membangun solusi digital yang andal,
-              scalable, dan berdampak nyata. Dengan pengalaman di berbagai proyek
-              beragam, saya memahami tantangan dari startup hingga perusahaan
-              besar, dan berkomitmen untuk kode yang bersih, performant, dan
-              mudah dipelihara.
-            </p>
-          </div>
-        </Reveal>
+    <section id="tentang" className="relative overflow-hidden bg-background">
+      {/* faint dotted texture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.5]"
+        style={{
+          backgroundImage: "radial-gradient(rgba(21,20,15,0.10) 1px, transparent 1px)",
+          backgroundSize: "26px 26px",
+          maskImage: "radial-gradient(70% 60% at 20% 20%, black, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(70% 60% at 20% 20%, black, transparent 75%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
+        <SectionHeading
+          index="01"
+          eyebrow="Tentang"
+          title="Siapa di balik karya ini?"
+          description="Programmer yang membangun solusi digital andal, scalable, dan berdampak nyata — dari startup hingga perusahaan besar."
+        />
 
-        {/* Kanan — baris bernomor dengan divider atas */}
-        <div>
+        <div className="mt-14 grid gap-4 md:grid-cols-3">
           {highlights.map((item, i) => (
-            <Reveal key={item.title} delay={i * 90}>
-              <div className="group flex gap-6 border-t border-border py-6 transition-colors first:border-t first:pt-6 hover:border-border-strong">
-                <span
-                  className="font-mono text-sm font-medium text-accent-hover transition-transform duration-300 group-hover:translate-x-0.5"
-                  style={{ fontFamily: "var(--font-mono-jb)" }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface-alt text-foreground transition-colors group-hover:border-border-strong group-hover:bg-accent group-hover:text-accent-ink">
-                      <item.icon size={15} strokeWidth={1.5} />
+            <Reveal key={item.title} delay={i * 100}>
+              <article className="group relative h-full overflow-hidden rounded-3xl border border-border bg-surface p-7 transition-all duration-300 hover:-translate-y-1.5 hover:border-border-strong hover:shadow-[0_28px_60px_rgba(21,20,15,0.14)]">
+                {/* hover lime wash */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ background: "radial-gradient(120% 90% at 50% 0%, rgba(199,242,60,0.14), transparent 60%)" }}
+                />
+                <div className="relative">
+                  <div className="flex items-center justify-between">
+                    <span className="flex size-12 items-center justify-center rounded-2xl bg-dark text-accent shadow-[0_10px_28px_rgba(21,20,15,0.25)] transition-all duration-300 group-hover:rotate-6 group-hover:bg-accent group-hover:text-accent-ink group-hover:shadow-[0_10px_28px_rgba(199,242,60,0.45)]">
+                      <item.icon size={20} strokeWidth={1.8} />
                     </span>
-                    <h3
-                      className="text-[17px] font-semibold tracking-tight text-foreground"
-                      style={{ fontFamily: "var(--font-display)" }}
-                    >
-                      {item.title}
-                    </h3>
+                    <span className="font-mono text-[11px] font-semibold text-muted-light" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                   </div>
-                  <p className="mt-2 max-w-[42ch] text-[14px] leading-relaxed text-muted">
+                  <p className="mt-6 inline-flex rounded-full bg-surface-alt px-3 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                    {item.tag}
+                  </p>
+                  <h3 className="mt-3 font-display text-[21px] font-semibold tracking-tight text-foreground" style={{ fontFamily: "var(--font-display)" }}>
+                    {item.title}
+                  </h3>
+                  <p className="mt-2.5 text-[14.5px] leading-relaxed text-muted">
                     {item.text}
                   </p>
                 </div>
-              </div>
+              </article>
             </Reveal>
           ))}
-          {/* Divider penutup */}
-          <div className="border-t border-border" />
         </div>
+
+        {/* Bio strip */}
+        <Reveal delay={120}>
+          <div className="relative mt-4 flex flex-col items-start justify-between gap-5 overflow-hidden rounded-3xl bg-dark p-8 sm:flex-row sm:items-center sm:p-10">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute"
+              style={{ inset: 0, background: "radial-gradient(60% 120% at 90% 50%, rgba(199,242,60,0.14), transparent 60%)" }}
+            />
+            <p className="relative max-w-[62ch] text-[15.5px] leading-relaxed text-background/85">
+              <span className="font-semibold text-accent">Prinsip saya sederhana:</span>{" "}
+              kode yang bersih, performant, dan mudah dipelihara — dibungkus pengalaman
+              yang terasa premium bagi pengguna. Tertarik kerja sama?
+            </p>
+            <a href={`mailto:${siteConfig.email}`} className="btn btn-primary relative shrink-0">
+              Diskusi Proyek
+              <ArrowUpRight size={16} />
+            </a>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

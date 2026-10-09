@@ -25,10 +25,12 @@ import {
   ErrorBanner,
   Field,
   IconButton,
+  ListSkeleton,
   Modal,
   OutlineButton,
   PageHeader,
   PrimaryButton,
+  TableSkeleton,
   TextInput,
 } from "@/components/admin/ui";
 
@@ -320,7 +322,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
       {/* ---- Tabel (desktop) ---- */}
       {!loading && items.length > 0 ? (
-        <div className="hidden overflow-hidden rounded-[14px] border border-border sm:block">
+        <div className="admin-table-wrap hidden sm:block">
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
               <tr>
@@ -364,15 +366,13 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
           </table>
         </div>
       ) : loading ? (
-        <div className="card hidden p-8 text-center text-sm text-muted sm:block">
-          Memuat data...
-        </div>
+        <TableSkeleton />
       ) : null}
 
       {/* ---- Mobile list ---- */}
       <div className="space-y-3 sm:hidden">
         {loading ? (
-          <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
+          <ListSkeleton />
         ) : items.length > 0 ? (
           items.map((cert) => (
             <div key={cert.id} className="card p-4">
@@ -446,7 +446,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
           {rows.map((row, i) => (
             <div
               key={row.key}
-              className="rounded-[14px] border border-border bg-surface-alt/60 p-4"
+              className="admin-row-card"
             >
               <div className="mb-3 flex items-center justify-between">
                 <span
@@ -507,8 +507,8 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
                 <Field label="Foto Sertifikat" className="sm:col-span-2">
                   <label
-                    className={`flex h-[110px] w-full items-center gap-3 overflow-hidden rounded-[12px] border border-dashed border-border-strong bg-surface px-4 text-muted transition-colors hover:border-foreground hover:text-foreground ${
-                      row.uploadingImage ? "pointer-events-none opacity-60" : "cursor-pointer"
+                    className={`admin-dropzone ${
+                      row.uploadingImage ? "pointer-events-none opacity-60" : ""
                     }`}
                   >
                     <input
@@ -527,10 +527,10 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                       <img
                         src={row.imagePreview}
                         alt=""
-                        className="h-[86px] w-[110px] shrink-0 rounded-[8px] border border-border object-cover"
+                        className="h-[86px] w-[110px] shrink-0 rounded-xl border border-border object-cover shadow-sm"
                       />
                     ) : (
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface-alt">
+                      <span className="admin-thumb h-9 w-9">
                         {row.uploadingImage ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : (
@@ -629,7 +629,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
             <Field label="Foto Sertifikat" className="sm:col-span-2">
               <label
-                className={`flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-border-strong bg-surface-alt text-muted transition-colors hover:border-foreground hover:text-foreground ${
+                className={`flex min-h-[150px] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-[1.5px] border-dashed border-muted-light bg-surface text-muted transition-all hover:border-accent-hover hover:bg-accent/[0.05] hover:text-foreground ${
                   editUploading ? "pointer-events-none opacity-60" : "cursor-pointer"
                 }`}
               >
@@ -645,7 +645,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                   }}
                 />
                 {editImagePreview ? (
-                  <div className="relative h-full w-full overflow-hidden rounded-[14px]">
+                  <div className="relative h-full min-h-[150px] w-full overflow-hidden rounded-2xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={editImagePreview}
@@ -711,13 +711,13 @@ function Thumb({ cert }: { cert: { imageUrl: string | null } }) {
       <img
         src={cert.imageUrl}
         alt=""
-        className="size-11 shrink-0 rounded-[8px] border border-border object-cover"
+        className="h-11 w-11 shrink-0 rounded-xl border border-border object-cover shadow-sm"
       />
     );
   }
   return (
-    <span className="flex size-11 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface-alt text-muted">
-      <Award size={16} />
+    <span className="admin-thumb">
+      <Award size={17} />
     </span>
   );
 }

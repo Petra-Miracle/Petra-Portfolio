@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
-import { MarqueeRow } from "@/components/MarqueeRow";
-import { ExternalLink, FolderGit2, Trophy, X } from "lucide-react";
+import { SectionHeading } from "@/components/SectionHeading";
+import { ArrowUpRight, ExternalLink, FolderGit2, PackageOpen, Trophy, X } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 
 interface ProjectsProps {
@@ -14,68 +15,105 @@ interface ProjectsProps {
   competitions: Project[];
 }
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 export function ProjectsSection({ projects, competitions }: ProjectsProps) {
+  const hasAny = projects.length > 0 || competitions.length > 0;
+
   return (
-    <section id="proyek" className="overflow-hidden bg-background">
-      <div className="mx-auto max-w-[1280px] px-6 pb-[80px] pt-[140px] sm:px-10 lg:px-20">
-        <Reveal>
-          <div>
-            <p
-              className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-muted"
-              style={{ fontFamily: "var(--font-mono-jb)" }}
-            >
-              Karya &amp; Kompetisi
-            </p>
-            <h2
-              className="mt-5 font-display text-4xl font-semibold tracking-tight text-foreground"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Hasil Karya Terbaik
-            </h2>
+    <section id="proyek" className="relative overflow-hidden bg-background">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.5]"
+        style={{
+          backgroundImage: "radial-gradient(rgba(21,20,15,0.08) 1px, transparent 1px)",
+          backgroundSize: "26px 26px",
+          maskImage: "radial-gradient(60% 40% at 80% 0%, black, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(60% 40% at 80% 0%, black, transparent 75%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
+        <SectionHeading
+          index="04"
+          eyebrow="Karya & Kompetisi"
+          title="Karya yang berbicara"
+          description="Project pilihan dan pencapaian kompetisi — klik kartu mana pun untuk detail, demo, dan repository."
+        />
+
+        {!hasAny ? (
+          <Reveal>
+            <div className="empty-state mt-14 rounded-3xl! p-14!">
+              <span className="empty-state-icon size-14!">
+                <PackageOpen size={24} strokeWidth={1.5} />
+              </span>
+              <p className="empty-state-title">Belum ada data project.</p>
+              <p className="empty-state-desc">Data akan muncul otomatis setelah ditambahkan melalui panel admin.</p>
+            </div>
+          </Reveal>
+        ) : null}
+
+        {/* ---- Projects ---- */}
+        {projects.length > 0 && (
+          <div className="mt-14">
+            <Reveal>
+              <Subhead count={projects.length} label="Project Pilihan" />
+            </Reveal>
+            {/* Featured + grid */}
+            <div className="mt-7 grid gap-5 lg:grid-cols-2">
+              {projects.slice(0, 1).map((p, i) => (
+                <Reveal key={p.id} delay={i * 80} className="lg:col-span-2">
+                  <FeaturedProjectCard project={p} />
+                </Reveal>
+              ))}
+              {projects.slice(1).map((p, i) => (
+                <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
+                  <ProjectCard project={p} />
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </Reveal>
+        )}
+
+        {/* ---- Competitions ---- */}
+        {competitions.length > 0 && (
+          <div className="mt-16">
+            <Reveal>
+              <Subhead count={competitions.length} label="Kompetisi & Lomba" dark />
+            </Reveal>
+            <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {competitions.map((p, i) => (
+                <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
+                  <CompetitionCard project={p} />
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-
-      {projects.length > 0 && (
-        <Reveal className="mb-10">
-          <MarqueeRow>
-            {projects.map((p) => (
-              <ProjectCard key={p.id} project={p} />
-            ))}
-          </MarqueeRow>
-        </Reveal>
-      )}
-
-      {competitions.length > 0 && (
-        <Reveal className="mb-[80px]">
-          <MarqueeRow reversed>
-            {competitions.map((p) => (
-              <CompetitionCard key={p.id} project={p} />
-            ))}
-          </MarqueeRow>
-        </Reveal>
-      )}
-
-      {projects.length === 0 && (
-        <Reveal>
-          <EmptyMarquee
-            title="Belum ada data project."
-            description="Data akan muncul setelah ditambahkan melalui panel admin."
-          />
-        </Reveal>
-      )}
     </section>
   );
 }
 
+function Subhead({ count, label, dark = false }: { count: number; label: string; dark?: boolean }) {
+  return (
+    <div className="flex items-center gap-3.5">
+      <h3 className={`font-mono text-[12px] font-bold uppercase tracking-[0.2em] ${dark ? "text-foreground" : "text-foreground"}`} style={{ fontFamily: "var(--font-mono-jb)" }}>
+        {label}
+      </h3>
+      <span className="rounded-full bg-dark px-2.5 py-1 font-mono text-[11px] font-bold text-accent" style={{ fontFamily: "var(--font-mono-jb)" }}>
+        {String(count).padStart(2, "0")}
+      </span>
+      <span className="h-px flex-1 bg-border" aria-hidden />
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------
-   Project card — 300x400, paper-dim
+   Featured project — wide editorial card
 ------------------------------------------------------------------- */
 
-function ProjectCard({ project }: { project: Project }) {
+function FeaturedProjectCard({ project }: { project: Project }) {
   const [detailOpen, setDetailOpen] = useState(false);
-  const visibleTags = project.techStack.slice(0, 3);
-  const extra = project.techStack.length - visibleTags.length;
 
   return (
     <>
@@ -90,109 +128,90 @@ function ProjectCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="group mr-6 flex h-[400px] w-[300px] shrink-0 cursor-pointer flex-col overflow-hidden rounded-[14px] border border-border bg-surface-alt transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-[0_24px_56px_rgba(21,20,15,0.16)]"
+        className="group grid cursor-pointer overflow-hidden rounded-[28px] border border-border bg-surface shadow-[0_10px_40px_rgba(21,20,15,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_32px_72px_rgba(21,20,15,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent md:grid-cols-[1.15fr_1fr]"
       >
-        {/* Foto */}
-        <div className="relative h-[190px] shrink-0 overflow-hidden bg-surface">
+        <div className="relative min-h-[260px] overflow-hidden bg-surface-alt md:min-h-[340px]">
           {project.imageUrl ? (
             <Image
               src={project.imageUrl}
               alt={project.title}
               fill
-              sizes="300px"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+              sizes="(max-width: 768px) 100vw, 60vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
             />
           ) : (
-            <div className="flex h-full items-center justify-center">
-              <Trophy size={24} className="text-muted" strokeWidth={1} />
+            <div className="flex h-full min-h-[260px] items-center justify-center">
+              <FolderGit2 size={36} className="text-muted-light" strokeWidth={1} />
             </div>
           )}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-dark/30 via-transparent to-transparent opacity-60" />
+          <span className="glass-dark absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-accent" style={{ fontFamily: "var(--font-mono-jb)" }}>
+            <Sparkle />
+            Featured
+          </span>
         </div>
 
-        {/* Body */}
-        <div className="flex flex-1 flex-col p-5">
-          <h3
-            className="font-display text-[15px] font-semibold leading-snug tracking-tight text-foreground"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
+        <div className="flex flex-col p-7 sm:p-9">
+          <div className="flex items-center gap-2 font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+            {project.year ? <span>{project.year}</span> : null}
+            {project.year && project.techStack.length > 0 ? <span aria-hidden>·</span> : null}
+            {project.techStack.slice(0, 2).join(" · ")}
+          </div>
+          <h4 className="mt-3 font-display text-[26px] font-semibold leading-tight tracking-tight text-foreground sm:text-[30px]" style={{ fontFamily: "var(--font-display)" }}>
             {project.title}
-          </h3>
-          <p className="mt-2 line-clamp-2 shrink-0 text-[13px] leading-relaxed text-muted">
+          </h4>
+          <p className="mt-3 line-clamp-3 text-[14.5px] leading-relaxed text-muted">
             {project.description}
           </p>
-
-          {visibleTags.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {visibleTags.map((tech, i) => (
-                <span
-                  key={`${project.id}-${i}`}
-                  className="rounded-[6px] border border-border bg-surface px-2 py-1 font-mono text-[11px] text-muted"
-                  style={{ fontFamily: "var(--font-mono-jb)" }}
-                >
+          {project.techStack.length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-1.5">
+              {project.techStack.slice(0, 4).map((tech, i) => (
+                <span key={`${project.id}-${i}`} className="tag tag-light">
                   {tech}
                 </span>
               ))}
-              {extra > 0 ? (
-                <span
-                  className="rounded-[6px] border border-border bg-surface px-2 py-1 font-mono text-[11px] text-muted"
-                  style={{ fontFamily: "var(--font-mono-jb)" }}
-                >
-                  +{extra}
-                </span>
-              ) : null}
+              {project.techStack.length > 4 && (
+                <span className="tag tag-light">+{project.techStack.length - 4}</span>
+              )}
             </div>
-          ) : null}
-
-          <div className="mt-auto flex items-center gap-2.5 pt-4">
-            {project.demoUrl ? (
-              <a
-                href={project.demoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Buka demo ${project.title}`}
-                title="Buka demo"
-                onClick={(e) => e.stopPropagation()}
-                className="btn btn-icon btn-outline"
-              >
-                <ExternalLink size={14} />
-              </a>
-            ) : null}
-            {project.repoUrl ? (
-              <a
-                href={project.repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Lihat repository ${project.title}`}
-                title="Lihat repository"
-                onClick={(e) => e.stopPropagation()}
-                className="btn btn-icon btn-outline"
-              >
-                <SocialIcon name="github" className="size-3.5" />
-              </a>
-            ) : null}
+          )}
+          <div className="mt-auto flex items-center gap-3 pt-7">
+            <span className="btn btn-primary btn-sm px-5! py-3!">
+              Lihat Detail
+              <ArrowUpRight size={15} />
+            </span>
+            {(project.demoUrl || project.repoUrl) && (
+              <span className="font-mono text-[11.5px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                + demo & repo tersedia
+              </span>
+            )}
           </div>
         </div>
       </article>
 
-      {detailOpen ? (
-        <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
-      ) : null}
+      <AnimatePresence>
+        {detailOpen ? (
+          <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }
 
+function Sparkle() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z" />
+    </svg>
+  );
+}
+
 /* ------------------------------------------------------------------
-   Competition card — 300x230, ink-soft
+   Project card — standard grid
 ------------------------------------------------------------------- */
 
-function CompetitionCard({ project }: { project: Project }) {
+function ProjectCard({ project }: { project: Project }) {
   const [detailOpen, setDetailOpen] = useState(false);
-  const visibleTags = project.techStack.slice(0, 2);
-  const extra = project.techStack.length - visibleTags.length;
 
   return (
     <>
@@ -207,77 +226,176 @@ function CompetitionCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="group mr-6 flex h-[230px] w-[300px] shrink-0 cursor-pointer flex-col rounded-[14px] border border-transparent bg-dark-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/25 hover:shadow-[0_24px_56px_rgba(0,0,0,0.4)]"
+        className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[24px] border border-border bg-surface transition-all duration-300 hover:-translate-y-1.5 hover:border-border-strong hover:shadow-[0_28px_64px_rgba(21,20,15,0.16)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
       >
-        <div className="flex items-center justify-between">
-          <span className="flex size-10 items-center justify-center rounded-[10px] bg-dark text-accent transition-transform duration-300 group-hover:scale-105">
-            <Trophy size={18} />
+        <div className="relative h-[210px] shrink-0 overflow-hidden bg-surface-alt">
+          {project.imageUrl ? (
+            <Image
+              src={project.imageUrl}
+              alt={project.title}
+              fill
+              sizes="(max-width: 1024px) 100vw, 40vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <FolderGit2 size={30} className="text-muted-light" strokeWidth={1} />
+            </div>
+          )}
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-dark/35 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <span className="absolute right-4 top-4 flex size-10 translate-y-1 items-center justify-center rounded-full bg-accent text-accent-ink opacity-0 shadow-[0_8px_24px_rgba(199,242,60,0.5)] transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            <ArrowUpRight size={17} />
+          </span>
+          {project.year ? (
+            <span className="glass-dark absolute left-4 top-4 rounded-full px-3 py-1 font-mono text-[10.5px] font-bold text-background" style={{ fontFamily: "var(--font-mono-jb)" }}>
+              {project.year}
+            </span>
+          ) : null}
+        </div>
+
+        <div className="flex flex-1 flex-col p-6">
+          <h4 className="font-display text-[19px] font-semibold leading-snug tracking-tight text-foreground" style={{ fontFamily: "var(--font-display)" }}>
+            {project.title}
+          </h4>
+          <p className="mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-muted">
+            {project.description}
+          </p>
+          {project.techStack.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {project.techStack.slice(0, 3).map((tech, i) => (
+                <span key={`${project.id}-${i}`} className="rounded-lg border border-border bg-surface-alt px-2.5 py-1 font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                  {tech}
+                </span>
+              ))}
+              {project.techStack.length > 3 && (
+                <span className="rounded-lg border border-border bg-surface-alt px-2.5 py-1 font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                  +{project.techStack.length - 3}
+                </span>
+              )}
+            </div>
+          )}
+          <div className="mt-auto flex items-center gap-2 pt-5">
+            {project.demoUrl ? (
+              <ActionIcon href={project.demoUrl} label={`Buka demo ${project.title}`}>
+                <ExternalLink size={14} />
+              </ActionIcon>
+            ) : null}
+            {project.repoUrl ? (
+              <ActionIcon href={project.repoUrl} label={`Lihat repository ${project.title}`}>
+                <SocialIcon name="github" className="size-3.5" />
+              </ActionIcon>
+            ) : null}
+            <span className="ml-auto font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-light opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ fontFamily: "var(--font-mono-jb)" }}>
+              Detail →
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <AnimatePresence>
+        {detailOpen ? (
+          <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
+        ) : null}
+      </AnimatePresence>
+    </>
+  );
+}
+
+function ActionIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      title={label}
+      onClick={(e) => e.stopPropagation()}
+      className="btn btn-icon btn-outline rounded-full! transition-all hover:bg-dark! hover:text-accent!"
+    >
+      {children}
+    </a>
+  );
+}
+
+/* ------------------------------------------------------------------
+   Competition card
+------------------------------------------------------------------- */
+
+function CompetitionCard({ project }: { project: Project }) {
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  return (
+    <>
+      <article
+        role="button"
+        tabIndex={0}
+        onClick={() => setDetailOpen(true)}
+        onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return;
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setDetailOpen(true);
+          }
+        }}
+        className="group gradient-border relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[24px] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_28px_64px_rgba(0,0,0,0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ background: "radial-gradient(100% 70% at 50% 0%, rgba(199,242,60,0.10), transparent 65%)" }}
+        />
+        <div className="relative flex items-center justify-between">
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-accent text-accent-ink shadow-[0_8px_28px_rgba(199,242,60,0.35)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+            <Trophy size={20} />
           </span>
           {project.result ? (
-            <span className="badge-success">
+            <span className="badge-success rounded-full! px-3.5! py-1.5!">
               <Trophy size={12} />
               {project.result}
             </span>
           ) : null}
         </div>
 
-        <h3
-          className="mt-4 font-display text-[17px] font-semibold leading-snug tracking-tight text-background"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
+        <h4 className="relative mt-5 font-display text-[19px] font-semibold leading-snug tracking-tight text-background" style={{ fontFamily: "var(--font-display)" }}>
           {project.title}
-        </h3>
-        <p className="mt-2.5 line-clamp-2 shrink-0 text-[13px] leading-relaxed text-background/80">
+        </h4>
+        <p className="relative mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-background/70">
           {project.description}
         </p>
 
-        <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
-          {visibleTags.map((tech, i) => (
-            <span
-              key={`${project.id}-${i}`}
-              className="rounded-[6px] border border-border-strong bg-dark px-2.5 py-1 font-mono text-[11px] text-background/70"
-              style={{ fontFamily: "var(--font-mono-jb)" }}
-            >
+        <div className="relative mt-auto flex flex-wrap items-center gap-1.5 pt-5">
+          {project.techStack.slice(0, 2).map((tech, i) => (
+            <span key={`${project.id}-${i}`} className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 font-mono text-[11px] text-background/75" style={{ fontFamily: "var(--font-mono-jb)" }}>
               {tech}
             </span>
           ))}
-          {extra > 0 ? (
-            <span
-              className="rounded-[6px] border border-border-strong bg-dark px-2.5 py-1 font-mono text-[11px] text-background/70"
-              style={{ fontFamily: "var(--font-mono-jb)" }}
-            >
-              +{extra}
+          {project.techStack.length > 2 && (
+            <span className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 font-mono text-[11px] text-background/75" style={{ fontFamily: "var(--font-mono-jb)" }}>
+              +{project.techStack.length - 2}
             </span>
-          ) : null}
+          )}
           {project.year ? (
-            <span
-              className="ml-auto font-mono text-[11px] text-background/50"
-              style={{ fontFamily: "var(--font-mono-jb)" }}
-            >
+            <span className="ml-auto font-mono text-[11px] text-background/45" style={{ fontFamily: "var(--font-mono-jb)" }}>
               {project.year}
             </span>
           ) : null}
         </div>
       </article>
 
-      {detailOpen ? (
-        <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
-      ) : null}
+      <AnimatePresence>
+        {detailOpen ? (
+          <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }
 
 /* ------------------------------------------------------------------
-   Detail modal — shown when a project/competition card is clicked
+   Detail modal — spring entrance, blurred backdrop
 ------------------------------------------------------------------- */
 
-function ProjectDetailModal({
-  project,
-  onClose,
-}: {
-  project: Project;
-  onClose: () => void;
-}) {
+function ProjectDetailModal({ project, onClose }: { project: Project; onClose: () => void }) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -300,168 +418,102 @@ function ProjectDetailModal({
   const hasLinks = Boolean(project.demoUrl || project.repoUrl);
 
   return createPortal(
-    <div
-      className="modal-scrim items-center p-4 sm:p-6"
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-dark/70 p-4 backdrop-blur-md sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="project-modal-title"
       onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22 }}
     >
-      <div
-        className="modal-panel flex w-full max-w-[460px] flex-col overflow-hidden rounded-[28px] border border-border shadow-[0_32px_80px_rgba(21,20,15,0.28)]"
-        style={{ maxHeight: "88vh" }}
+      <motion.div
+        className="flex max-h-[88vh] w-full max-w-[520px] flex-col overflow-hidden rounded-[28px] border border-border bg-background shadow-[0_40px_100px_rgba(0,0,0,0.45)]"
         onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 44, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 28, scale: 0.96 }}
+        transition={{ duration: 0.4, ease: EASE }}
       >
-        {/* Media header — visual proof of work comes first */}
-        <div className="relative h-[200px] w-full shrink-0 overflow-hidden sm:h-[240px]">
+        <div className="relative h-[210px] w-full shrink-0 overflow-hidden sm:h-[250px]">
           {project.imageUrl ? (
             <Image
               src={project.imageUrl}
               alt={project.title}
               fill
-              sizes="(max-width: 640px) 100vw, 460px"
+              sizes="(max-width: 640px) 100vw, 520px"
               className="object-cover"
             />
           ) : (
-            <div
-              className={`flex h-full items-center justify-center ${
-                isCompetition ? "bg-dark-surface" : "bg-surface-alt"
-              }`}
-            >
-              <HeaderIcon
-                size={32}
-                strokeWidth={1.25}
-                className={isCompetition ? "text-accent" : "text-muted"}
-              />
+            <div className={`flex h-full items-center justify-center ${isCompetition ? "bg-dark-surface" : "bg-surface-alt"}`}>
+              <HeaderIcon size={36} strokeWidth={1.25} className={isCompetition ? "text-accent" : "text-muted"} />
             </div>
           )}
-
-          {/* Legibility gradient for the overlaid pill + close button */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(21,20,15,0.45), rgba(21,20,15,0) 55%)",
-            }}
-          />
-
-          <span
-            className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-dark/80 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-background backdrop-blur-sm"
-            style={{ fontFamily: "var(--font-mono-jb)" }}
-          >
-            <HeaderIcon size={11} />
+          <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(21,20,15,0.5), transparent 55%)" }} />
+          <span className="glass-dark absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-background" style={{ fontFamily: "var(--font-mono-jb)" }}>
+            <HeaderIcon size={11} className="text-accent" />
             {typeLabel}
           </span>
-
           <button
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-full bg-background/90 text-foreground shadow-[0_4px_14px_rgba(21,20,15,0.25)] backdrop-blur-sm transition-all duration-150 hover:scale-105 hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+            className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg backdrop-blur-sm transition-all duration-150 hover:rotate-90 hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           >
-            <X size={15} />
+            <X size={16} />
           </button>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-7">
-          <h3
-            id="project-modal-title"
-            className="font-display text-[20px] font-semibold leading-snug tracking-tight text-foreground"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
+        <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8">
+          <h3 id="project-modal-title" className="font-display text-[23px] font-semibold leading-snug tracking-tight text-foreground" style={{ fontFamily: "var(--font-display)" }}>
             {project.title}
           </h3>
-
-          {project.result || project.year ? (
-            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          {(project.result || project.year) && (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               {project.result ? (
-                <span className="badge-success">
-                  <Trophy size={12} />
-                  {project.result}
-                </span>
+                <span className="badge-success"><Trophy size={12} />{project.result}</span>
               ) : null}
               {project.year ? (
-                <span
-                  className="font-mono text-[12px] text-muted"
-                  style={{ fontFamily: "var(--font-mono-jb)" }}
-                >
-                  {project.year}
-                </span>
+                <span className="font-mono text-[12.5px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>{project.year}</span>
               ) : null}
             </div>
-          ) : null}
-
-          <p className="mt-4 text-[14px] leading-relaxed text-muted">
-            {project.description}
-          </p>
-
-          {project.techStack.length > 0 ? (
-            <div className="mt-5">
-              <p
-                className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-light"
-                style={{ fontFamily: "var(--font-mono-jb)" }}
-              >
+          )}
+          <p className="mt-4 text-[14.5px] leading-relaxed text-muted">{project.description}</p>
+          {project.techStack.length > 0 && (
+            <div className="mt-6">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-muted-light" style={{ fontFamily: "var(--font-mono-jb)" }}>
                 Tech Stack
               </p>
               <div className="mt-2.5 flex flex-wrap gap-2">
                 {project.techStack.map((tech, i) => (
-                  <span key={`${tech}-${i}`} className="tag tag-light">
-                    {tech}
-                  </span>
+                  <span key={`${tech}-${i}`} className="tag tag-light">{tech}</span>
                 ))}
               </div>
             </div>
-          ) : null}
+          )}
         </div>
 
-        {/* Sticky CTA footer — primary action stays visually dominant */}
         {hasLinks ? (
-          <div className="flex shrink-0 gap-2.5 border-t border-border bg-background p-5 sm:px-7">
+          <div className="flex shrink-0 gap-2.5 border-t border-border bg-background p-5 sm:px-8">
             {project.demoUrl ? (
-              <a
-                href={project.demoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`btn btn-primary ${project.repoUrl ? "flex-1" : "w-full"}`}
-              >
+              <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className={`btn btn-primary ${project.repoUrl ? "flex-1" : "w-full"}`}>
                 <ExternalLink size={14} />
                 Buka Demo
               </a>
             ) : null}
             {project.repoUrl ? (
-              <a
-                href={project.repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`btn btn-outline ${project.demoUrl ? "flex-1" : "w-full"}`}
-              >
+              <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className={`btn btn-outline ${project.demoUrl ? "flex-1" : "w-full"}`}>
                 <SocialIcon name="github" className="size-3.5" />
                 Lihat Repo
               </a>
             ) : null}
           </div>
         ) : null}
-      </div>
-    </div>,
+      </motion.div>
+    </motion.div>,
     document.body,
-  );
-}
-
-function EmptyMarquee({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="mx-auto mb-[80px] max-w-[1280px] px-6 sm:px-10 lg:px-20">
-      <div className="empty-state">
-        <p className="empty-state-title">{title}</p>
-        <p className="empty-state-desc">{description}</p>
-      </div>
-    </div>
   );
 }

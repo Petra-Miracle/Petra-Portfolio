@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
 const SECTION_IDS = siteConfig.navLinks.map((l) => l.href.replace("#", ""));
@@ -17,14 +18,10 @@ export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [active, setActive] = useState("#tentang");
   const [scrolled, setScrolled] = useState(false);
-  const [navRowHeight, setNavRowHeight] = useState(88);
   const headerRef = useRef<HTMLElement>(null);
-  const navRowRef = useRef<HTMLElement>(null);
 
-  /* ---- measure the nav row so the mobile overlay can sit flush below it ---- */
-  useEffect(() => {
-    if (navRowRef.current) setNavRowHeight(navRowRef.current.offsetHeight);
-  }, []);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
 
   /* ---- lock body scroll while the mobile overlay is open ---- */
   useEffect(() => {
@@ -36,7 +33,7 @@ export function Navigation() {
     };
   }, [mobileOpen]);
 
-  /* ---- transparent over Hero, solid once it scrolls past ---- */
+  /* ---- transparent over Hero, glass once it scrolls past ---- */
   useEffect(() => {
     const heroEl = document.getElementById("beranda");
 
@@ -46,8 +43,6 @@ export function Navigation() {
         return;
       }
       const navHeight = headerRef.current?.offsetHeight ?? 88;
-      // +16px buffer absorbs the page's scroll-padding-top overshoot when
-      // jumping to an anchor, so the switch doesn't lag behind by a sliver.
       setScrolled(heroEl.getBoundingClientRect().bottom <= navHeight + 16);
     };
 
@@ -86,99 +81,137 @@ export function Navigation() {
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   return (
-    <header
-      ref={headerRef}
-      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300 ${
-        scrolled || mobileOpen
-          ? "border-b border-border-strong bg-dark shadow-[0_8px_30px_rgba(0,0,0,0.25)]"
-          : "border-b border-transparent bg-transparent"
-      }`}
-    >
-      <nav
-        ref={navRowRef}
-        className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-6 sm:px-10 lg:px-20"
-      >
-        {/* Left: logo + nav links */}
-        <div className="flex items-center gap-10">
-          <a
-            href="#beranda"
-            className="font-mono text-[15px] font-semibold leading-none tracking-tight text-accent"
-            style={{ fontFamily: "var(--font-mono-jb)" }}
-          >
-            {initials(siteConfig.author.name)}.
-          </a>
+    <>
+      {/* Scroll progress hairline */}
+      <motion.div
+        aria-hidden
+        className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left"
+        style={{
+          scaleX: progress,
+          background: "linear-gradient(90deg, var(--accent-hover), var(--accent), #e9ff9e)",
+          boxShadow: "0 0 12px var(--accent-glow)",
+        }}
+      />
 
-          <div className="hidden items-center gap-8 md:flex">
-            {siteConfig.navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  active === link.href
-                    ? "text-background"
-                    : "text-dark-muted hover:text-background/80"
-                }`}
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: CTA (desktop) + hamburger (mobile) */}
-        <div className="flex items-center gap-1">
-          <a
-            href="#kontak"
-            className="btn btn-primary btn-primary-sm hidden md:inline-flex"
-          >
-            Hubungi Saya
-          </a>
-
-          <button
-            type="button"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-            className="btn btn-icon btn-ghost btn-ghost-dark md:hidden"
-            style={{ width: 36, height: 36 }}
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile overlay — fixed full-height so nothing bleeds through behind it */}
-      {mobileOpen && (
-        <div
-          className="mobile-menu-enter fixed inset-x-0 bottom-0 z-40 overflow-y-auto border-t border-border-strong bg-dark px-6 py-8 md:hidden"
-          style={{ top: navRowHeight }}
+      <header ref={headerRef} className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
+        <motion.nav
+          initial={{ y: -32, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className={`mx-auto flex max-w-[1280px] items-center justify-between gap-4 rounded-2xl py-3 pl-4 pr-3 transition-all duration-300 sm:pl-5 ${
+            scrolled || mobileOpen
+              ? "glass-dark shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
+              : "border border-white/[0.06] bg-dark/40 backdrop-blur-xl"
+          }`}
         >
-          <div className="space-y-1">
-            {siteConfig.navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={closeMobile}
-                className={`block rounded-xl px-4 py-3.5 text-base font-medium transition-colors ${
-                  active === link.href
-                    ? "bg-dark-surface text-background"
-                    : "text-dark-muted hover:bg-dark-surface/60 hover:text-background"
-                }`}
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-          <div className="pt-5">
-            <a
-              href="#kontak"
-              onClick={closeMobile}
-              className="btn btn-primary w-full"
-            >
-              Hubungi Saya
+          {/* Left: logo */}
+          <div className="flex items-center gap-8">
+            <a href="#beranda" className="group flex items-center gap-2.5">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-accent font-mono text-[13px] font-bold text-accent-ink shadow-[0_4px_18px_rgba(199,242,60,0.4)] transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                {initials(siteConfig.author.name)}
+              </span>
+              <span className="hidden flex-col leading-none lg:flex">
+                <span className="text-[13px] font-semibold tracking-tight text-background">
+                  {siteConfig.author.name}
+                </span>
+                <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                  {siteConfig.author.role}
+                </span>
+              </span>
             </a>
+
+            <div className="hidden items-center gap-1 md:flex">
+              {siteConfig.navLinks.map((link) => {
+                const isActive = active === link.href;
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className={`relative rounded-full px-3.5 py-2 text-[13.5px] font-medium transition-colors duration-200 ${
+                      isActive ? "text-accent-ink" : "text-dark-muted hover:text-background"
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="nav-active-pill"
+                        className="absolute inset-0 rounded-full bg-accent shadow-[0_4px_18px_rgba(199,242,60,0.4)]"
+                        transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      />
+                    )}
+                    <span className="relative">{link.label}</span>
+                  </a>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
-    </header>
+
+          {/* Right: CTA + hamburger */}
+          <div className="flex items-center gap-2">
+            <span className="mr-1 hidden items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-dark-muted xl:inline-flex" style={{ fontFamily: "var(--font-mono-jb)" }}>
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
+              </span>
+              Open to work
+            </span>
+            <a href="#kontak" className="btn btn-primary btn-primary-sm hidden py-2.5! md:inline-flex">
+              Hubungi Saya
+              <ArrowUpRight size={15} />
+            </a>
+
+            <button
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+              className="flex size-10 items-center justify-center rounded-xl border border-white/10 text-background transition-colors hover:bg-white/10 md:hidden"
+            >
+              {mobileOpen ? <X size={19} /> : <Menu size={19} />}
+            </button>
+          </div>
+        </motion.nav>
+
+        {/* Mobile overlay */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="glass-dark mt-2 overflow-hidden rounded-2xl p-3 shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:hidden"
+            >
+              <div className="space-y-1">
+                {siteConfig.navLinks.map((link, i) => (
+                  <motion.a
+                    key={link.href}
+                    href={link.href}
+                    onClick={closeMobile}
+                    initial={{ opacity: 0, x: -14 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * i, duration: 0.3 }}
+                    className={`flex items-center justify-between rounded-xl px-4 py-3.5 text-[15px] font-medium transition-colors ${
+                      active === link.href
+                        ? "bg-accent text-accent-ink"
+                        : "text-dark-muted hover:bg-white/[0.06] hover:text-background"
+                    }`}
+                  >
+                    {link.label}
+                    <span className="font-mono text-[10px] opacity-50" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                      0{i + 1}
+                    </span>
+                  </motion.a>
+                ))}
+              </div>
+              <div className="p-1 pt-3">
+                <a href="#kontak" onClick={closeMobile} className="btn btn-primary w-full">
+                  Hubungi Saya
+                  <ArrowUpRight size={16} />
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+    </>
   );
 }

@@ -111,12 +111,16 @@ export function SettingsManager({ token }: SettingsManagerProps) {
       ) : null}
 
       {loading ? (
-        <div className="card p-8 text-center text-sm text-muted">Memuat data...</div>
+        <div className="card space-y-3 p-6 sm:p-8">
+          <div className="skeleton h-5 w-44" />
+          <div className="skeleton h-16 w-full rounded-2xl" />
+          <div className="skeleton h-10 w-36 rounded-full" />
+        </div>
       ) : (
-        <div className="card p-6">
+        <div className="card p-6 sm:p-8">
           <Field label="CV (PDF)" hint="Maks. 5MB, format PDF." className="max-w-md">
             {cvUrl ? (
-              <div className="flex items-center justify-between gap-3 rounded-[8px] border border-border bg-surface-alt px-4 py-3">
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface-alt px-4 py-3.5 transition-colors hover:border-muted-light">
                 <a
                   href={cvUrl}
                   target="_blank"
