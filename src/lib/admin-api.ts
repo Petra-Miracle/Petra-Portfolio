@@ -2,6 +2,8 @@ import type {
   AdminUser,
   Certificate,
   CertificateInput,
+  GalleryItem,
+  GalleryItemInput,
   Project,
   ProjectInput,
   SiteSettings,
@@ -230,6 +232,40 @@ export function updateCertificate(
 
 export function deleteCertificate(token: string, id: string): Promise<void> {
   return authedRequest<void>(`/api/certificates/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export function getGallery(token: string): Promise<GalleryItem[]> {
+  return authedRequest<GalleryItem[]>("/api/gallery", { token });
+}
+
+export function createGalleryItemsBulk(
+  token: string,
+  items: GalleryItemInput[],
+): Promise<GalleryItem[]> {
+  return authedRequest<GalleryItem[]>("/api/gallery/bulk", {
+    method: "POST",
+    token,
+    body: { items },
+  });
+}
+
+export function updateGalleryItem(
+  token: string,
+  id: string,
+  body: Partial<GalleryItemInput>,
+): Promise<GalleryItem> {
+  return authedRequest<GalleryItem>(`/api/gallery/${id}`, {
+    method: "PUT",
+    token,
+    body,
+  });
+}
+
+export function deleteGalleryItem(token: string, id: string): Promise<void> {
+  return authedRequest<void>(`/api/gallery/${id}`, {
     method: "DELETE",
     token,
   });

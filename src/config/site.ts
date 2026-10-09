@@ -5,7 +5,7 @@ export const siteConfig = {
   author: {
     name: "Petra Lenggu",
     role: "Full-Stack Developer",
-    image: "/img/hero-profile.png",
+    image: "/img/pet-portfolio.jpg",
     // Ubah ke null untuk sembunyikan badge ketersediaan di Hero & Footer
     status: "Available" as "Available" | null,
   },
@@ -20,6 +20,7 @@ export const siteConfig = {
     { label: "Teknologi", href: "#teknologi" },
     { label: "Sertifikat", href: "#sertifikat" },
     { label: "Karya", href: "#proyek" },
+    { label: "Galeri", href: "#galeri" },
     { label: "Kontak", href: "#kontak" },
   ],
   socials: [

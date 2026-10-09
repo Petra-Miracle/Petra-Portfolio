@@ -63,6 +63,21 @@ export interface CertificateInput {
   order?: number;
 }
 
+export interface GalleryItem {
+  id: string;
+  caption: string;
+  imageUrl: string;
+  year: number | null;
+  order: number;
+}
+
+export interface GalleryItemInput {
+  caption: string;
+  imageUrl: string;
+  year?: number | null;
+  order?: number;
+}
+
 export interface AdminUser {
   id: string;
   email: string;

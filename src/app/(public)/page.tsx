@@ -1,6 +1,7 @@
 import {
   fetchAllProjects,
   fetchCertificates,
+  fetchGallery,
   fetchSiteSettings,
   fetchTechnologies,
 } from "@/lib/api";
@@ -10,15 +11,17 @@ import { About } from "@/components/About";
 import { Technologies } from "@/components/Technologies";
 import { Certificates } from "@/components/Certificates";
 import { ProjectsSection } from "@/components/ProjectsSection";
+import { Gallery } from "@/components/Gallery";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [technologies, { projects, competitions }, certificates, settings] =
+  const [technologies, { projects, competitions }, certificates, gallery, settings] =
     await Promise.all([
       fetchTechnologies(),
       fetchAllProjects(),
       fetchCertificates(),
+      fetchGallery(),
       fetchSiteSettings(),
     ]);
 
@@ -34,6 +37,7 @@ export default async function Home() {
       <Technologies technologies={technologies} />
       <Certificates certificates={certificates} />
       <ProjectsSection projects={projects} competitions={competitions} />
+      <Gallery items={gallery} />
     </main>
   );
 }

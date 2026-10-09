@@ -6,6 +6,7 @@ import {
   Award,
   ExternalLink,
   FolderGit2,
+  Images,
   Layers,
   LogOut,
   Menu,
@@ -16,13 +17,19 @@ import { getToken } from "@/lib/admin-api";
 import { TechnologiesManager } from "@/components/admin/TechnologiesManager";
 import { ProjectsManager } from "@/components/admin/ProjectsManager";
 import { CertificatesManager } from "@/components/admin/CertificatesManager";
+import { GalleryManager } from "@/components/admin/GalleryManager";
 import { SettingsManager } from "@/components/admin/SettingsManager";
 
 interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type SectionKey = "technologies" | "projects" | "certificates" | "settings";
+type SectionKey =
+  | "technologies"
+  | "projects"
+  | "certificates"
+  | "gallery"
+  | "settings";
 
 const initial = "P";
 
@@ -34,6 +41,7 @@ const NAV_ITEMS: {
   { key: "technologies", label: "Teknologi", icon: Layers },
   { key: "projects", label: "Project & Kompetisi", icon: FolderGit2 },
   { key: "certificates", label: "Sertifikat", icon: Award },
+  { key: "gallery", label: "Galeri", icon: Images },
   { key: "settings", label: "Pengaturan", icon: Settings },
 ];
 
@@ -123,6 +131,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <ProjectsManager token={token} />
         ) : section === "certificates" ? (
           <CertificatesManager token={token} />
+        ) : section === "gallery" ? (
+          <GalleryManager token={token} />
         ) : (
           <SettingsManager token={token} />
         )}

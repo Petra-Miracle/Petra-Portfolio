@@ -1,4 +1,11 @@
-import type { Certificate, Project, ProjectType, SiteSettings, Technology } from "@/lib/types";
+import type {
+  Certificate,
+  GalleryItem,
+  Project,
+  ProjectType,
+  SiteSettings,
+  Technology,
+} from "@/lib/types";
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
@@ -69,6 +76,17 @@ export async function fetchAllProjects(): Promise<{
 export async function fetchCertificates(): Promise<Certificate[]> {
   try {
     const data = await get<Certificate[]>("/api/certificates");
+    return Array.isArray(data)
+      ? data.sort((a, b) => a.order - b.order || (b.year ?? 0) - (a.year ?? 0))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchGallery(): Promise<GalleryItem[]> {
+  try {
+    const data = await get<GalleryItem[]>("/api/gallery");
     return Array.isArray(data)
       ? data.sort((a, b) => a.order - b.order || (b.year ?? 0) - (a.year ?? 0))
       : [];
