@@ -9,6 +9,9 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import Cpu from "@gravity-ui/icons/Cpu";
+import LayersIcon from "@gravity-ui/icons/Layers";
+import Sparkles from "@gravity-ui/icons/Sparkles";
 import type { Technology, TechnologyCategory } from "@/lib/types";
 import {
   createTechnology,
@@ -24,6 +27,7 @@ import {
   EmptyState,
   ErrorBanner,
   Field,
+  FilterDropdown,
   IconButton,
   ListSkeleton,
   Modal,
@@ -31,7 +35,6 @@ import {
   PageHeader,
   PrimaryButton,
   SegmentedControl,
-  Select,
   TableSkeleton,
   TextInput,
 } from "@/components/admin/ui";
@@ -233,15 +236,29 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
       {/* ---- Filter kategori ---- */}
       {!loading && items.length > 0 ? (
         <div className="admin-filterbar">
-          <Select
+          <FilterDropdown
             value={categoryFilter}
             onChange={setCategoryFilter}
-            aria-label="Filter kategori"
-            className="w-[170px]"
+            label="Filter kategori"
             options={[
-              { value: "ALL", label: "Semua Kategori" },
-              { value: "GENERAL", label: "General" },
-              { value: "AI", label: "AI" },
+              {
+                value: "ALL",
+                label: "Semua Kategori",
+                icon: <LayersIcon className="size-4 shrink-0 text-muted" />,
+                shortcut: "1",
+              },
+              {
+                value: "GENERAL",
+                label: "General",
+                icon: <Cpu className="size-4 shrink-0 text-muted" />,
+                shortcut: "2",
+              },
+              {
+                value: "AI",
+                label: "AI",
+                icon: <Sparkles className="size-4 shrink-0 text-muted" />,
+                shortcut: "3",
+              },
             ]}
           />
           <span className="admin-count-chip">

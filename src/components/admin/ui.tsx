@@ -8,7 +8,8 @@ import type {
 } from "react";
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Loader2, TriangleAlert, X } from "lucide-react";
+import { Button, Dropdown, Kbd, Label } from "@heroui/react";
+import { Check, ChevronDown, Loader2, TriangleAlert, X } from "lucide-react";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -211,6 +212,68 @@ export function Select<T extends string>({
       </select>
       <ChevronDown size={15} className="select-chevron" aria-hidden="true" />
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------
+   Filter dropdown (HeroUI Dropdown + Gravity icons + Kbd hints)
+   Drop-in replacement for the native Select in filter bars.
+------------------------------------------------------------------- */
+
+export interface FilterDropdownOption<T extends string> {
+  value: T;
+  label: string;
+  icon?: ReactNode;
+  shortcut?: string;
+}
+
+export function FilterDropdown<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+  className = "",
+}: {
+  value: T;
+  options: FilterDropdownOption<T>[];
+  onChange: (value: T) => void;
+  /** Accessible name for trigger + menu */
+  label: string;
+  className?: string;
+}) {
+  const current = options.find((o) => o.value === value) ?? options[0];
+
+  return (
+    <Dropdown>
+      <Button
+        variant="secondary"
+        aria-label={label}
+        className={`min-w-[190px] justify-between gap-3 rounded-xl px-4 py-2.5 text-[13px] font-semibold shadow-sm ${className}`}
+      >
+        <span className="flex min-w-0 items-center gap-2.5">
+          {current?.icon}
+          <span className="truncate">{current?.label}</span>
+        </span>
+        <ChevronDown size={15} className="shrink-0 opacity-60" aria-hidden />
+      </Button>
+      <Dropdown.Popover placement="bottom start" className="min-w-[230px]">
+        <Dropdown.Menu aria-label={label} onAction={(key) => onChange(String(key) as T)}>
+          {options.map((opt) => (
+            <Dropdown.Item key={opt.value} id={opt.value} textValue={opt.label}>
+              {opt.icon}
+              <Label>{opt.label}</Label>
+              {opt.value === value ? (
+                <Check size={15} strokeWidth={2.5} className="ms-auto shrink-0 text-accent" aria-hidden />
+              ) : opt.shortcut ? (
+                <Kbd className="ms-auto" slot="keyboard" variant="light">
+                  <Kbd.Content>{opt.shortcut}</Kbd.Content>
+                </Kbd>
+              ) : null}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown>
   );
 }
 

@@ -18,6 +18,9 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import FolderOpen from "@gravity-ui/icons/FolderOpen";
+import Layers from "@gravity-ui/icons/Layers";
+import SealCheck from "@gravity-ui/icons/SealCheck";
 import type { Project, ProjectType } from "@/lib/types";
 import {
   createProject,
@@ -32,6 +35,7 @@ import {
   EmptyState,
   ErrorBanner,
   Field,
+  FilterDropdown,
   IconButton,
   ListSkeleton,
   Modal,
@@ -39,7 +43,6 @@ import {
   PageHeader,
   PrimaryButton,
   SegmentedControl,
-  Select,
   TableSkeleton,
   TextArea,
   TextInput,
@@ -285,15 +288,29 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
       {/* ---- Filter tipe ---- */}
       {!loading && items.length > 0 ? (
         <div className="admin-filterbar">
-          <Select
+          <FilterDropdown
             value={typeFilter}
             onChange={setTypeFilter}
-            aria-label="Filter tipe"
-            className="w-[170px]"
+            label="Filter tipe"
             options={[
-              { value: "ALL", label: "Semua Tipe" },
-              { value: "PROJECT", label: "Project" },
-              { value: "COMPETITION", label: "Kompetisi" },
+              {
+                value: "ALL",
+                label: "Semua Tipe",
+                icon: <Layers className="size-4 shrink-0 text-muted" />,
+                shortcut: "1",
+              },
+              {
+                value: "PROJECT",
+                label: "Project",
+                icon: <FolderOpen className="size-4 shrink-0 text-muted" />,
+                shortcut: "2",
+              },
+              {
+                value: "COMPETITION",
+                label: "Kompetisi",
+                icon: <SealCheck className="size-4 shrink-0 text-muted" />,
+                shortcut: "3",
+              },
             ]}
           />
           <span className="admin-count-chip">
