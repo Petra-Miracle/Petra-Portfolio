@@ -170,45 +170,70 @@ export function Navigation() {
           </div>
         </motion.nav>
 
-        {/* Mobile overlay */}
+        {/* Mobile drawer — slides in from the right */}
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -12, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -12, scale: 0.98 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="glass-dark mt-2 overflow-hidden rounded-2xl p-3 shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:hidden"
-            >
-              <div className="space-y-1">
-                {siteConfig.navLinks.map((link, i) => (
-                  <motion.a
-                    key={link.href}
-                    href={link.href}
-                    onClick={closeMobile}
-                    initial={{ opacity: 0, x: -14 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.04 * i, duration: 0.3 }}
-                    className={`flex items-center justify-between rounded-xl px-4 py-3.5 text-[15px] font-medium transition-colors ${
-                      active === link.href
-                        ? "bg-accent text-accent-ink"
-                        : "text-dark-muted hover:bg-white/[0.06] hover:text-background"
-                    }`}
-                  >
-                    {link.label}
-                    <span className="font-mono text-[10px] opacity-50" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                      0{i + 1}
-                    </span>
-                  </motion.a>
-                ))}
-              </div>
-              <div className="p-1 pt-3">
-                <a href="#kontak" onClick={closeMobile} className="btn btn-primary w-full">
-                  Hubungi Saya
-                  <ArrowUpRight size={16} />
-                </a>
-              </div>
-            </motion.div>
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                onClick={closeMobile}
+                aria-hidden
+                className="fixed inset-0 z-40 bg-dark/60 backdrop-blur-sm md:hidden"
+              />
+              <motion.aside
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", stiffness: 320, damping: 34 }}
+                className="glass-dark fixed bottom-0 right-0 top-0 z-40 flex w-[300px] max-w-[85vw] flex-col border-l border-white/10 px-5 pb-8 pt-28 shadow-[0_0_80px_rgba(0,0,0,0.55)] md:hidden"
+              >
+                <p
+                  className="px-3 pb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-dark-muted"
+                  style={{ fontFamily: "var(--font-mono-jb)" }}
+                >
+                  Menu
+                </p>
+                <div className="flex-1 space-y-1 overflow-y-auto">
+                  {siteConfig.navLinks.map((link, i) => (
+                    <motion.a
+                      key={link.href}
+                      href={link.href}
+                      onClick={closeMobile}
+                      initial={{ opacity: 0, x: 28 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.06 + 0.05 * i, duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                      className={`flex items-center justify-between rounded-xl px-4 py-3.5 text-[15px] font-medium transition-colors ${
+                        active === link.href
+                          ? "bg-accent text-accent-ink shadow-[0_6px_24px_rgba(199,242,60,0.35)]"
+                          : "text-dark-muted hover:bg-white/[0.06] hover:text-background"
+                      }`}
+                    >
+                      {link.label}
+                      <span
+                        className="font-mono text-[10px] opacity-50"
+                        style={{ fontFamily: "var(--font-mono-jb)" }}
+                      >
+                        0{i + 1}
+                      </span>
+                    </motion.a>
+                  ))}
+                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.3 }}
+                  className="pt-4"
+                >
+                  <a href="#kontak" onClick={closeMobile} className="btn btn-primary w-full">
+                    Hubungi Saya
+                    <ArrowUpRight size={16} />
+                  </a>
+                </motion.div>
+              </motion.aside>
+            </>
           )}
         </AnimatePresence>
       </header>
