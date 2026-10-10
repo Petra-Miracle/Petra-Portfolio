@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/Reveal";
+import StaggerText from "@/components/effects/stagger-text";
 
 interface SectionHeadingProps {
   index: string;
@@ -43,7 +44,7 @@ export function SectionHeading({
             }`}
             style={{ fontFamily: "var(--font-display)" }}
           >
-            {title}
+            <StaggerText divideBy="word">{title}</StaggerText>
           </h2>
         </div>
         {description ? (

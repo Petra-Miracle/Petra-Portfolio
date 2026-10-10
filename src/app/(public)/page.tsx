@@ -8,6 +8,7 @@ import {
 import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
 import { About } from "@/components/About";
+import { StatementSection } from "@/components/effects/scroll-statement";
 import { Technologies } from "@/components/Technologies";
 import { Certificates } from "@/components/Certificates";
 import { ProjectsSection } from "@/components/ProjectsSection";
@@ -27,13 +28,14 @@ export default async function Home() {
 
   return (
     <main>
-      <Hero cvUrl={settings.cvUrl} />
+      <Hero cvUrl={settings.cvUrl} techNames={technologies.map((t) => t.name)} />
       <Stats
         projects={projects}
         competitions={competitions}
         technologies={technologies}
       />
       <About />
+      <StatementSection />
       <Technologies technologies={technologies} />
       <Certificates certificates={certificates} />
       <ProjectsSection projects={projects} competitions={competitions} />

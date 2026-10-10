@@ -10,6 +10,7 @@ import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button, Dropdown, Kbd, Label } from "@heroui/react";
 import { Check, ChevronDown, Loader2, TriangleAlert, X } from "lucide-react";
+import StaggerText from "@/components/effects/stagger-text";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -337,7 +338,7 @@ export function PageHeader({
           className="mt-2.5 font-display text-[30px] font-semibold tracking-tight text-foreground sm:text-[34px]"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          {title}
+          <StaggerText divideBy="word">{title}</StaggerText>
         </h1>
         {subtitle ? (
           <p className="mt-1.5 max-w-[60ch] text-[13.5px] leading-relaxed text-muted">{subtitle}</p>

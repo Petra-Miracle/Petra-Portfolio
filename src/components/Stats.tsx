@@ -1,5 +1,6 @@
 import type { Project, Technology } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
+import StatsCounter from "@/components/effects/stats-counter";
 import { Award, FolderGit2, Layers, Trophy } from "lucide-react";
 
 /**
@@ -45,7 +46,7 @@ export function Stats({
                 </span>
                 <span className="flex flex-col">
                   <span className="font-display text-[34px] font-bold leading-none tracking-tight text-background sm:text-[40px]" style={{ fontFamily: "var(--font-display)" }}>
-                    {String(stat.value).padStart(2, "0")}
+                    <StatsCounter value={stat.value} duration={1.8} />
                   </span>
                   <span className="mt-2 font-mono text-[10.5px] font-medium uppercase tracking-[0.12em] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
                     {stat.label}

@@ -1,8 +1,12 @@
-import Image from "next/image";
-import { Expand, Images, PackageOpen } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Images, PackageOpen } from "lucide-react";
 import type { GalleryItem } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
+// Creative 3D carousel by Skiper UI (free, https://skiper-ui.com/v1/skiper50)
+import { Carousel_004 } from "@/components/ui/skiper-ui/skiper50";
 
 interface GalleryProps {
   items: GalleryItem[];
@@ -10,21 +14,23 @@ interface GalleryProps {
 
 export function Gallery({ items }: GalleryProps) {
   const isEmpty = items.length === 0;
+  const [active, setActive] = useState(0);
+  const current = items.length > 0 ? items[active % items.length] : null;
 
   return (
     <section id="galeri" className="relative overflow-hidden bg-background">
       <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
         <SectionHeading
-          index="05"
+          index="06"
           eyebrow="Dokumentasi"
           title="Galeri kegiatan"
-          description="Momen di balik layar — kompetisi, kolaborasi, dan proses berkarya."
+          description="Momen di balik layar — kompetisi, kolaborasi, dan proses berkarya. Geser untuk menjelajah."
         />
 
         {isEmpty ? (
           <Reveal>
-            <div className="empty-state mt-14 rounded-3xl! p-14!">
-              <span className="empty-state-icon size-14!">
+            <div className="empty-state mt-14 rounded-3xl p-14">
+              <span className="empty-state-icon size-14">
                 <PackageOpen size={24} strokeWidth={1.5} />
               </span>
               <p className="empty-state-title">Belum ada dokumentasi kegiatan.</p>
@@ -32,58 +38,39 @@ export function Gallery({ items }: GalleryProps) {
             </div>
           </Reveal>
         ) : (
-          <div className="mt-14 columns-2 gap-4 sm:columns-3 lg:columns-4 [&>*]:mb-4">
-            {items.map((item, i) => (
-              <Reveal key={item.id} delay={(i % 4) * 60}>
-                <GalleryCard item={item} wide={i % 5 === 0} />
-              </Reveal>
-            ))}
-          </div>
+          <Reveal className="mt-14">
+            <div className="overflow-hidden rounded-[32px] border border-border bg-surface-alt/50 px-2 py-8 shadow-[0_24px_64px_rgba(21,20,15,0.10)] sm:px-6">
+              <Carousel_004
+                images={items.map((item) => ({ src: item.imageUrl, alt: item.caption }))}
+                showPagination
+                showNavigation={items.length > 1}
+                loop={items.length > 2}
+                autoplay={items.length > 1}
+                onActiveChange={setActive}
+              />
+              {current ? (
+                <div className="mx-auto mt-2 flex max-w-xl flex-col items-center gap-1.5 px-6 pb-4 text-center">
+                  <span
+                    key={current.id}
+                    className="animate-fade-in-up font-display text-[17px] font-semibold tracking-tight text-foreground"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {current.caption || <Images size={18} className="inline text-muted-light" />}
+                  </span>
+                  <span className="flex items-center gap-2 font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                    <span className="font-bold text-accent-hover">
+                      {String((active % items.length) + 1).padStart(2, "0")}
+                    </span>
+                    /
+                    {String(items.length).padStart(2, "0")}
+                    {current.year ? <span>· {current.year}</span> : null}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          </Reveal>
         )}
       </div>
     </section>
-  );
-}
-
-function GalleryCard({ item, wide = false }: { item: GalleryItem; wide?: boolean }) {
-  return (
-    <figure className="group relative overflow-hidden rounded-[20px] border border-border bg-surface-alt break-inside-avoid transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(21,20,15,0.14)]">
-      <div className={`relative overflow-hidden ${wide ? "aspect-[4/3]" : "aspect-[4/5]"}`}>
-        {item.imageUrl ? (
-          <Image
-            src={item.imageUrl}
-            alt={item.caption}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <Images size={26} className="text-muted-light" strokeWidth={1} />
-          </div>
-        )}
-        {/* hover caption overlay */}
-        <div
-          aria-hidden
-          className="absolute inset-0 flex items-end bg-gradient-to-t from-dark/75 via-dark/10 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        >
-          <span className="flex items-center gap-1.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-accent" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            <Expand size={12} />
-            {item.year ?? "Dokumentasi"}
-          </span>
-        </div>
-      </div>
-
-      <figcaption className="px-4 py-3.5">
-        <p className="line-clamp-2 text-[13.5px] font-medium leading-snug text-foreground">
-          {item.caption}
-        </p>
-        {item.year ? (
-          <p className="mt-1 font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            {item.year}
-          </p>
-        ) : null}
-      </figcaption>
-    </figure>
   );
 }

@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { ApiError, getToken, login, setToken } from "@/lib/admin-api";
 import { ErrorBanner, Field, PrimaryButton, TextInput } from "@/components/admin/ui";
+import StaggerText from "@/components/effects/stagger-text";
+import { GlowBorderCard } from "@/components/effects/glow-border-card";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -97,7 +99,9 @@ export default function AdminLoginPage() {
             Panel Admin
           </p>
           <h1 className="mt-5 font-display text-[44px] font-bold leading-[1.04] tracking-tight text-background" style={{ fontFamily: "var(--font-display)" }}>
-            Satu pintu untuk <span className="text-gradient-accent">seluruh karya</span> Anda.
+            <StaggerText delay={0.2}>Satu pintu untuk</StaggerText>{" "}
+            <span className="text-gradient-accent">seluruh karya</span>{" "}
+            <StaggerText delay={0.55}>Anda.</StaggerText>
           </h1>
           <p className="mt-5 max-w-[42ch] text-[15px] leading-relaxed text-dark-muted">
             Tambah, ubah, dan hapus konten portfolio — semua tersimpan aman dan tampil instan di halaman publik.
@@ -154,7 +158,20 @@ export default function AdminLoginPage() {
             </span>
           </div>
 
-          <div className="rounded-[28px] border border-border bg-surface p-7 shadow-[0_24px_64px_rgba(21,20,15,0.12)] sm:p-9">
+          <GlowBorderCard
+            width="100%"
+            height="auto"
+            borderRadius="28px"
+            animationDuration={8}
+            borderWidth="2px"
+            blurAmount="14px"
+            inset="-2px"
+            gradientColors={[
+              "#c7f23c", "#9ccb1e", "#e9ff9e", "#c7f23c", "#726c57",
+              "#c7f23c", "#9ccb1e", "#e9ff9e", "#c7f23c", "#9ccb1e",
+            ]}
+          >
+          <div className="w-full rounded-[28px] border border-border bg-surface p-7 shadow-[0_24px_64px_rgba(21,20,15,0.12)] sm:p-9">
             <span className="inline-flex size-13 items-center justify-center rounded-2xl bg-dark p-3.5 text-accent">
               <Lock size={22} />
             </span>
@@ -216,6 +233,7 @@ export default function AdminLoginPage() {
               </PrimaryButton>
             </form>
           </div>
+          </GlowBorderCard>
 
           <p className="mt-6 text-center font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
             Area khusus pemilik · Akses tidak sah dilarang

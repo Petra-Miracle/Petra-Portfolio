@@ -15,10 +15,16 @@ import {
 import { siteConfig } from "@/config/site";
 import { AtmosphereBg } from "@/components/AtmosphereBg";
 import { SocialIcon } from "@/components/SocialIcon";
+import StaggerText from "@/components/effects/stagger-text";
+import { Magnetic } from "@/components/effects/magnetic";
 
 interface HeroProps {
   cvUrl: string | null;
+  techNames: string[];
 }
+
+const TICKER_MASK =
+  "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -32,7 +38,7 @@ const fadeUp = {
   }),
 };
 
-export function Hero({ cvUrl }: HeroProps) {
+export function Hero({ cvUrl, techNames }: HeroProps) {
   const [firstName, ...rest] = siteConfig.author.name.trim().split(/\s+/);
   const lastName = rest.join(" ");
 
@@ -108,7 +114,8 @@ export function Hero({ cvUrl }: HeroProps) {
             className="mt-8 font-mono text-[12px] font-semibold uppercase tracking-[0.24em] text-dark-muted"
             style={{ fontFamily: "var(--font-mono-jb)" }}
           >
-            <span className="text-accent">—</span> {siteConfig.author.role}
+            <span className="text-accent">—</span>{" "}
+            <StaggerText delay={0.3}>{siteConfig.author.role}</StaggerText>
           </motion.p>
 
           <motion.h1
@@ -119,7 +126,7 @@ export function Hero({ cvUrl }: HeroProps) {
             className="mt-4 font-display text-[64px] font-bold leading-[0.92] tracking-tight text-background sm:text-[112px] lg:text-[124px]"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            {firstName}
+            {firstName ? <StaggerText delay={0.35}>{firstName}</StaggerText> : null}
             <br />
             <span className="text-gradient-accent pr-2">{lastName || "Karya"}</span>
           </motion.h1>
@@ -144,11 +151,14 @@ export function Hero({ cvUrl }: HeroProps) {
             custom={0.3}
             className="mt-9 flex flex-wrap items-center gap-3.5"
           >
-            <a href="#proyek" className="btn btn-primary px-7! py-4! text-[15px]!">
-              Lihat Karya
-              <ArrowRight size={17} />
-            </a>
+            <Magnetic>
+              <a href="#proyek" className="btn btn-primary px-7! py-4! text-[15px]!">
+                Lihat Karya
+                <ArrowRight size={17} />
+              </a>
+            </Magnetic>
             {cvUrl ? (
+              <Magnetic>
               <a
                 href={cvUrl}
                 download
@@ -159,6 +169,7 @@ export function Hero({ cvUrl }: HeroProps) {
                 <Download size={16} className="text-accent" />
                 Unduh CV
               </a>
+              </Magnetic>
             ) : null}
             <div className="ml-1 hidden items-center gap-1 sm:flex">
               {siteConfig.socials.slice(0, 3).map((s) => (
@@ -301,8 +312,76 @@ export function Hero({ cvUrl }: HeroProps) {
               ))}
             </p>
           </motion.div>
+
+          {/* Rotating availability badge */}
+          <motion.a
+            href="#tentang"
+            aria-label="Tersedia untuk proyek baru — lihat selengkapnya"
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.9, duration: 0.6, ease: EASE }}
+            whileHover={{ scale: 1.08 }}
+            className="absolute -right-3 -top-6 z-10 hidden size-28 sm:block"
+          >
+            <span className="glass-dark absolute inset-0 rounded-full shadow-[0_16px_40px_rgba(0,0,0,0.5)]" aria-hidden />
+            <span className="absolute inset-0 animate-spin-slow" aria-hidden>
+              <svg viewBox="0 0 100 100" className="size-full">
+                <defs>
+                  <path
+                    id="hero-badge-circle"
+                    d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"
+                    fill="none"
+                  />
+                </defs>
+                <text
+                  className="fill-accent font-mono text-[8px] font-bold uppercase"
+                  style={{ letterSpacing: "2.4px", fontFamily: "var(--font-mono-jb)" }}
+                >
+                  <textPath href="#hero-badge-circle" textLength="224">
+                    Terbuka untuk proyek baru • terbuka untuk proyek baru •
+                  </textPath>
+                </text>
+              </svg>
+            </span>
+            <span className="absolute inset-0 flex items-center justify-center">
+              <span className="flex size-11 items-center justify-center rounded-full bg-accent text-accent-ink shadow-[0_8px_28px_rgba(199,242,60,0.5)]">
+                <ArrowDown size={17} />
+              </span>
+            </span>
+          </motion.a>
         </motion.div>
       </div>
+
+      {/* Tech ticker — live stack strip */}
+      {techNames.length > 0 ? (
+        <div className="absolute inset-x-0 bottom-0 border-t border-white/[0.08] bg-dark/70 py-4 backdrop-blur-sm">
+          <div
+            className="marquee-pause overflow-hidden"
+            style={{ maskImage: TICKER_MASK, WebkitMaskImage: TICKER_MASK }}
+          >
+            <div
+              className="animate-marquee flex w-max items-center"
+              style={{ "--marquee-duration": "36s" } as React.CSSProperties}
+            >
+              {[...techNames, ...techNames].map((name, i) => (
+                <span
+                  key={`${name}-${i}`}
+                  aria-hidden={i >= techNames.length || undefined}
+                  className="flex items-center"
+                >
+                  <span
+                    className="whitespace-nowrap px-7 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-dark-muted transition-colors hover:text-accent"
+                    style={{ fontFamily: "var(--font-mono-jb)" }}
+                  >
+                    {name}
+                  </span>
+                  <span className="size-1.5 rounded-full bg-accent/70" aria-hidden />
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Scroll cue — kiri bawah */}
       <motion.a

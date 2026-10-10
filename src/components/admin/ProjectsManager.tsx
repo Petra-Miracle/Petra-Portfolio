@@ -21,6 +21,7 @@ import {
 import FolderOpen from "@gravity-ui/icons/FolderOpen";
 import Layers from "@gravity-ui/icons/Layers";
 import SealCheck from "@gravity-ui/icons/SealCheck";
+import StatsCounter from "@/components/effects/stats-counter";
 import type { Project, ProjectType } from "@/lib/types";
 import {
   createProject,
@@ -314,7 +315,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
             ]}
           />
           <span className="admin-count-chip">
-            <strong>{filteredItems.length}</strong> item
+            <strong><StatsCounter value={filteredItems.length} duration={1} /></strong> item
           </span>
         </div>
       ) : null}

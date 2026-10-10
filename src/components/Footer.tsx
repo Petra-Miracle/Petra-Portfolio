@@ -4,6 +4,8 @@ import { Reveal } from "@/components/Reveal";
 import { SocialIcon } from "@/components/SocialIcon";
 import { AtmosphereBg } from "@/components/AtmosphereBg";
 import { EmailCopyButton } from "@/components/EmailCopyButton";
+import { LocalTime } from "@/components/LocalTime";
+import StaggerText from "@/components/effects/stagger-text";
 
 export function Footer() {
   return (
@@ -26,11 +28,12 @@ export function Footer() {
               ) : null}
 
               <p className="eyebrow" style={{ color: "var(--dark-muted)" }}>
-                <span style={{ color: "var(--accent-hover)" }}>06</span> Kontak
+                <span style={{ color: "var(--accent-hover)" }}>07</span> Kontak
               </p>
 
               <h2 className="mt-6 max-w-[16ch] font-display text-[42px] font-bold leading-[1.02] tracking-tight text-background sm:text-[68px]" style={{ fontFamily: "var(--font-display)" }}>
-                Punya proyek yang ingin <span className="text-gradient-accent">dibangun?</span>
+                <StaggerText divideBy="word">Punya proyek yang ingin</StaggerText>{" "}
+                <span className="text-gradient-accent">dibangun?</span>
               </h2>
 
               <p className="mt-6 max-w-[46ch] text-[16px] leading-relaxed text-dark-muted">
@@ -59,6 +62,13 @@ export function Footer() {
                 </a>
                 <EmailCopyButton email={siteConfig.email} />
               </div>
+              <div className="mt-5 flex items-center gap-2 font-mono text-[11.5px] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                <span className="relative flex size-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
+                </span>
+                Waktu lokal — <LocalTime /> WIB
+              </div>
               <div className="mt-6 flex flex-wrap gap-2.5 border-t border-white/[0.08] pt-6">
                 {siteConfig.socials.map((social) => (
                   <a
@@ -83,6 +93,9 @@ export function Footer() {
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/[0.08] pt-8 sm:flex-row">
           <p className="font-mono text-[12px] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
             © {new Date().getFullYear()} {siteConfig.author.name} · Dibangun dengan ketelitian
+          </p>
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-dark-muted/60 max-sm:order-last" style={{ fontFamily: "var(--font-mono-jb)" }}>
+            Motion & UI: Vengence UI · Skiper UI · HeroUI
           </p>
           <a
             href="#beranda"

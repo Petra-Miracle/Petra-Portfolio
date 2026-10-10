@@ -25,7 +25,7 @@ export function Technologies({ technologies }: TechnologiesProps) {
       <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
         <SectionHeading
           dark
-          index="02"
+          index="03"
           eyebrow="Tumpukan Teknologi"
           title="Senjata yang saya percaya"
           description="Perangkat inti untuk membangun produk — dari fondasi umum hingga tooling AI sehari-hari."

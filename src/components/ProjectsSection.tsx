@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
+import { GlowBorderCard } from "@/components/effects/glow-border-card";
 import { ArrowUpRight, ExternalLink, FolderGit2, PackageOpen, Trophy, X } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 
@@ -17,8 +18,78 @@ interface ProjectsProps {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+/** Lime aurora palette for the featured-card glow ring (Vengeance GlowBorderCard). */
+const LIME_GLOW = [
+  "#c7f23c", "#e9ff9e", "#9ccb1e", "#f7f3e9", "#c7f23c",
+  "#9ccb1e", "#e9ff9e", "#c7f23c", "#9ccb1e", "#e9ff9e",
+];
+
+type WorkTab = "SEMUA" | "PROJECT" | "COMPETITION";
+
 export function ProjectsSection({ projects, competitions }: ProjectsProps) {
   const hasAny = projects.length > 0 || competitions.length > 0;
+  const [tab, setTab] = useState<WorkTab>("SEMUA");
+
+  const TABS: { key: WorkTab; label: string; count: number }[] = [
+    { key: "SEMUA", label: "Semua", count: projects.length + competitions.length },
+    { key: "PROJECT", label: "Project", count: projects.length },
+    { key: "COMPETITION", label: "Kompetisi", count: competitions.length },
+  ];
+
+  function renderProjectsBlock() {
+    if (projects.length === 0) return null;
+    return (
+      <div>
+        <Reveal>
+          <Subhead count={projects.length} label="Project Pilihan" />
+        </Reveal>
+        {/* Featured + grid */}
+        <div className="mt-7 grid gap-5 lg:grid-cols-2">
+          {projects.slice(0, 1).map((p, i) => (
+            <Reveal key={p.id} delay={i * 80} className="lg:col-span-2">
+              <FeaturedProjectCard project={p} />
+            </Reveal>
+          ))}
+          {projects.slice(1).map((p, i) => (
+            <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
+              <ProjectCard project={p} />
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function renderCompetitionsBlock() {
+    if (competitions.length === 0) return null;
+    return (
+      <div>
+        <Reveal>
+          <Subhead count={competitions.length} label="Kompetisi & Lomba" dark />
+        </Reveal>
+        <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {competitions.map((p, i) => (
+            <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
+              <CompetitionCard project={p} />
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function renderTabEmpty(title: string) {
+    return (
+      <Reveal>
+        <div className="empty-state mt-2 rounded-3xl p-12">
+          <p className="empty-state-title">{title}</p>
+          <p className="empty-state-desc">
+            Coba tab lain, atau tambah data melalui panel admin.
+          </p>
+        </div>
+      </Reveal>
+    );
+  }
 
   return (
     <section id="proyek" className="relative overflow-hidden bg-background">
@@ -34,7 +105,7 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
       />
       <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
         <SectionHeading
-          index="04"
+          index="05"
           eyebrow="Karya & Kompetisi"
           title="Karya yang berbicara"
           description="Project pilihan dan pencapaian kompetisi — klik kartu mana pun untuk detail, demo, dan repository."
@@ -50,44 +121,79 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
               <p className="empty-state-desc">Data akan muncul otomatis setelah ditambahkan melalui panel admin.</p>
             </div>
           </Reveal>
-        ) : null}
-
-        {/* ---- Projects ---- */}
-        {projects.length > 0 && (
-          <div className="mt-14">
-            <Reveal>
-              <Subhead count={projects.length} label="Project Pilihan" />
+        ) : (
+          <>
+            {/* ---- Filter tabs ---- */}
+            <Reveal className="mt-10">
+              <div
+                className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-surface p-1.5 shadow-sm"
+                role="tablist"
+                aria-label="Filter karya"
+              >
+                {TABS.map((t) => {
+                  const isActive = tab === t.key;
+                  return (
+                    <button
+                      key={t.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() => setTab(t.key)}
+                      className={`relative shrink-0 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-colors duration-200 sm:px-5 ${
+                        isActive ? "text-background" : "text-muted hover:text-foreground"
+                      }`}
+                    >
+                      {isActive ? (
+                        <motion.span
+                          layoutId="proj-tab-pill"
+                          className="absolute inset-0 rounded-full bg-dark shadow-[0_6px_20px_rgba(21,20,15,0.3)]"
+                          transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                        />
+                      ) : null}
+                      <span className="relative">
+                        {t.label}{" "}
+                        <span
+                          className={`font-mono text-[11px] ${isActive ? "text-accent" : "text-muted-light"}`}
+                          style={{ fontFamily: "var(--font-mono-jb)" }}
+                        >
+                          {String(t.count).padStart(2, "0")}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </Reveal>
-            {/* Featured + grid */}
-            <div className="mt-7 grid gap-5 lg:grid-cols-2">
-              {projects.slice(0, 1).map((p, i) => (
-                <Reveal key={p.id} delay={i * 80} className="lg:col-span-2">
-                  <FeaturedProjectCard project={p} />
-                </Reveal>
-              ))}
-              {projects.slice(1).map((p, i) => (
-                <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
-                  <ProjectCard project={p} />
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* ---- Competitions ---- */}
-        {competitions.length > 0 && (
-          <div className="mt-16">
-            <Reveal>
-              <Subhead count={competitions.length} label="Kompetisi & Lomba" dark />
-            </Reveal>
-            <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {competitions.map((p, i) => (
-                <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
-                  <CompetitionCard project={p} />
-                </Reveal>
-              ))}
-            </div>
-          </div>
+            {/* ---- Tab views ---- */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -14 }}
+                transition={{ duration: 0.32, ease: EASE }}
+                className="mt-12 space-y-16"
+              >
+                {tab === "SEMUA" ? (
+                  <>
+                    {renderProjectsBlock()}
+                    {renderCompetitionsBlock()}
+                  </>
+                ) : tab === "PROJECT" ? (
+                  <>
+                    {projects.length > 0
+                      ? renderProjectsBlock()
+                      : renderTabEmpty("Belum ada data project.")}
+                  </>
+                ) : competitions.length > 0 ? (
+                  renderCompetitionsBlock()
+                ) : (
+                  renderTabEmpty("Belum ada data kompetisi.")
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </>
         )}
       </div>
     </section>
@@ -117,6 +223,17 @@ function FeaturedProjectCard({ project }: { project: Project }) {
 
   return (
     <>
+      <GlowBorderCard
+        width="100%"
+        height="auto"
+        borderRadius="28px"
+        animationDuration={7}
+        borderWidth="2px"
+        blurAmount="16px"
+        inset="-3px"
+        gradientColors={LIME_GLOW}
+        className="transition-transform duration-300 hover:-translate-y-1"
+      >
       <article
         role="button"
         tabIndex={0}
@@ -128,7 +245,7 @@ function FeaturedProjectCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="group grid cursor-pointer overflow-hidden rounded-[28px] border border-border bg-surface shadow-[0_10px_40px_rgba(21,20,15,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_32px_72px_rgba(21,20,15,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent md:grid-cols-[1.15fr_1fr]"
+        className="group grid w-full cursor-pointer overflow-hidden rounded-[28px] border border-border bg-surface shadow-[0_10px_40px_rgba(21,20,15,0.08)] transition-shadow duration-300 hover:shadow-[0_32px_72px_rgba(21,20,15,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent md:grid-cols-[1.15fr_1fr]"
       >
         <div className="relative min-h-[260px] overflow-hidden bg-surface-alt md:min-h-[340px]">
           {project.imageUrl ? (
@@ -188,6 +305,7 @@ function FeaturedProjectCard({ project }: { project: Project }) {
           </div>
         </div>
       </article>
+      </GlowBorderCard>
 
       <AnimatePresence>
         {detailOpen ? (

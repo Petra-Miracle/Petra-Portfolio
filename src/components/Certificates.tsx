@@ -18,7 +18,7 @@ export function Certificates({ certificates }: CertificatesProps) {
       <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
         <SectionHeading
           dark
-          index="03"
+          index="04"
           eyebrow="Kredensial"
           title="Sertifikat & pencapaian"
           description="Bukti kompetensi yang terverifikasi — klik untuk melihat kredensial aslinya."

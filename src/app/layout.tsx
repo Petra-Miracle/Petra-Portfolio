@@ -36,12 +36,25 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: siteConfig.author.name,
+    jobTitle: siteConfig.author.role,
+    description: siteConfig.description,
+    email: `mailto:${siteConfig.email}`,
+    sameAs: siteConfig.socials.map((s) => s.href),
+  };
   return (
     <html
       lang="id"
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {children}
       </body>
     </html>

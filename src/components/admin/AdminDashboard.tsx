@@ -21,12 +21,14 @@ import { ProjectsManager } from "@/components/admin/ProjectsManager";
 import { CertificatesManager } from "@/components/admin/CertificatesManager";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { SettingsManager } from "@/components/admin/SettingsManager";
+import { OverviewManager } from "@/components/admin/OverviewManager";
 
 interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type SectionKey =
+export type SectionKey =
+  | "ringkasan"
   | "technologies"
   | "projects"
   | "certificates"
@@ -39,6 +41,7 @@ const NAV_ITEMS: {
   desc: string;
   icon: typeof Layers;
 }[] = [
+  { key: "ringkasan", label: "Ringkasan", desc: "Statistik & pintasan", icon: LayoutDashboard },
   { key: "technologies", label: "Teknologi", desc: "Stack & AI tools", icon: Layers },
   { key: "projects", label: "Project & Kompetisi", desc: "Karya & lomba", icon: FolderGit2 },
   { key: "certificates", label: "Sertifikat", desc: "Kredensial", icon: Award },
@@ -54,7 +57,7 @@ const today = new Date().toLocaleDateString("id-ID", {
 });
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [section, setSection] = useState<SectionKey>("technologies");
+  const [section, setSection] = useState<SectionKey>("ringkasan");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const token = getToken();
 
@@ -170,7 +173,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            {section === "technologies" ? (
+            {section === "ringkasan" ? (
+              <OverviewManager token={token} onSelect={selectSection} />
+            ) : section === "technologies" ? (
               <TechnologiesManager token={token} />
             ) : section === "projects" ? (
               <ProjectsManager token={token} />
@@ -217,9 +222,24 @@ function SidebarContent({
         </span>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 space-y-1 px-3">
-        <p className="px-3 pb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-dark-muted/70" style={{ fontFamily: "var(--font-mono-jb)" }}>
+      {/* Nav — with mouse-follow spotlight (Vengeance spotlight technique) */}
+      <nav
+        className="group/sidebarnav relative flex-1 space-y-1 px-3"
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          e.currentTarget.style.setProperty("--spotlight-x", `${e.clientX - rect.left}px`);
+          e.currentTarget.style.setProperty("--spotlight-y", `${e.clientY - rect.top}px`);
+        }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover/sidebarnav:opacity-100"
+          style={{
+            background:
+              "radial-gradient(180px circle at var(--spotlight-x, 50%) var(--spotlight-y, 20%), rgba(199,242,60,0.10), transparent 70%)",
+          }}
+        />
+        <p className="relative px-3 pb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-dark-muted/70" style={{ fontFamily: "var(--font-mono-jb)" }}>
           Kelola Konten
         </p>
         {NAV_ITEMS.map((item, i) => {

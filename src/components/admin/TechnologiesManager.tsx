@@ -12,6 +12,7 @@ import {
 import Cpu from "@gravity-ui/icons/Cpu";
 import LayersIcon from "@gravity-ui/icons/Layers";
 import Sparkles from "@gravity-ui/icons/Sparkles";
+import StatsCounter from "@/components/effects/stats-counter";
 import type { Technology, TechnologyCategory } from "@/lib/types";
 import {
   createTechnology,
@@ -262,7 +263,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
             ]}
           />
           <span className="admin-count-chip">
-            <strong>{filteredItems.length}</strong> teknologi
+            <strong><StatsCounter value={filteredItems.length} duration={1} /></strong> teknologi
           </span>
         </div>
       ) : null}

@@ -80,6 +80,13 @@ export function Navigation() {
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
+  /* Mouse-follow spotlight on the floating bar (technique inspired by
+     Vengeance UI's spotlight-navbar: a CSS-var-driven radial glow). */
+  function onNavMouseMove(e: React.MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--spotlight-x", `${e.clientX - rect.left}px`);
+  }
+
   return (
     <>
       {/* Scroll progress hairline */}
@@ -98,12 +105,22 @@ export function Navigation() {
           initial={{ y: -32, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className={`mx-auto flex max-w-[1280px] items-center justify-between gap-4 rounded-2xl py-3 pl-4 pr-3 transition-all duration-300 sm:pl-5 ${
+          onMouseMove={onNavMouseMove}
+          className={`group/nav relative mx-auto flex max-w-[1280px] items-center justify-between gap-4 rounded-2xl py-3 pl-4 pr-3 transition-all duration-300 sm:pl-5 ${
             scrolled || mobileOpen
               ? "glass-dark shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
               : "border border-white/[0.06] bg-dark/40 backdrop-blur-xl"
           }`}
         >
+          {/* spotlight sweep */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover/nav:opacity-100"
+            style={{
+              background:
+                "radial-gradient(200px circle at var(--spotlight-x, 50%) 0%, rgba(199,242,60,0.14), transparent 70%)",
+            }}
+          />
           {/* Left: logo */}
           <div className="flex items-center gap-8">
             <a href="#beranda" className="group flex items-center gap-2.5">
