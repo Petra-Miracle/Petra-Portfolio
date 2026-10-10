@@ -6,8 +6,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
-import { FeaturedHoverStrip } from "@/components/FeaturedHoverStrip";
 import { ProjectDetailModal } from "@/components/ProjectDetailModal";
+// Coverflow 3D carousel by Skiper UI (free, https://skiper-ui.com/v1/skiper47)
+import { Carousel_001 } from "@/components/ui/skiper-ui/skiper47";
 import { ArrowUpRight, ExternalLink, FolderGit2, PackageOpen, Trophy } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 
@@ -32,26 +33,25 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 
   function renderProjectsBlock() {
     if (projects.length === 0) return null;
-    const STRIP_N = Math.min(5, projects.length);
-    const rest = projects.slice(STRIP_N);
     return (
       <div>
         <Reveal>
           <Subhead count={projects.length} label="Project Pilihan" />
         </Reveal>
-        {/* Hover-expand strip (Skiper-52) + grid sisa */}
+        {/* Coverflow 3D (Skiper-47); grid sederhana bila data < 3 */}
         <Reveal className="mt-7">
-          <FeaturedHoverStrip projects={projects} maxPanels={5} />
+          {projects.length >= 3 ? (
+            <ProjectCoverflow projects={projects} />
+          ) : (
+            <div className="grid gap-5 lg:grid-cols-2">
+              {projects.map((p, i) => (
+                <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
+                  <ProjectCard project={p} />
+                </Reveal>
+              ))}
+            </div>
+          )}
         </Reveal>
-        {rest.length > 0 ? (
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            {rest.map((p, i) => (
-              <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
-                <ProjectCard project={p} />
-              </Reveal>
-            ))}
-          </div>
-        ) : null}
       </div>
     );
   }
@@ -193,6 +193,61 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
         )}
       </div>
     </section>
+  );
+}
+
+/* ------------------------------------------------------------------
+   Project coverflow — Skiper-47 Carousel_001 + caption bar + modal
+------------------------------------------------------------------- */
+
+function ProjectCoverflow({ projects }: { projects: Project[] }) {
+  const [active, setActive] = useState(0);
+  const [detail, setDetail] = useState<Project | null>(null);
+  const current = projects.length > 0 ? projects[active % projects.length] : null;
+
+  return (
+    <>
+      <div className="overflow-hidden rounded-[28px] border border-border bg-surface-alt/40 px-1 pb-2 pt-7 shadow-[0_24px_64px_rgba(21,20,15,0.10)] sm:px-4">
+        <Carousel_001
+          className="mx-auto w-full max-w-4xl"
+          images={projects.map((p) => ({ src: p.imageUrl ?? "", alt: p.title }))}
+          showPagination
+          loop={projects.length > 2}
+          autoplay={projects.length > 1}
+          onActiveChange={setActive}
+          onSlideClick={(i) => {
+            const p = projects[i];
+            if (p) setDetail(p);
+          }}
+        />
+        {current ? (
+          <div className="mx-auto flex max-w-xl flex-col items-center gap-1.5 px-6 pb-5 text-center">
+            <span
+              key={current.id}
+              className="animate-fade-in-up font-display text-[19px] font-semibold tracking-tight text-foreground"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {current.title}
+            </span>
+            <span className="flex flex-wrap items-center justify-center gap-2 font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+              <span className="font-bold text-accent-hover">
+                {String((active % projects.length) + 1).padStart(2, "0")}
+              </span>
+              /
+              {String(projects.length).padStart(2, "0")}
+              {current.year ? <span>· {current.year}</span> : null}
+              <span className="text-muted-light">· klik foto untuk detail</span>
+            </span>
+          </div>
+        ) : null}
+      </div>
+
+      <AnimatePresence>
+        {detail ? (
+          <ProjectDetailModal project={detail} onClose={() => setDetail(null)} />
+        ) : null}
+      </AnimatePresence>
+    </>
   );
 }
 
