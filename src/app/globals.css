@@ -284,6 +284,55 @@ body {
   mask-composite: exclude;
 }
 
+/* ============================================================
+   Tech solar system — orbit technique in the spirit of
+   Vengeance UI's Solar System (vengenceui.com/components/solar-system).
+   Ring rotates; each node counter-rotates to stay upright.
+   Durations flow through --orbit-duration (inherits per ring).
+   ============================================================ */
+.orbit-spin {
+  animation: orbit-rotate var(--orbit-duration, 40s) linear infinite;
+  will-change: transform;
+}
+
+.orbit-spin[data-reverse="true"] {
+  animation-direction: reverse;
+}
+
+.orbit-node-fix {
+  animation: orbit-rotate-rev var(--orbit-duration, 40s) linear infinite;
+  will-change: transform;
+}
+
+.orbit-spin[data-reverse="true"] .orbit-node-fix {
+  animation-direction: reverse;
+}
+
+@keyframes orbit-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-rotate-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* Hovering any planet freezes the whole system so names can be read */
+.solar-root:has(.orbit-node:hover) .orbit-spin,
+.solar-root:has(.orbit-node:hover) .orbit-node-fix {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-spin,
+  .orbit-node-fix {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .glow-conic {
     animation: none;
