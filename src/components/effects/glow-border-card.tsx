@@ -1,5 +1,5 @@
 /**
- * Glow Border Card — vendored from Vengeance UI (free, https://www.vengenceui.com/components/glow-border-card)
+ * Glow Border Card, vendored from Vengeance UI (free, https://www.vengenceui.com/components/glow-border-card)
  * Adapted for this site's theme: the caller controls background/padding
  * (original defaults removed). Requires the `.glow-conic` CSS in globals.css
  * (rotating conic gradient via @property, faithful to the registry design).

@@ -45,7 +45,7 @@ export function SettingsManager({ token }: SettingsManagerProps) {
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : "Gagal memuat data.");
+        setError(err instanceof Error ? err.message : "Failed to load data.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -61,7 +61,7 @@ export function SettingsManager({ token }: SettingsManagerProps) {
     if (!file) return;
 
     if (file.type !== "application/pdf") {
-      setSaveError("File harus berformat PDF.");
+      setSaveError("File must be in PDF format.");
       return;
     }
 
@@ -76,14 +76,14 @@ export function SettingsManager({ token }: SettingsManagerProps) {
         handleUnauthorized();
         return;
       }
-      setSaveError(err instanceof Error ? err.message : "Upload gagal.");
+      setSaveError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
       setUploading(false);
     }
   }
 
   async function handleRemove() {
-    if (!window.confirm("Hapus CV yang sedang aktif?")) return;
+    if (!window.confirm("Delete the currently active CV?")) return;
     setSaveError(null);
     try {
       await updateSiteSettings(token, { cvUrl: null });
@@ -93,15 +93,15 @@ export function SettingsManager({ token }: SettingsManagerProps) {
         handleUnauthorized();
         return;
       }
-      setSaveError(err instanceof Error ? err.message : "Gagal menghapus data.");
+      setSaveError(err instanceof Error ? err.message : "Failed to delete data.");
     }
   }
 
   return (
     <div>
       <PageHeader
-        title="Pengaturan"
-        subtitle="Kelola file CV yang bisa diunduh pengunjung dari halaman utama."
+        title="Settings"
+        subtitle="Manage the CV file visitors can download from the homepage."
       />
 
       {error ? (
@@ -118,7 +118,7 @@ export function SettingsManager({ token }: SettingsManagerProps) {
         </div>
       ) : (
         <div className="card p-6 sm:p-8">
-          <Field label="CV (PDF)" hint="Maks. 5MB, format PDF." className="max-w-md">
+          <Field label="CV (PDF)" hint="Max 5MB, PDF format." className="max-w-md">
             {cvUrl ? (
               <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface-alt px-4 py-3.5 transition-colors hover:border-muted-light">
                 <a
@@ -128,12 +128,12 @@ export function SettingsManager({ token }: SettingsManagerProps) {
                   className="flex min-w-0 items-center gap-2.5 text-sm font-medium text-foreground hover:underline"
                 >
                   <FileText size={16} className="shrink-0 text-muted" />
-                  <span className="truncate">Lihat CV saat ini</span>
+                  <span className="truncate">View current CV</span>
                 </a>
                 <button
                   type="button"
                   onClick={handleRemove}
-                  aria-label="Hapus CV"
+                  aria-label="Delete CV"
                   className="btn btn-outline btn-icon shrink-0 text-danger"
                 >
                   <Trash2 size={15} />
@@ -142,8 +142,8 @@ export function SettingsManager({ token }: SettingsManagerProps) {
             ) : (
               <EmptyState
                 icon={<FileText size={22} />}
-                title="Belum ada CV yang diunggah."
-                description="Tombol “Unduh CV” di halaman utama akan tersembunyi sampai Anda mengunggah file di sini."
+                title="No CV uploaded yet."
+                description="The “Download CV” button on the homepage will stay hidden until you upload a file here."
               />
             )}
           </Field>
@@ -165,7 +165,7 @@ export function SettingsManager({ token }: SettingsManagerProps) {
             />
             {uploading ? (
               <PrimaryButton type="button" loading disabled>
-                Mengunggah...
+                Uploading...
               </PrimaryButton>
             ) : (
               <OutlineButton
@@ -173,7 +173,7 @@ export function SettingsManager({ token }: SettingsManagerProps) {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload size={15} />
-                {cvUrl ? "Ganti CV" : "Unggah CV"}
+                {cvUrl ? "Change CV" : "Upload CV"}
               </OutlineButton>
             )}
           </div>

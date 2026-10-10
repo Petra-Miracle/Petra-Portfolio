@@ -13,7 +13,7 @@ interface MarqueeRowProps {
 
 /**
  * Edge-fade + infinite scroll only make sense once the row's content is
- * actually wider than the page's content column — otherwise there's
+  * actually wider than the page's content column. Otherwise there's
  * nothing to scroll and it just looks like a stray/duplicated card.
  * Below that, cards render as a plain static row aligned to the same
  * column as the section heading instead of a full-bleed one stuck in

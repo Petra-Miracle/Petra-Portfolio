@@ -109,7 +109,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
           handleUnauthorized();
           return;
         }
-        setError(err instanceof Error ? err.message : "Gagal memuat data.");
+        setError(err instanceof Error ? err.message : "Failed to load data.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -156,7 +156,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
         return;
       }
       patchRow(row.key, {
-        imageError: err instanceof Error ? err.message : "Upload gagal.",
+        imageError: err instanceof Error ? err.message : "Upload failed.",
         imagePreview: row.imageUrl.trim() === "" ? null : row.imageUrl,
       });
     } finally {
@@ -172,12 +172,12 @@ export function GalleryManager({ token }: GalleryManagerProps) {
     // Skip rows the admin left completely blank (e.g. an unused extra row).
     const usable = rows.filter((r) => r.caption.trim() || r.imageUrl.trim());
     if (usable.length === 0) {
-      setBulkError("Isi minimal satu foto kegiatan.");
+      setBulkError("Enter at least one activity photo.");
       return;
     }
     const invalid = usable.some((r) => !r.caption.trim() || !r.imageUrl.trim());
     if (invalid) {
-      setBulkError("Keterangan dan foto wajib diisi di setiap baris.");
+      setBulkError("Caption and photo are required on every row.");
       return;
     }
 
@@ -199,7 +199,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
         handleUnauthorized();
         return;
       }
-      setBulkError(err instanceof Error ? err.message : "Gagal menyimpan data.");
+      setBulkError(err instanceof Error ? err.message : "Failed to save data.");
     } finally {
       setBulkSaving(false);
     }
@@ -238,7 +238,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
         handleUnauthorized();
         return;
       }
-      setEditImageError(err instanceof Error ? err.message : "Upload gagal.");
+      setEditImageError(err instanceof Error ? err.message : "Upload failed.");
       setEditImagePreview(editForm.imageUrl.trim() === "" ? null : editForm.imageUrl);
     } finally {
       URL.revokeObjectURL(localPreview);
@@ -250,7 +250,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
     event.preventDefault();
     if (!editingId || editUploading) return;
     if (editForm.imageUrl.trim() === "") {
-      setEditError("Foto wajib diisi.");
+      setEditError("Photo is required.");
       return;
     }
     setEditSaving(true);
@@ -268,14 +268,14 @@ export function GalleryManager({ token }: GalleryManagerProps) {
         handleUnauthorized();
         return;
       }
-      setEditError(err instanceof Error ? err.message : "Gagal menyimpan data.");
+      setEditError(err instanceof Error ? err.message : "Failed to save data.");
     } finally {
       setEditSaving(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Hapus foto kegiatan ini?")) return;
+    if (!window.confirm("Delete this activity photo?")) return;
     try {
       await deleteGalleryItem(token, id);
       setItems(await loadItems());
@@ -284,7 +284,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
         handleUnauthorized();
         return;
       }
-      window.alert(err instanceof Error ? err.message : "Gagal menghapus data.");
+      window.alert(err instanceof Error ? err.message : "Failed to delete data.");
     }
   }
 
@@ -293,12 +293,12 @@ export function GalleryManager({ token }: GalleryManagerProps) {
   return (
     <div>
       <PageHeader
-        title="Galeri"
-        subtitle="Kelola foto kegiatan yang ditampilkan di halaman publik."
+        title="Gallery"
+        subtitle="Manage the activity photos shown on the public page."
         action={
           <PrimaryButton onClick={openBulk}>
             <Plus size={16} />
-            Tambah
+            Add
           </PrimaryButton>
         }
       />
@@ -335,7 +335,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                     <Pencil size={15} />
                   </IconButton>
                   <IconButton
-                    label="Hapus"
+                    label="Delete"
                     variant="danger"
                     onClick={() => handleDelete(item.id)}
                   >
@@ -355,12 +355,12 @@ export function GalleryManager({ token }: GalleryManagerProps) {
         <div className="mt-6">
           <EmptyState
             icon={<Images size={22} />}
-            title="Belum ada foto kegiatan."
-            description="Foto kegiatan Anda akan tampil di sini setelah ditambahkan."
+            title="No activity photos yet."
+            description="Your activity photos will appear here once added."
             action={
               <PrimaryButton onClick={openBulk}>
                 <Plus size={16} />
-                Tambah Foto
+                Add Photo
               </PrimaryButton>
             }
           />
@@ -371,12 +371,12 @@ export function GalleryManager({ token }: GalleryManagerProps) {
       <Modal
         open={bulkOpen}
         onClose={closeBulk}
-        title="Tambah Foto Kegiatan"
+        title="Add Activity Photo"
         footer={
           <>
-            <OutlineButton onClick={closeBulk}>Batal</OutlineButton>
+            <OutlineButton onClick={closeBulk}>Cancel</OutlineButton>
             <PrimaryButton form="gallery-bulk-form" type="submit" loading={bulkSaving}>
-              Simpan {rows.length > 1 ? `(${rows.length})` : ""}
+              Save {rows.length > 1 ? `(${rows.length})` : ""}
             </PrimaryButton>
           </>
         }
@@ -398,22 +398,22 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                   className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted"
                   style={{ fontFamily: "var(--font-mono-jb)" }}
                 >
-                  Foto {String(i + 1).padStart(2, "0")}
+                  Photo {String(i + 1).padStart(2, "0")}
                 </span>
                 {rows.length > 1 ? (
                   <button
                     type="button"
                     onClick={() => removeRow(row.key)}
-                    aria-label={`Hapus baris ${i + 1}`}
+                    aria-label={`Remove row ${i + 1}`}
                     className="text-xs font-medium text-danger transition-colors hover:text-danger/80"
                   >
-                    Hapus baris
+                    Remove row
                   </button>
                 ) : null}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Foto *" className="sm:col-span-2">
+                <Field label="Photo *" className="sm:col-span-2">
                   <label
                     className={`admin-dropzone ${
                       row.uploadingImage ? "pointer-events-none opacity-60" : ""
@@ -448,10 +448,10 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                     )}
                     <span className="text-sm font-medium">
                       {row.uploadingImage
-                        ? "Mengupload..."
+                        ? "Uploading..."
                         : row.imagePreview
-                          ? "Ganti foto"
-                          : "Ketuk untuk unggah foto"}
+                          ? "Change photo"
+                          : "Tap to upload photo"}
                     </span>
                   </label>
                   {row.imageError ? (
@@ -459,22 +459,22 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                   ) : null}
                 </Field>
 
-                <Field label="Keterangan *" className="sm:col-span-2">
+                <Field label="Caption *" className="sm:col-span-2">
                   <TextInput
                     required={i === 0}
                     value={row.caption}
                     onChange={(e) => patchRow(row.key, { caption: e.target.value })}
-                    placeholder="cth: Workshop UI/UX di Kampus"
+                    placeholder="e.g. UI/UX Workshop on Campus"
                   />
                 </Field>
 
-                <Field label="Tahun">
+                <Field label="Year">
                   <TextInput
                     type="number"
                     inputMode="numeric"
                     value={row.year}
                     onChange={(e) => patchRow(row.key, { year: e.target.value })}
-                    placeholder="cth: 2026"
+                    placeholder="e.g. 2026"
                   />
                 </Field>
               </div>
@@ -483,7 +483,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
 
           <OutlineButton type="button" onClick={addRow} className="w-full">
             <Plus size={15} />
-            Tambah Foto Lain
+            Add Another Photo
           </OutlineButton>
         </form>
       </Modal>
@@ -492,16 +492,16 @@ export function GalleryManager({ token }: GalleryManagerProps) {
       <Modal
         open={editingItem !== null}
         onClose={closeEdit}
-        title="Edit Foto Kegiatan"
+        title="Edit Activity Photo"
         footer={
           <>
-            <OutlineButton onClick={closeEdit}>Batal</OutlineButton>
+            <OutlineButton onClick={closeEdit}>Cancel</OutlineButton>
             <PrimaryButton
               form="gallery-edit-form"
               type="submit"
               loading={editSaving || editUploading}
             >
-              Simpan Perubahan
+              Save Changes
             </PrimaryButton>
           </>
         }
@@ -514,7 +514,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
 
         <form id="gallery-edit-form" onSubmit={handleEditSubmit} className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Foto *" className="sm:col-span-2">
+            <Field label="Photo *" className="sm:col-span-2">
               <label
                 className={`flex min-h-[150px] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-[1.5px] border-dashed border-muted-light bg-surface text-muted transition-all hover:border-accent-hover hover:bg-accent/[0.05] hover:text-foreground ${
                   editUploading ? "pointer-events-none opacity-60" : "cursor-pointer"
@@ -545,7 +545,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                       </div>
                     ) : (
                       <div className="absolute inset-x-0 bottom-0 bg-background/85 py-1.5 text-center text-xs font-medium">
-                        Ganti foto
+                        Change photo
                       </div>
                     )}
                   </div>
@@ -554,7 +554,7 @@ export function GalleryManager({ token }: GalleryManagerProps) {
                 ) : (
                   <>
                     <ImageIcon size={22} />
-                    <span className="text-sm font-medium">Ketuk untuk unggah foto</span>
+                    <span className="text-sm font-medium">Tap to upload photo</span>
                   </>
                 )}
               </label>
@@ -563,23 +563,23 @@ export function GalleryManager({ token }: GalleryManagerProps) {
               ) : null}
             </Field>
 
-            <Field label="Keterangan *" className="sm:col-span-2">
+            <Field label="Caption *" className="sm:col-span-2">
               <TextInput
                 required
                 autoFocus
                 value={editForm.caption}
                 onChange={(e) => setEditForm((f) => ({ ...f, caption: e.target.value }))}
-                placeholder="cth: Workshop UI/UX di Kampus"
+                placeholder="e.g. UI/UX Workshop on Campus"
               />
             </Field>
 
-            <Field label="Tahun">
+            <Field label="Year">
               <TextInput
                 type="number"
                 inputMode="numeric"
                 value={editForm.year}
                 onChange={(e) => setEditForm((f) => ({ ...f, year: e.target.value }))}
-                placeholder="cth: 2026"
+                placeholder="e.g. 2026"
               />
             </Field>
           </div>

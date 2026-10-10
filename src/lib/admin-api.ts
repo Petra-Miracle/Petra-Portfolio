@@ -67,10 +67,10 @@ export async function login(
   });
 
   if (res.status === 401) {
-    throw new ApiError("Email atau password salah.", 401);
+    throw new ApiError("Incorrect email or password.", 401);
   }
   if (!res.ok) {
-    throw new ApiError("Gagal terhubung ke server.", res.status);
+    throw new ApiError("Failed to connect to the server.", res.status);
   }
   return (await res.json()) as LoginResponse;
 }
@@ -100,17 +100,17 @@ async function authedRequest<T>(
   });
 
   if (res.status === 401) {
-    throw new ApiError("Sesi berakhir. Silakan login ulang.", 401);
+    throw new ApiError("Session expired. Please log in again.", 401);
   }
   if (!res.ok) {
-    let message = `Request gagal (${res.status}).`;
+    let message = `Request failed (${res.status}).`;
     try {
       const data = (await res.json()) as {
         error?: string;
         details?: unknown;
       };
       if (data?.error === "Validation error") {
-        message = "Data tidak valid, cek kembali form.";
+        message = "Invalid data. Please check the form.";
       } else if (data?.error) {
         message = data.error;
       }
@@ -291,16 +291,16 @@ export async function uploadImage(
 
   const res = await fetch(`${API_URL}/api/uploads`, {
     method: "POST",
-    // Jangan set Content-Type manual — browser yang set boundary multipart-nya.
+    // Don't set Content-Type manually, the browser sets the multipart boundary.
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
 
   if (res.status === 401) {
-    throw new ApiError("Sesi berakhir. Silakan login ulang.", 401);
+    throw new ApiError("Session expired. Please log in again.", 401);
   }
   if (!res.ok) {
-    let message = "Upload gagal.";
+    let message = "Upload failed.";
     try {
       const data = (await res.json()) as { error?: string };
       if (data?.error) message = data.error;

@@ -2,51 +2,59 @@ import { ArrowUp, ArrowUpRight, Mail } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { Reveal } from "@/components/Reveal";
 import { SocialIcon } from "@/components/SocialIcon";
-import { AtmosphereBg } from "@/components/AtmosphereBg";
 import { EmailCopyButton } from "@/components/EmailCopyButton";
 import { LocalTime } from "@/components/LocalTime";
 import StaggerText from "@/components/effects/stagger-text";
 
 export function Footer() {
   return (
-    <footer id="kontak" className="noise relative overflow-hidden bg-dark">
-      <AtmosphereBg glowPosition="50% 0%" variant="hero" />
+    <footer id="contact" className="relative overflow-hidden bg-background">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(70% 50% at 50% 0%, rgba(199,242,60,0.12), transparent 65%)",
+        }}
+      />
       <div className="relative mx-auto max-w-[1280px] px-6 pb-10 pt-24 sm:px-10 sm:pt-32 lg:px-20">
         <Reveal>
           <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
               {siteConfig.author.status ? (
-                <div className="glass-dark mb-7 inline-flex items-center gap-2.5 rounded-full py-2 pl-3.5 pr-4">
+                <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-border bg-surface py-2 pl-3.5 pr-4 shadow-sm">
                   <span className="relative flex size-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
                     <span className="relative inline-flex size-2 rounded-full bg-accent shadow-[0_0_10px_var(--accent-glow)]" />
                   </span>
-                  <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-background/85" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                    Tersedia untuk proyek baru
+                  <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                    Available for new projects
                   </span>
                 </div>
               ) : null}
 
-              <p className="eyebrow" style={{ color: "var(--dark-muted)" }}>
-                <span style={{ color: "var(--accent-hover)" }}>07</span> Kontak
+              <p className="eyebrow" style={{ color: "var(--muted)" }}>
+                <span style={{ color: "var(--lime-deep)" }}>07</span> Contact
               </p>
 
-              <h2 className="mt-6 max-w-[16ch] font-display text-[42px] font-bold leading-[1.02] tracking-tight text-background sm:text-[68px]" style={{ fontFamily: "var(--font-display)" }}>
-                <StaggerText divideBy="word">Punya proyek yang ingin</StaggerText>{" "}
-                <span className="text-gradient-accent">dibangun?</span>
+              <h2 className="mt-6 max-w-[16ch] font-display text-[42px] font-bold leading-[1.02] tracking-tight text-foreground sm:text-[68px]" style={{ fontFamily: "var(--font-display)" }}>
+                <StaggerText divideBy="word">Have a project you&apos;d like</StaggerText>{" "}
+                <span className="inline-block rounded-2xl bg-accent px-4 pb-1 text-accent-ink">
+                  to build?
+                </span>
               </h2>
 
-              <p className="mt-6 max-w-[46ch] text-[16px] leading-relaxed text-dark-muted">
-                Selalu terbuka untuk diskusi peluang kerja sama, proyek baru,
-                atau sekadar bertukar ide. Kirim pesan — biasanya saya balas
-                dalam 1–2 hari kerja.
+              <p className="mt-6 max-w-[46ch] text-[16px] leading-relaxed text-muted">
+                Always open to discussing collaboration opportunities, new
+                projects, or just exchanging ideas. Send a message. I
+                usually reply within 1 to 2 business days.
               </p>
             </div>
 
-            {/* Contact card */}
-            <div className="glass-dark rounded-[28px] p-7 sm:p-8">
+            {/* Contact card: dark panel closing on light */}
+            <div className="rounded-[28px] border border-white/10 bg-dark p-7 shadow-[0_32px_80px_rgba(21,20,15,0.25)] sm:p-8">
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                Hubungi langsung
+                Get in touch directly
               </p>
               <a
                 href={`mailto:${siteConfig.email}`}
@@ -58,7 +66,7 @@ export function Footer() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <a href={`mailto:${siteConfig.email}`} className="btn btn-primary flex-1 px-6! py-3.5!">
                   <Mail size={16} />
-                  Kirim Email
+                  Send Email
                 </a>
                 <EmailCopyButton email={siteConfig.email} />
               </div>
@@ -67,7 +75,7 @@ export function Footer() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
                   <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
                 </span>
-                Waktu lokal — <LocalTime /> WIB
+                Local time: <LocalTime /> WIB
               </div>
               <div className="mt-6 flex flex-wrap gap-2.5 border-t border-white/[0.08] pt-6">
                 {siteConfig.socials.map((social) => (
@@ -90,20 +98,20 @@ export function Footer() {
         </Reveal>
 
         {/* Bottom bar */}
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/[0.08] pt-8 sm:flex-row">
-          <p className="font-mono text-[12px] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            © {new Date().getFullYear()} {siteConfig.author.name} · Dibangun dengan ketelitian
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
+          <p className="font-mono text-[12px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+            © {new Date().getFullYear()} {siteConfig.author.name} · Built with care
           </p>
-          <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-dark-muted/60 max-sm:order-last" style={{ fontFamily: "var(--font-mono-jb)" }}>
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted max-sm:order-last" style={{ fontFamily: "var(--font-mono-jb)" }}>
             Motion & UI: Vengence UI · Skiper UI · HeroUI
           </p>
           <a
-            href="#beranda"
-            className="group inline-flex items-center gap-2.5 font-mono text-[12px] font-semibold text-dark-muted transition-colors hover:text-accent"
+            href="#home"
+            className="group inline-flex items-center gap-2.5 font-mono text-[12px] font-semibold text-muted transition-colors hover:text-foreground"
             style={{ fontFamily: "var(--font-mono-jb)" }}
           >
-            Kembali ke atas
-            <span className="flex size-9 items-center justify-center rounded-full border border-white/12 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-accent/60 group-hover:bg-accent group-hover:text-accent-ink">
+            Back to top
+            <span className="flex size-9 items-center justify-center rounded-full border border-border transition-all duration-300 group-hover:-translate-y-1 group-hover:border-accent group-hover:bg-accent group-hover:text-accent-ink">
               <ArrowUp size={14} />
             </span>
           </a>

@@ -1,7 +1,7 @@
 /**
- * ScrollStatement — original scroll-driven word reveal built with framer-motion,
+ * ScrollStatement, original scroll-driven word reveal built with framer-motion,
  * in the spirit of Skiper UI's scroll text-reveal components
- * (https://skiper-ui.com — e.g. TextBoxReveal). Each word fades from
+ * (https://skiper-ui.com, mis. TextBoxReveal). Each word fades from
  * dim to full as scroll progresses through the section.
  */
 "use client";
@@ -62,7 +62,7 @@ function Word({
     <motion.span
       style={{ opacity, y }}
       className={`mr-[0.28em] inline-block will-change-[opacity,transform] ${
-        accent ? "text-accent" : ""
+        accent ? "text-lime-deep" : ""
       }`}
     >
       {children}
@@ -72,27 +72,27 @@ function Word({
 
 export function StatementSection() {
   return (
-    <section className="relative overflow-hidden bg-dark" aria-label="Prinsip kerja">
+    <section className="relative overflow-hidden bg-background" aria-label="Working principles">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(70% 60% at 50% 100%, rgba(199,242,60,0.08), transparent 65%)",
+            "radial-gradient(70% 60% at 50% 100%, rgba(156,203,30,0.14), transparent 65%)",
         }}
       />
       <div className="relative mx-auto max-w-[1000px] px-6 py-24 sm:px-10 sm:py-32">
         <Reveal>
           <p
             className="eyebrow mb-8"
-            style={{ color: "var(--dark-muted)" }}
+            style={{ color: "var(--muted)" }}
           >
-            <span style={{ color: "var(--accent-hover)" }}>02</span> Prinsip
+            <span style={{ color: "var(--lime-deep)" }}>02</span> Principles
           </p>
         </Reveal>
         <ScrollStatement
-          text="Saya merancang dan membangun aplikasi web yang cepat, rapi, dan siap produksi — dari ide, desain, sampai rilis."
-          accentWords={["cepat,", "rapi,", "produksi", "rilis."]}
+          text="I design and build web applications that are fast, clean, and production-ready, from idea and design to release."
+          accentWords={["fast,", "clean,", "production-ready,", "release."]}
         />
       </div>
     </section>

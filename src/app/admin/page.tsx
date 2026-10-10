@@ -16,7 +16,7 @@ const AdminDashboard = dynamic(
     loading: () => (
       <div className="flex min-h-[60vh] items-center justify-center gap-2 text-foreground/60">
         <Loader2 size={18} className="animate-spin" />
-        Memeriksa sesi...
+        Checking session...
       </div>
     ),
   },

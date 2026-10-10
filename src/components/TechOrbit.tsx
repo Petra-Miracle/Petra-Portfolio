@@ -1,4 +1,4 @@
-// Tech orbit — layout in the spirit of Vengeance UI's Solar System
+// Tech orbit: layout in the spirit of Vengeance UI's Solar System
 // (vengenceui.com/components/solar-system): elliptical tilted orbits with
 // pill nodes (icon + label) and depth scaling. The registry file for the
 // original was never published, so this is a faithful original
@@ -154,7 +154,7 @@ export function TechOrbit({
       ref={rootRef}
       className="relative mx-auto aspect-[16/10] w-full max-w-[640px]"
       role="img"
-      aria-label={`Ekosistem teknologi: ${entries.length} teknologi mengorbit inti stack`}
+      aria-label={`Technology ecosystem: ${entries.length} technologies orbiting the core stack`}
       onMouseEnter={() => {
         pausedRef.current = true;
       }}

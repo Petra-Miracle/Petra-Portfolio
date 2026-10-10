@@ -18,13 +18,13 @@ export function Gallery({ items }: GalleryProps) {
   const current = items.length > 0 ? items[active % items.length] : null;
 
   return (
-    <section id="galeri" className="relative overflow-hidden bg-background">
+    <section id="gallery" className="relative overflow-hidden bg-background">
       <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
         <SectionHeading
           index="06"
-          eyebrow="Dokumentasi"
-          title="Galeri kegiatan"
-          description="Momen di balik layar — kompetisi, kolaborasi, dan proses berkarya. Geser untuk menjelajah."
+          eyebrow="Documentation"
+          title="Activity gallery"
+          description="Behind-the-scenes moments: competitions, collaboration, and the creative process. Swipe to explore."
         />
 
         {isEmpty ? (
@@ -33,8 +33,8 @@ export function Gallery({ items }: GalleryProps) {
               <span className="empty-state-icon size-14">
                 <PackageOpen size={24} strokeWidth={1.5} />
               </span>
-              <p className="empty-state-title">Belum ada dokumentasi kegiatan.</p>
-              <p className="empty-state-desc">Data akan muncul otomatis setelah ditambahkan melalui panel admin.</p>
+              <p className="empty-state-title">No activity photos yet.</p>
+              <p className="empty-state-desc">Data will appear automatically once added through the admin panel.</p>
             </div>
           </Reveal>
         ) : (

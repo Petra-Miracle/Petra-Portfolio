@@ -11,7 +11,7 @@ interface TechnologiesProps {
 }
 
 /**
- * Tech section — notes on the left, elliptical orbit system on the right
+ * Tech section: notes on the left, elliptical orbit system on the right
  * (in the spirit of Vengeance UI's Solar System). Fully data-driven:
  * GENERAL fills inner rings, AI fills outer rings, opening new rings
  * as data grows.
@@ -27,7 +27,7 @@ export function Technologies({ technologies }: TechnologiesProps) {
   const isEmpty = general.length === 0 && ai.length === 0;
 
   return (
-    <section id="teknologi" className="noise relative overflow-hidden bg-dark">
+    <section id="technologies" className="noise relative overflow-hidden bg-dark">
       <AtmosphereBg glowPosition="12% 12%" />
       <div className="relative mx-auto max-w-[1280px] px-6 py-24 sm:px-10 sm:py-32 lg:px-20">
         {isEmpty ? (
@@ -35,43 +35,43 @@ export function Technologies({ technologies }: TechnologiesProps) {
             <Reveal>
               <p className="eyebrow" style={{ color: "var(--dark-muted)" }}>
                 <span style={{ color: "var(--accent-hover)" }}>03</span>
-                Tumpukan Teknologi
+                Tech Stack
               </p>
               <h2
                 className="mt-5 font-display text-4xl font-semibold tracking-tight text-background sm:text-5xl"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Senjata yang saya percaya
+                The tools I trust
               </h2>
             </Reveal>
             <Reveal>
               <div className="mt-14 flex flex-col items-center gap-4 rounded-3xl border border-dashed border-white/15 bg-white/[0.02] p-14 text-center">
-                <p className="text-base font-semibold text-background">Belum ada data teknologi.</p>
+                <p className="text-base font-semibold text-background">No technology data yet.</p>
                 <p className="max-w-[40ch] text-sm leading-relaxed text-dark-muted">
-                  Data akan muncul otomatis setelah ditambahkan melalui panel admin.
+                  Data will appear automatically once added through the admin panel.
                 </p>
               </div>
             </Reveal>
           </>
         ) : (
           <div className="grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8">
-            {/* ---- Kiri: catatan pribadi ---- */}
+            {/* ---- Left: personal notes ---- */}
             <div>
               <Reveal>
                 <p className="eyebrow" style={{ color: "var(--dark-muted)" }}>
                   <span style={{ color: "var(--accent-hover)" }}>03</span>
-                  Tumpukan Teknologi
+                  Tech Stack
                 </p>
                 <h2
                   className="mt-5 font-display text-4xl font-semibold tracking-tight text-balance text-background sm:text-5xl"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  <StaggerText divideBy="word">Senjata yang saya percaya</StaggerText>
+                  <StaggerText divideBy="word">The tools I trust</StaggerText>
                 </h2>
                 <p className="mt-5 max-w-[46ch] text-[15px] leading-relaxed text-dark-muted">
-                  Ini ekosistem teknologi saya — yang di orbit dalam dipakai
-                  setiap hari untuk membangun produk, yang di orbit luar adalah
-                  AI tools yang mempercepat cara saya bekerja.
+                  This is my technology ecosystem. The inner orbit is what I
+                  use every day to build products, the outer orbit is the AI
+                  tools that speed up how I work.
                 </p>
               </Reveal>
 
@@ -85,13 +85,13 @@ export function Technologies({ technologies }: TechnologiesProps) {
                       <span className="block font-display text-[26px] font-bold leading-none text-background" style={{ fontFamily: "var(--font-display)" }}>
                         <StatsCounter value={general.length} duration={1.4} />
                         <span className="ml-2 align-middle font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                          Teknologi inti
+                          Core technologies
                         </span>
                       </span>
                       <span className="mt-2 block text-[13.5px] leading-relaxed text-dark-muted">
-                        Bahasa, database, dan framework yang saya pakai untuk
-                        merancang dan membangun aplikasi — dari prototipe
-                        sampai produksi.
+                        Languages, databases, and frameworks I use to design
+                        and build applications, from prototype to
+                        production.
                       </span>
                     </span>
                   </article>
@@ -110,8 +110,8 @@ export function Technologies({ technologies }: TechnologiesProps) {
                         </span>
                       </span>
                       <span className="mt-2 block text-[13.5px] leading-relaxed text-dark-muted">
-                        Asisten kecerdasan buatan yang mempercepat riset,
-                        penulisan kode, dan penyelesaian masalah setiap hari.
+                        AI assistants that speed up research, code writing,
+                        and problem-solving every day.
                       </span>
                     </span>
                   </article>
@@ -122,7 +122,7 @@ export function Technologies({ technologies }: TechnologiesProps) {
                 <p className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[11.5px] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
                   <span className="inline-flex items-center gap-1.5">
                     <MousePointerClick size={13} className="text-accent" />
-                    Arahkan kursor ke orbit untuk menjedanya
+                    Hover over the orbit to pause it
                   </span>
                   <span className="inline-flex items-center gap-3">
                     <span className="inline-flex items-center gap-1.5">

@@ -28,7 +28,7 @@ interface OverviewManagerProps {
 }
 
 interface StatDef {
-  key: Exclude<SectionKey, "ringkasan">;
+  key: Exclude<SectionKey, "overview">;
   label: string;
   desc: string;
   icon: typeof Layers;
@@ -62,7 +62,7 @@ export function OverviewManager({ token, onSelect }: OverviewManagerProps) {
         setStats([
           {
             key: "technologies",
-            label: "Teknologi",
+            label: "Technologies",
             desc: "Stack & AI tools",
             icon: Layers,
             count: technologies.length,
@@ -70,28 +70,28 @@ export function OverviewManager({ token, onSelect }: OverviewManagerProps) {
           {
             key: "projects",
             label: "Project",
-            desc: "Karya pilihan",
+            desc: "Featured work",
             icon: FolderGit2,
             count: projects.filter((p) => p.type === "PROJECT").length,
           },
           {
             key: "projects",
-            label: "Kompetisi",
-            desc: "Lomba diikuti",
+            label: "Competition",
+            desc: "Competitions entered",
             icon: Trophy,
             count: projects.filter((p) => p.type === "COMPETITION").length,
           },
           {
             key: "certificates",
-            label: "Sertifikat",
-            desc: "Kredensial",
+            label: "Certificates",
+            desc: "Credentials",
             icon: Award,
             count: certificates.length,
           },
           {
             key: "gallery",
-            label: "Galeri",
-            desc: "Dokumentasi",
+            label: "Gallery",
+            desc: "Documentation",
             icon: Images,
             count: gallery.length,
           },
@@ -113,14 +113,14 @@ export function OverviewManager({ token, onSelect }: OverviewManagerProps) {
   return (
     <div>
       <PageHeader
-        title="Ringkasan"
-        subtitle="Statistik konten portfolio dan jalan pintas ke setiap bagian kelola."
+        title="Overview"
+        subtitle="Portfolio content stats and shortcuts to each section."
       />
 
       {failed ? (
         <EmptyState
-          title="Gagal memuat ringkasan."
-          description="Periksa koneksi ke backend, lalu muat ulang halaman."
+          title="Failed to load overview."
+          description="Check your connection to the backend, then reload the page."
         />
       ) : !stats ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-hidden>
@@ -195,12 +195,12 @@ export function OverviewManager({ token, onSelect }: OverviewManagerProps) {
               className="relative font-display text-[22px] font-semibold leading-tight tracking-tight text-background"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Lihat hasil
+              See the results
               <br />
-              di website
+              on the website
             </p>
             <span className="relative inline-flex w-fit items-center gap-2 rounded-full bg-accent px-4 py-2 text-[13px] font-bold text-accent-ink transition-transform duration-300 group-hover:gap-3">
-              Buka Website <ArrowUpRight size={15} />
+              Open Website <ArrowUpRight size={15} />
             </span>
           </motion.a>
         </div>

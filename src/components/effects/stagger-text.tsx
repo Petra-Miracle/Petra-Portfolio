@@ -1,5 +1,5 @@
 /**
- * Stagger Text — vendored from Vengeance UI (free, https://www.vengenceui.com/components/stagger-text)
+ * Stagger Text, vendored from Vengeance UI (free, https://www.vengenceui.com/components/stagger-text)
  * Slightly adapted: added optional className passthrough. Original logic unchanged.
  */
 'use client';

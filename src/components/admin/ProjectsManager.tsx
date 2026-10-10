@@ -107,7 +107,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
           handleUnauthorized();
           return;
         }
-        setError(err instanceof Error ? err.message : "Gagal memuat data.");
+        setError(err instanceof Error ? err.message : "Failed to load data.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -175,7 +175,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         handleUnauthorized();
         return;
       }
-      setImageError(err instanceof Error ? err.message : "Upload gagal.");
+      setImageError(err instanceof Error ? err.message : "Upload failed.");
       setImagePreview(form.imageUrl.trim() === "" ? null : form.imageUrl);
     } finally {
       URL.revokeObjectURL(localPreview);
@@ -237,7 +237,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         return;
       }
       setSubmitError(
-        err instanceof Error ? err.message : "Gagal menyimpan data.",
+        err instanceof Error ? err.message : "Failed to save data.",
       );
     } finally {
       setSaving(false);
@@ -245,7 +245,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Hapus data ini?")) return;
+    if (!window.confirm("Delete this item?")) return;
     try {
       await deleteProject(token, id);
       setItems(await loadItems());
@@ -255,7 +255,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         return;
       }
       window.alert(
-        err instanceof Error ? err.message : "Gagal menghapus data.",
+        err instanceof Error ? err.message : "Failed to delete data.",
       );
     }
   }
@@ -270,12 +270,12 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
   return (
     <div>
       <PageHeader
-        title="Project & Kompetisi"
-        subtitle="Kelola karya yang ditampilkan di halaman publik."
+        title="Project & Competitions"
+        subtitle="Manage the work shown on the public page."
         action={
           <PrimaryButton onClick={openCreate}>
             <Plus size={16} />
-            Tambah
+            Add
           </PrimaryButton>
         }
       />
@@ -292,11 +292,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
           <FilterDropdown
             value={typeFilter}
             onChange={setTypeFilter}
-            label="Filter tipe"
+            label="Filter type"
             options={[
               {
                 value: "ALL",
-                label: "Semua Tipe",
+                label: "All Types",
                 icon: <Layers className="size-4 shrink-0 text-muted" />,
                 shortcut: "1",
               },
@@ -308,14 +308,14 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               },
               {
                 value: "COMPETITION",
-                label: "Kompetisi",
+                label: "Competition",
                 icon: <SealCheck className="size-4 shrink-0 text-muted" />,
                 shortcut: "3",
               },
             ]}
           />
           <span className="admin-count-chip">
-            <strong><StatsCounter value={filteredItems.length} duration={1} /></strong> item
+            <strong><StatsCounter value={filteredItems.length} duration={1} /></strong> items
           </span>
         </div>
       ) : null}
@@ -326,11 +326,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
               <tr>
-                <Th>Foto</Th>
-                <Th>Judul</Th>
-                <Th>Tipe</Th>
-                <Th className="text-center">Tahun</Th>
-                <Th className="text-right">Aksi</Th>
+                <Th>Photo</Th>
+                <Th>Title</Th>
+                <Th>Type</Th>
+                <Th className="text-center">Year</Th>
+                <Th className="text-right">Action</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -355,7 +355,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                       <TypeTag type={project.type} />
                     </td>
                     <td className="px-5 py-[14px] text-center text-sm text-muted">
-                      {project.year ?? "—"}
+                      {project.year ?? "-"}
                     </td>
                     <td className="px-5 py-[14px]">
                       <div className="flex justify-end gap-2">
@@ -363,7 +363,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                           <Pencil size={15} />
                         </IconButton>
                         <IconButton
-                          label="Hapus"
+                          label="Delete"
                           variant="danger"
                           onClick={() => handleDelete(project.id)}
                         >
@@ -380,7 +380,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         <TableSkeleton />
       ) : items.length > 0 ? (
         <div className="admin-table-wrap hidden p-10 text-center text-sm text-muted sm:block">
-          Tidak ada data pada tipe ini.
+          No data for this type.
         </div>
       ) : null}
 
@@ -409,7 +409,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                     <Pencil size={15} />
                   </IconButton>
                   <IconButton
-                    label="Hapus"
+                    label="Delete"
                     variant="danger"
                     onClick={() => handleDelete(project.id)}
                   >
@@ -421,7 +421,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
           ))
         ) : items.length > 0 ? (
           <div className="card p-8 text-center text-sm text-muted">
-            Tidak ada data pada tipe ini.
+            No data for this type.
           </div>
         ) : null}
       </div>
@@ -431,12 +431,12 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
         <div className="mt-6">
           <EmptyState
             icon={<FolderGit2 size={22} />}
-            title="Belum ada data project."
-            description="Data project dan kompetisi Anda akan tampil di sini setelah ditambahkan."
+            title="No project data yet."
+            description="Your project and competition data will appear here once added."
             action={
               <PrimaryButton onClick={openCreate}>
                 <Plus size={16} />
-                Tambah Project
+                Add Project
               </PrimaryButton>
             }
           />
@@ -447,16 +447,16 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
       <Modal
         open={modalOpen}
         onClose={closeModal}
-        title={editingId ? "Edit Project" : "Tambah Project"}
+        title={editingId ? "Edit Project" : "Add Project"}
         footer={
           <>
-            <OutlineButton onClick={closeModal}>Batal</OutlineButton>
+            <OutlineButton onClick={closeModal}>Cancel</OutlineButton>
             <PrimaryButton
               form="project-form"
               type="submit"
               loading={saving || uploadingImage}
             >
-              {editingId ? "Simpan Perubahan" : "Simpan"}
+              {editingId ? "Save Changes" : "Save"}
             </PrimaryButton>
           </>
         }
@@ -469,7 +469,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
 
         <form id="project-form" onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Judul *" className="sm:col-span-2">
+            <Field label="Title *" className="sm:col-span-2">
               <TextInput
                 required
                 autoFocus
@@ -477,22 +477,22 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, title: e.target.value }))
                 }
-                placeholder="cth: Aplikasi Absensi"
+                placeholder="e.g. Attendance App"
               />
             </Field>
 
-            <Field label="Tipe" className="sm:col-span-2">
+            <Field label="Type" className="sm:col-span-2">
               <SegmentedControl
                 value={form.type}
                 onChange={(v) => setForm((f) => ({ ...f, type: v }))}
                 options={[
                   { value: "PROJECT", label: "Project" },
-                  { value: "COMPETITION", label: "Kompetisi" },
+                  { value: "COMPETITION", label: "Competition" },
                 ]}
               />
             </Field>
 
-            <Field label="Deskripsi *" className="sm:col-span-2">
+            <Field label="Description *" className="sm:col-span-2">
               <TextArea
                 required
                 rows={3}
@@ -500,7 +500,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, description: e.target.value }))
                 }
-                placeholder="Deskripsi singkat"
+                placeholder="Brief description"
               />
             </Field>
 
@@ -515,11 +515,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                       addTech();
                     }
                   }}
-                  placeholder="cth: React, lalu tekan Enter"
+                  placeholder="e.g. React, then press Enter"
                 />
                 <OutlineButton type="button" onClick={addTech} className="shrink-0">
                   <Plus size={15} />
-                  Tambah
+                  Add
                 </OutlineButton>
               </div>
               {techStack.length > 0 ? (
@@ -534,7 +534,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                         type="button"
                         onClick={() => removeTech(i)}
                         className="ml-1.5 text-muted transition-colors hover:text-danger"
-                        aria-label={`Hapus ${tech}`}
+                        aria-label={`Remove ${tech}`}
                       >
                         <X size={11} />
                       </button>
@@ -566,7 +566,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               />
             </Field>
 
-            <Field label="Foto Project" className="sm:col-span-2">
+            <Field label="Project Photo" className="sm:col-span-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -598,7 +598,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <Upload size={14} />
-                      Ganti Foto
+                      Change Photo
                     </button>
                     <button
                       type="button"
@@ -607,7 +607,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                       onClick={clearImage}
                     >
                       <Trash2 size={14} />
-                      Hapus Foto
+                      Remove Photo
                     </button>
                   </div>
                 </div>
@@ -624,7 +624,7 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                     <ImageIcon size={22} />
                   )}
                   <span className="text-sm font-medium">
-                    {uploadingImage ? "Mengupload..." : "Ketuk untuk unggah foto"}
+                    {uploadingImage ? "Uploading..." : "Tap to upload photo"}
                   </span>
                 </button>
               )}
@@ -635,17 +635,17 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
               ) : null}
             </Field>
 
-            <Field label="Hasil (khusus kompetisi)">
+            <Field label="Result (competitions only)">
               <TextInput
                 value={form.result}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, result: e.target.value }))
                 }
-                placeholder="cth: Juara 1"
+                placeholder="e.g. 1st Place"
               />
             </Field>
 
-            <Field label="Tahun">
+            <Field label="Year">
               <TextInput
                 type="number"
                 inputMode="numeric"
@@ -653,11 +653,11 @@ export function ProjectsManager({ token }: ProjectsManagerProps) {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, year: e.target.value }))
                 }
-                placeholder="cth: 2026"
+                placeholder="e.g. 2026"
               />
             </Field>
 
-            <Field label="Urutan">
+            <Field label="Order">
               <TextInput
                 type="number"
                 inputMode="numeric"
@@ -716,7 +716,7 @@ function Thumb({ project }: { project: { imageUrl: string | null } }) {
 
 function TypeTag({ type }: { type: ProjectType }) {
   if (type === "COMPETITION") {
-    return <span className="badge-success">KOMPETISI</span>;
+    return <span className="badge-success">COMPETITION</span>;
   }
   return <span className="badge-neutral">PROJECT</span>;
 }

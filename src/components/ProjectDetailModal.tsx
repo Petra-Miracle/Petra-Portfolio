@@ -35,7 +35,7 @@ export function ProjectDetailModal({
 
   const isCompetition = project.type === "COMPETITION";
   const HeaderIcon = isCompetition ? Trophy : FolderGit2;
-  const typeLabel = isCompetition ? "Kompetisi" : "Project";
+  const typeLabel = isCompetition ? "Competition" : "Project";
   const hasLinks = Boolean(project.demoUrl || project.repoUrl);
 
   return createPortal(
@@ -81,7 +81,7 @@ export function ProjectDetailModal({
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            aria-label="Tutup"
+            aria-label="Close"
             className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg backdrop-blur-sm transition-all duration-150 hover:rotate-90 hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           >
             <X size={16} />
@@ -122,13 +122,13 @@ export function ProjectDetailModal({
             {project.demoUrl ? (
               <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className={`btn btn-primary ${project.repoUrl ? "flex-1" : "w-full"}`}>
                 <ExternalLink size={14} />
-                Buka Demo
+                Open Demo
               </a>
             ) : null}
             {project.repoUrl ? (
               <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className={`btn btn-outline ${project.demoUrl ? "flex-1" : "w-full"}`}>
                 <SocialIcon name="github" className="size-3.5" />
-                Lihat Repo
+                View Repo
               </a>
             ) : null}
           </div>

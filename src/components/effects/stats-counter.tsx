@@ -1,5 +1,5 @@
 /**
- * Stats Counter — vendored from Vengeance UI (free, https://www.vengenceui.com/components/stats-counter)
+ * Stats Counter, vendored from Vengeance UI (free, https://www.vengenceui.com/components/stats-counter)
  * Original logic unchanged.
  */
 "use client";

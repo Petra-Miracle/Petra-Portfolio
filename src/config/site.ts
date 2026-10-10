@@ -1,30 +1,30 @@
 export const siteConfig = {
   title: "Petra Portfolio",
   description:
-    "Full-Stack Developer yang membangun aplikasi web nyata — dari perencanaan, pengembangan, hingga rilis produksi.",
+    "Full-Stack Developer who builds real-world web applications, from planning and development to production release.",
   author: {
     name: "Petra Lenggu",
     role: "Full-Stack Developer",
     image: "/img/pet-portfolio.jpg",
-    // Ubah ke null untuk sembunyikan badge ketersediaan di Hero & Footer
+    // Set to null to hide the availability badge in the Hero & Footer
     status: "Available" as "Available" | null,
   },
-  // TODO: Ganti dengan angka & email asli
+  // TODO: Replace with real figures & email
   stats: {
     experience: "2+",
-    experienceLabel: "TAHUN PENGALAMAN",
+    experienceLabel: "YEARS OF EXPERIENCE",
   },
   email: "petra221106@gmail.com",
   navLinks: [
-    { label: "Tentang", href: "#tentang" },
-    { label: "Teknologi", href: "#teknologi" },
-    { label: "Sertifikat", href: "#sertifikat" },
-    { label: "Karya", href: "#proyek" },
-    { label: "Galeri", href: "#galeri" },
-    { label: "Kontak", href: "#kontak" },
+    { label: "About", href: "#about" },
+    { label: "Technologies", href: "#technologies" },
+    { label: "Certificates", href: "#certificates" },
+    { label: "Work", href: "#work" },
+    { label: "Gallery", href: "#gallery" },
+    { label: "Contact", href: "#contact" },
   ],
   socials: [
-    // TODO: Ganti dengan link asli
+    // TODO: Replace with real links
     { label: "GitHub", href: "https://github.com/Petra-Miracle", icon: "github" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/petra-lenggu-538226319/", icon: "linkedin" },
     { label: "Twitter / X", href: "https://x.com/SmkindEzz", icon: "twitter" },

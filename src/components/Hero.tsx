@@ -61,7 +61,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
 
   return (
     <section
-      id="beranda"
+      id="home"
       ref={sectionRef}
       onMouseMove={onMouseMove}
       className="noise relative flex min-h-screen flex-col justify-center overflow-hidden bg-dark"
@@ -99,7 +99,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
                     <span className="relative inline-flex size-2 rounded-full bg-accent shadow-[0_0_10px_var(--accent-glow)]" />
                   </span>
                   <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-accent" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                    Tersedia untuk proyek baru
+                    Available for new projects
                   </span>
                 </span>
               ) : null}
@@ -114,7 +114,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
             className="mt-8 font-mono text-[12px] font-semibold uppercase tracking-[0.24em] text-dark-muted"
             style={{ fontFamily: "var(--font-mono-jb)" }}
           >
-            <span className="text-accent">—</span>{" "}
+            <span className="text-accent">{"//"}</span>{" "}
             <StaggerText delay={0.3}>{siteConfig.author.role}</StaggerText>
           </motion.p>
 
@@ -128,7 +128,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
           >
             {firstName ? <StaggerText delay={0.35}>{firstName}</StaggerText> : null}
             <br />
-            <span className="text-gradient-accent pr-2">{lastName || "Karya"}</span>
+            <span className="text-gradient-accent pr-2">{lastName || "Work"}</span>
           </motion.h1>
 
           <motion.p
@@ -140,7 +140,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
           >
             {siteConfig.description}{" "}
             <span className="text-background/85">
-              Saya merancang dan membangun produk yang cepat, rapi, dan siap produksi.
+              I design and build products that are fast, clean, and production-ready.
             </span>
           </motion.p>
 
@@ -152,8 +152,8 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
             className="mt-9 flex flex-wrap items-center gap-3.5"
           >
             <Magnetic>
-              <a href="#proyek" className="btn btn-primary px-7! py-4! text-[15px]!">
-                Lihat Karya
+              <a href="#work" className="btn btn-primary px-7! py-4! text-[15px]!">
+                View Work
                 <ArrowRight size={17} />
               </a>
             </Magnetic>
@@ -167,7 +167,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
                 className="btn glass-dark border-white/15! px-7! py-4! text-[15px]! text-background! hover:border-accent/50! hover:bg-white/[0.08]!"
               >
                 <Download size={16} className="text-accent" />
-                Unduh CV
+                Download CV
               </a>
               </Magnetic>
             ) : null}
@@ -207,9 +207,9 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
               ))}
             </div>
             <p className="text-[13px] leading-snug text-dark-muted">
-              <span className="font-semibold text-background">{siteConfig.stats.experience} pengalaman</span>
+              <span className="font-semibold text-background">{siteConfig.stats.experience} experience</span>
               <br />
-              membangun aplikasi web nyata
+              building real-world web applications
             </p>
             <span className="ml-auto hidden items-center gap-1.5 font-mono text-[11px] text-dark-muted sm:inline-flex" style={{ fontFamily: "var(--font-mono-jb)" }}>
               <BadgeCheck size={14} className="text-accent" />
@@ -243,7 +243,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
             <div className="relative h-[480px] overflow-hidden rounded-[31px] bg-dark-surface sm:h-[540px]">
               <Image
                 src={siteConfig.author.image}
-                alt={`Foto ${siteConfig.author.name}`}
+                alt={`Photo of ${siteConfig.author.name}`}
                 fill
                 priority
                 sizes="(max-width: 640px) 90vw, 420px"
@@ -266,8 +266,8 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
                   </p>
                 </div>
                 <a
-                  href="#proyek"
-                  aria-label="Lihat karya"
+                  href="#work"
+                  aria-label="View work"
                   className="flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-ink shadow-[0_8px_28px_rgba(199,242,60,0.5)] transition-transform duration-300 hover:rotate-45"
                 >
                   <ArrowUpRight size={20} />
@@ -276,7 +276,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
             </div>
           </motion.div>
 
-          {/* Floating card — experience */}
+          {/* Floating card: experience */}
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -295,7 +295,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
             </span>
           </motion.div>
 
-          {/* Floating card — stack */}
+          {/* Floating card: stack */}
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
@@ -315,8 +315,8 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
 
           {/* Rotating availability badge */}
           <motion.a
-            href="#tentang"
-            aria-label="Tersedia untuk proyek baru — lihat selengkapnya"
+            href="#about"
+            aria-label="Available for new projects. Learn more"
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.9, duration: 0.6, ease: EASE }}
@@ -338,7 +338,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
                   style={{ letterSpacing: "2.4px", fontFamily: "var(--font-mono-jb)" }}
                 >
                   <textPath href="#hero-badge-circle" textLength="224">
-                    Terbuka untuk proyek baru • terbuka untuk proyek baru •
+                    Open for new projects • Open for new projects •
                   </textPath>
                 </text>
               </svg>
@@ -352,7 +352,7 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
         </motion.div>
       </div>
 
-      {/* Tech ticker — live stack strip */}
+      {/* Tech ticker: live stack strip */}
       {techNames.length > 0 ? (
         <div className="absolute inset-x-0 bottom-0 border-t border-white/[0.08] bg-dark/70 py-4 backdrop-blur-sm">
           <div
@@ -383,10 +383,10 @@ export function Hero({ cvUrl, techNames }: HeroProps) {
         </div>
       ) : null}
 
-      {/* Scroll cue — kiri bawah */}
+      {/* Scroll cue: bottom left */}
       <motion.a
-        href="#tentang"
-        aria-label="Scroll ke bagian Tentang"
+        href="#about"
+        aria-label="Scroll to the About section"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.1, duration: 0.8 }}

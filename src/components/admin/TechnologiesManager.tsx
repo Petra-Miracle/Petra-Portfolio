@@ -91,7 +91,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
           handleUnauthorized();
           return;
         }
-        setError(err instanceof Error ? err.message : "Gagal memuat data.");
+        setError(err instanceof Error ? err.message : "Failed to load data.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -148,7 +148,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         handleUnauthorized();
         return;
       }
-      setIconError(err instanceof Error ? err.message : "Upload gagal.");
+      setIconError(err instanceof Error ? err.message : "Upload failed.");
       setIconPreview(form.icon.trim() === "" ? null : form.icon);
     } finally {
       URL.revokeObjectURL(localPreview);
@@ -187,7 +187,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         return;
       }
       setSubmitError(
-        err instanceof Error ? err.message : "Gagal menyimpan data.",
+        err instanceof Error ? err.message : "Failed to save data.",
       );
     } finally {
       setSaving(false);
@@ -195,7 +195,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Hapus teknologi ini?")) return;
+    if (!window.confirm("Delete this technology?")) return;
     try {
       await deleteTechnology(token, id);
       setItems(await loadItems());
@@ -205,7 +205,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         return;
       }
       window.alert(
-        err instanceof Error ? err.message : "Gagal menghapus data.",
+        err instanceof Error ? err.message : "Failed to delete data.",
       );
     }
   }
@@ -218,12 +218,12 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
   return (
     <div>
       <PageHeader
-        title="Teknologi"
-        subtitle="Kelola daftar teknologi yang ditampilkan di halaman publik."
+        title="Technologies"
+        subtitle="Manage the list of technologies shown on the public page."
         action={
           <PrimaryButton onClick={openCreate}>
             <Plus size={16} />
-            Tambah
+            Add
           </PrimaryButton>
         }
       />
@@ -240,11 +240,11 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
           <FilterDropdown
             value={categoryFilter}
             onChange={setCategoryFilter}
-            label="Filter kategori"
+            label="Filter category"
             options={[
               {
                 value: "ALL",
-                label: "Semua Kategori",
+                label: "All Categories",
                 icon: <LayersIcon className="size-4 shrink-0 text-muted" />,
                 shortcut: "1",
               },
@@ -263,7 +263,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
             ]}
           />
           <span className="admin-count-chip">
-            <strong><StatsCounter value={filteredItems.length} duration={1} /></strong> teknologi
+            <strong><StatsCounter value={filteredItems.length} duration={1} /></strong> technologies
           </span>
         </div>
       ) : null}
@@ -275,10 +275,10 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
             <thead className="border-b border-border bg-surface">
               <tr>
                 <Th>Icon</Th>
-                <Th>Nama</Th>
-                <Th>Kategori</Th>
-                <Th className="text-center">Urutan</Th>
-                <Th className="text-right">Aksi</Th>
+                <Th>Name</Th>
+                <Th>Category</Th>
+                <Th className="text-center">Order</Th>
+                <Th className="text-right">Action</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -304,7 +304,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
                         <Pencil size={15} />
                       </IconButton>
                       <IconButton
-                        label="Hapus"
+                        label="Delete"
                         variant="danger"
                         onClick={() => handleDelete(tech.id)}
                       >
@@ -321,7 +321,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         <TableSkeleton />
       ) : items.length > 0 ? (
         <div className="admin-table-wrap hidden p-10 text-center text-sm text-muted sm:block">
-          Tidak ada teknologi pada kategori ini.
+          No technologies in this category.
         </div>
       ) : null}
 
@@ -348,7 +348,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
                   <Pencil size={15} />
                 </IconButton>
                 <IconButton
-                  label="Hapus"
+                  label="Delete"
                   variant="danger"
                   onClick={() => handleDelete(tech.id)}
                 >
@@ -359,7 +359,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
           ))
         ) : items.length > 0 ? (
           <div className="card p-8 text-center text-sm text-muted">
-            Tidak ada teknologi pada kategori ini.
+            No technologies in this category.
           </div>
         ) : null}
       </div>
@@ -369,12 +369,12 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
         <div className="mt-6">
           <EmptyState
             icon={<Layers size={22} />}
-            title="Belum ada data teknologi."
-            description="Data teknologi Anda akan tampil di sini setelah ditambahkan."
+            title="No technology data yet."
+            description="Your technology data will appear here once added."
             action={
               <PrimaryButton onClick={openCreate}>
                 <Plus size={16} />
-                Tambah Teknologi
+                Add Technology
               </PrimaryButton>
             }
           />
@@ -385,16 +385,16 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
       <Modal
         open={modalOpen}
         onClose={closeModal}
-        title={editingId ? "Edit Teknologi" : "Tambah Teknologi"}
+        title={editingId ? "Edit Technology" : "Add Technology"}
         footer={
           <>
-            <OutlineButton onClick={closeModal}>Batal</OutlineButton>
+            <OutlineButton onClick={closeModal}>Cancel</OutlineButton>
             <PrimaryButton
               form="technology-form"
               type="submit"
               loading={saving || uploadingIcon}
             >
-              {editingId ? "Simpan Perubahan" : "Simpan"}
+              {editingId ? "Save Changes" : "Save"}
             </PrimaryButton>
           </>
         }
@@ -407,17 +407,17 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
 
         <form id="technology-form" onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Nama *" className="sm:col-span-2">
+            <Field label="Name *" className="sm:col-span-2">
               <TextInput
                 required
                 autoFocus
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="cth: React"
+                placeholder="e.g. React"
               />
             </Field>
 
-            <Field label="Kategori" className="sm:col-span-2">
+            <Field label="Category" className="sm:col-span-2">
               <SegmentedControl
                 value={form.category}
                 onChange={(v) => setForm((f) => ({ ...f, category: v }))}
@@ -428,7 +428,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
               />
             </Field>
 
-            <Field label="Urutan">
+            <Field label="Order">
               <TextInput
                 type="number"
                 inputMode="numeric"
@@ -440,8 +440,8 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
           </div>
 
           <Field
-            label="Icon (opsional)"
-            hint="Logo teknologi. Jika kosong, akan ditampilkan sebagai inisial."
+            label="Icon (optional)"
+            hint="Technology logo. If left empty, initials will be shown instead."
           >
             <label
               className={`admin-dropzone min-h-[96px] ${
@@ -471,10 +471,10 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
               </span>
               <span className="text-sm font-medium">
                 {uploadingIcon
-                  ? "Mengupload..."
+                  ? "Uploading..."
                   : iconPreview
-                    ? "Ganti icon"
-                    : "Ketuk untuk unggah icon"}
+                    ? "Change icon"
+                    : "Tap to upload icon"}
               </span>
             </label>
             {iconPreview && !uploadingIcon ? (
@@ -483,7 +483,7 @@ export function TechnologiesManager({ token }: TechnologiesManagerProps) {
                 onClick={clearIcon}
                 className="mt-2 text-xs font-medium text-danger transition-colors hover:text-danger/80"
               >
-                Hapus icon
+                Remove icon
               </button>
             ) : null}
             {iconError ? (

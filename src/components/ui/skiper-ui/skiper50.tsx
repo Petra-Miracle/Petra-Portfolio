@@ -198,7 +198,7 @@ const Carousel_004 = ({
 export { Carousel_004 };
 
 /**
- * Skiper 50 Carousel_004 — React + Swiper
+  * Skiper 50 Carousel_004, React + Swiper
  * Built with Swiper.js - Read docs to learn more https://swiperjs.com/
  * Illustrations by AarzooAly - https://x.com/AarzooAly
  *

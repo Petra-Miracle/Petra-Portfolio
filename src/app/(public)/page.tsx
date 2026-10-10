@@ -13,6 +13,7 @@ import { Technologies } from "@/components/Technologies";
 import { Certificates } from "@/components/Certificates";
 import { ProjectsSection } from "@/components/ProjectsSection";
 import { Gallery } from "@/components/Gallery";
+import { CrowdFarewell } from "@/components/CrowdFarewell";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,7 @@ export default async function Home() {
       <Certificates certificates={certificates} />
       <ProjectsSection projects={projects} competitions={competitions} />
       <Gallery items={gallery} />
+      <CrowdFarewell />
     </main>
   );
 }

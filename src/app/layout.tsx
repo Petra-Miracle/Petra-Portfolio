@@ -19,7 +19,7 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  // TODO: Set URL domain asli project ini (mis. https://yourname.vercel.app)
+  // TODO: Set this project's real domain (e.g. https://yourname.vercel.app)
   // metadataBase: new URL("https://yourname.vercel.app"),
   title: {
     default: siteConfig.title,
@@ -47,7 +47,7 @@ export default function RootLayout({
   };
   return (
     <html
-      lang="id"
+      lang="en"
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">

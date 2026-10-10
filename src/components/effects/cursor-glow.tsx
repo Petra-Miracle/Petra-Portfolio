@@ -1,5 +1,5 @@
 /**
- * CursorGlow — original mouse-follow ambient glow (Animmaster-style
+ * CursorGlow, original mouse-follow ambient glow (Animmaster-style
  * mouse effect). A soft lime aura trails the cursor across the public
  * site. Pointer-events-free, spring-smoothed, disabled on touch devices.
  */

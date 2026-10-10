@@ -10,8 +10,8 @@ interface RevealProps {
 }
 
 /**
- * Wrapper yang mereveal konten saat masuk viewport (IntersectionObserver + CSS).
- * `stagger` mengaktifkan animasi berurutan pada anak bertag `.reveal-item`.
+ * Wrapper that reveals content as it enters the viewport (IntersectionObserver + CSS).
+ * `stagger` enables a sequential animation on children tagged `.reveal-item`.
  */
 export function Reveal({
   children,

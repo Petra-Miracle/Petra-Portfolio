@@ -174,7 +174,7 @@ const Carousel_001 = ({
                   {image.alt}
                 </span>
                 <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dark-muted">
-                  Tanpa foto
+                  No photo
                 </span>
               </div>
             )}
@@ -198,7 +198,7 @@ const Carousel_001 = ({
 export { Carousel_001 };
 
 /**
- * Skiper 47 Carousel_001 — React + Swiper
+  * Skiper 47 Carousel_001, React + Swiper
  * Built with Swiper.js - Read docs to learn more https://swiperjs.com/
  * Illustrations by AarzooAly - https://x.com/AarzooAly
  *

@@ -332,7 +332,7 @@ export function PageHeader({
           style={{ fontFamily: "var(--font-mono-jb)" }}
         >
           <span className="mr-2 inline-block h-[7px] w-[7px] rounded-full bg-accent align-middle shadow-[0_0_10px_var(--accent-glow)]" />
-          Panel Admin
+          Admin Panel
         </p>
         <h1
           className="mt-2.5 font-display text-[30px] font-semibold tracking-tight text-foreground sm:text-[34px]"
@@ -352,7 +352,7 @@ export function PageHeader({
 }
 
 /* ------------------------------------------------------------------
-   Modal — spring entrance, blurred backdrop
+    Modal: spring entrance, blurred backdrop
 ------------------------------------------------------------------- */
 
 interface ModalProps {
@@ -419,7 +419,7 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
                 ref={closeRef}
                 type="button"
                 onClick={onClose}
-                aria-label="Tutup"
+                aria-label="Close"
                 className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border text-muted transition-all duration-150 hover:rotate-90 hover:border-danger/40 hover:text-danger"
               >
                 <X size={16} />

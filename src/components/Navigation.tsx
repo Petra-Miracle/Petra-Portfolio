@@ -16,7 +16,7 @@ function initials(name: string): string {
 
 export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [active, setActive] = useState("#tentang");
+  const [active, setActive] = useState("#about");
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -35,7 +35,7 @@ export function Navigation() {
 
   /* ---- transparent over Hero, glass once it scrolls past ---- */
   useEffect(() => {
-    const heroEl = document.getElementById("beranda");
+    const heroEl = document.getElementById("home");
 
     const onScroll = () => {
       if (!heroEl) {
@@ -123,7 +123,7 @@ export function Navigation() {
           />
           {/* Left: logo */}
           <div className="flex items-center gap-8">
-            <a href="#beranda" className="group flex items-center gap-2.5">
+            <a href="#home" className="group flex items-center gap-2.5">
               <span className="flex size-9 items-center justify-center rounded-xl bg-accent font-mono text-[13px] font-bold text-accent-ink shadow-[0_4px_18px_rgba(199,242,60,0.4)] transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105" style={{ fontFamily: "var(--font-mono-jb)" }}>
                 {initials(siteConfig.author.name)}
               </span>
@@ -171,15 +171,15 @@ export function Navigation() {
               </span>
               Open to work
             </span>
-            <a href="#kontak" className="btn btn-primary btn-primary-sm hidden py-2.5! md:inline-flex">
-              Hubungi Saya
+            <a href="#contact" className="btn btn-primary btn-primary-sm hidden py-2.5! md:inline-flex">
+              Contact Me
               <ArrowUpRight size={15} />
             </a>
 
             <button
               type="button"
               onClick={() => setMobileOpen((v) => !v)}
-              aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
               className="flex size-10 items-center justify-center rounded-xl border border-white/10 text-background transition-colors hover:bg-white/10 md:hidden"
             >
               {mobileOpen ? <X size={19} /> : <Menu size={19} />}
@@ -187,7 +187,7 @@ export function Navigation() {
           </div>
         </motion.nav>
 
-        {/* Mobile drawer — slides in from the right */}
+        {/* Mobile drawer: slides in from the right */}
         <AnimatePresence>
           {mobileOpen && (
             <>
@@ -244,8 +244,8 @@ export function Navigation() {
                   transition={{ delay: 0.4, duration: 0.3 }}
                   className="pt-4"
                 >
-                  <a href="#kontak" onClick={closeMobile} className="btn btn-primary w-full">
-                    Hubungi Saya
+                  <a href="#contact" onClick={closeMobile} className="btn btn-primary w-full">
+                    Contact Me
                     <ArrowUpRight size={16} />
                   </a>
                 </motion.div>

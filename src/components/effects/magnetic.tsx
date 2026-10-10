@@ -1,5 +1,5 @@
 /**
- * Magnetic — original implementation inspired by Animmaster-style
+ * Magnetic, original implementation inspired by Animmaster-style
  * magnetic interactions (https://animmasterlib.dev/, mouse-effect category).
  * Pulls its child gently toward the cursor with springs. Subtle by design.
  */
@@ -14,7 +14,7 @@ export function Magnetic({
   className,
 }: {
   children: React.ReactNode;
-  /** 0–1, how strongly the element follows the cursor */
+  /** Scale from 0 to 1, how strongly the element follows the cursor */
   strength?: number;
   className?: string;
 }) {

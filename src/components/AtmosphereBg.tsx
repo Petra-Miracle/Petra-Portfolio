@@ -7,7 +7,7 @@ interface AtmosphereBgProps {
 
 /**
  * Premium atmospheric backdrop: layered lime glow orbs, fine grid,
- * vignette and film grain — one system for every dark section so the
+  * vignette and film grain, one system for every dark section so the
  * page reads as a cohesive, high-end studio site.
  */
 export function AtmosphereBg({
@@ -33,7 +33,7 @@ export function AtmosphereBg({
           backgroundImage: `radial-gradient(circle at ${glowPosition}, rgba(199,242,60,0.16), rgba(199,242,60,0.04) 32%, transparent 55%)`,
         }}
       />
-      {/* Secondary orb — hero only */}
+      {/* Secondary orb, hero only */}
       {variant === "hero" ? (
         <div
           aria-hidden

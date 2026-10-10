@@ -28,7 +28,7 @@ interface AdminDashboardProps {
 }
 
 export type SectionKey =
-  | "ringkasan"
+  | "overview"
   | "technologies"
   | "projects"
   | "certificates"
@@ -41,15 +41,15 @@ const NAV_ITEMS: {
   desc: string;
   icon: typeof Layers;
 }[] = [
-  { key: "ringkasan", label: "Ringkasan", desc: "Statistik & pintasan", icon: LayoutDashboard },
-  { key: "technologies", label: "Teknologi", desc: "Stack & AI tools", icon: Layers },
-  { key: "projects", label: "Project & Kompetisi", desc: "Karya & lomba", icon: FolderGit2 },
-  { key: "certificates", label: "Sertifikat", desc: "Kredensial", icon: Award },
-  { key: "gallery", label: "Galeri", desc: "Dokumentasi", icon: Images },
-  { key: "settings", label: "Pengaturan", desc: "CV & situs", icon: Settings },
+  { key: "overview", label: "Overview", desc: "Stats & shortcuts", icon: LayoutDashboard },
+  { key: "technologies", label: "Technologies", desc: "Stack & AI tools", icon: Layers },
+  { key: "projects", label: "Project & Competitions", desc: "Work & competitions", icon: FolderGit2 },
+  { key: "certificates", label: "Certificates", desc: "Credentials", icon: Award },
+  { key: "gallery", label: "Gallery", desc: "Documentation", icon: Images },
+  { key: "settings", label: "Settings", desc: "CV & site", icon: Settings },
 ];
 
-const today = new Date().toLocaleDateString("id-ID", {
+const today = new Date().toLocaleDateString("en-US", {
   weekday: "long",
   day: "numeric",
   month: "long",
@@ -57,7 +57,7 @@ const today = new Date().toLocaleDateString("id-ID", {
 });
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [section, setSection] = useState<SectionKey>("ringkasan");
+  const [section, setSection] = useState<SectionKey>("overview");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const token = getToken();
 
@@ -84,7 +84,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
-          aria-label="Buka menu"
+          aria-label="Open menu"
           className="flex size-10 items-center justify-center rounded-xl border border-border bg-surface text-foreground shadow-sm transition-transform active:scale-95"
         >
           <Menu size={18} />
@@ -94,7 +94,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {active.label}
           </p>
           <p className="truncate font-mono text-[10.5px] uppercase tracking-[0.12em] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            Panel Admin
+            Admin Panel
           </p>
         </div>
         <span className="flex size-10 items-center justify-center rounded-xl bg-dark font-display text-[15px] font-bold text-accent" style={{ fontFamily: "var(--font-display)" }}>
@@ -108,7 +108,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <>
             <motion.button
               type="button"
-              aria-label="Tutup menu"
+              aria-label="Close menu"
               onClick={() => setDrawerOpen(false)}
               className="fixed inset-0 z-40 bg-dark/60 backdrop-blur-sm md:hidden"
               initial={{ opacity: 0 }}
@@ -126,7 +126,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <button
                   type="button"
                   onClick={() => setDrawerOpen(false)}
-                  aria-label="Tutup menu"
+                  aria-label="Close menu"
                   className="flex size-9 items-center justify-center rounded-xl border border-white/10 text-dark-muted transition-colors hover:text-background"
                 >
                   <X size={18} />
@@ -157,7 +157,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 className="btn btn-outline btn-sm rounded-full! px-4! transition-all hover:-translate-y-0.5"
               >
                 <ExternalLink size={14} />
-                Lihat Website
+                View Website
               </Link>
               <span className="flex size-10 items-center justify-center rounded-xl bg-dark font-display text-[15px] font-bold text-accent shadow-[0_8px_24px_rgba(21,20,15,0.25)]" style={{ fontFamily: "var(--font-display)" }}>
                 P
@@ -173,7 +173,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            {section === "ringkasan" ? (
+            {section === "overview" ? (
               <OverviewManager token={token} onSelect={selectSection} />
             ) : section === "technologies" ? (
               <TechnologiesManager token={token} />
@@ -222,7 +222,7 @@ function SidebarContent({
         </span>
       </div>
 
-      {/* Nav — with mouse-follow spotlight (Vengeance spotlight technique) */}
+      {/* Nav: mouse-follow spotlight (Vengeance spotlight technique) */}
       <nav
         className="group/sidebarnav relative flex-1 space-y-1 px-3"
         onMouseMove={(e) => {
@@ -240,7 +240,7 @@ function SidebarContent({
           }}
         />
         <p className="relative px-3 pb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-dark-muted/70" style={{ fontFamily: "var(--font-mono-jb)" }}>
-          Kelola Konten
+          Manage Content
         </p>
         {NAV_ITEMS.map((item, i) => {
           const isActive = section === item.key;
@@ -276,10 +276,10 @@ function SidebarContent({
       <div className="space-y-1.5 px-3 py-5">
         <div className="mb-3 rounded-2xl border border-accent/25 bg-accent/[0.07] p-4">
           <p className="font-display text-[13.5px] font-semibold leading-snug text-background" style={{ fontFamily: "var(--font-display)" }}>
-            Perubahan tampil instan
+            Changes appear instantly
           </p>
           <p className="mt-1 text-[12px] leading-relaxed text-dark-muted">
-            Data yang disimpan langsung muncul di halaman publik.
+            Saved data appears on the public page immediately.
           </p>
           <Link
             href="/"
@@ -287,7 +287,7 @@ function SidebarContent({
             style={{ fontFamily: "var(--font-mono-jb)" }}
           >
             <ExternalLink size={12} />
-            LIHAT WEBSITE
+            VIEW WEBSITE
           </Link>
         </div>
         <button
@@ -298,7 +298,7 @@ function SidebarContent({
           <span className="admin-nav-icon border-danger/30 bg-danger/10 text-danger transition-colors group-hover:bg-danger group-hover:text-white">
             <LogOut size={17} strokeWidth={1.9} />
           </span>
-          <span className="flex-1 text-left text-danger">Keluar</span>
+          <span className="flex-1 text-left text-danger">Log Out</span>
         </button>
         <p className="px-3 pt-2 font-mono text-[10px] text-dark-muted/50" style={{ fontFamily: "var(--font-mono-jb)" }}>
           © {new Date().getFullYear()} Petra Portfolio

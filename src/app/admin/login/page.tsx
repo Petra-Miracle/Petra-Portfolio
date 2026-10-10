@@ -23,10 +23,10 @@ import { GlowBorderCard } from "@/components/effects/glow-border-card";
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 const PERKS = [
-  { icon: Layers, label: "Teknologi & AI tools" },
-  { icon: FolderGit2, label: "Project & kompetisi" },
-  { icon: Award, label: "Sertifikat" },
-  { icon: Images, label: "Galeri & CV" },
+  { icon: Layers, label: "Technologies & AI tools" },
+  { icon: FolderGit2, label: "Project & competitions" },
+  { icon: Award, label: "Certificates" },
+  { icon: Images, label: "Gallery & CV" },
 ];
 
 export default function AdminLoginPage() {
@@ -55,7 +55,7 @@ export default function AdminLoginPage() {
       setError(
         err instanceof ApiError
           ? err.message
-          : "Terjadi kesalahan. Coba lagi.",
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -96,15 +96,14 @@ export default function AdminLoginPage() {
           className="relative"
         >
           <p className="eyebrow" style={{ color: "var(--dark-muted)" }}>
-            Panel Admin
+            Admin Panel
           </p>
           <h1 className="mt-5 font-display text-[44px] font-bold leading-[1.04] tracking-tight text-background" style={{ fontFamily: "var(--font-display)" }}>
-            <StaggerText delay={0.2}>Satu pintu untuk</StaggerText>{" "}
-            <span className="text-gradient-accent">seluruh karya</span>{" "}
-            <StaggerText delay={0.55}>Anda.</StaggerText>
+            <StaggerText delay={0.2}>One place for</StaggerText>{" "}
+            <span className="text-gradient-accent">all your work.</span>
           </h1>
           <p className="mt-5 max-w-[42ch] text-[15px] leading-relaxed text-dark-muted">
-            Tambah, ubah, dan hapus konten portfolio — semua tersimpan aman dan tampil instan di halaman publik.
+            Add, edit, and delete your portfolio content. Everything is stored securely and appears instantly on the public page.
           </p>
 
           <div className="mt-8 grid grid-cols-2 gap-2.5">
@@ -131,7 +130,7 @@ export default function AdminLoginPage() {
           style={{ fontFamily: "var(--font-mono-jb)" }}
         >
           <ShieldCheck size={14} className="text-accent" />
-          Sesi terenkripsi · © {new Date().getFullYear()} Petra Portfolio
+          Encrypted session · © {new Date().getFullYear()} Petra Portfolio
         </motion.div>
       </aside>
 
@@ -176,10 +175,10 @@ export default function AdminLoginPage() {
               <Lock size={22} />
             </span>
             <h2 className="mt-5 font-display text-[27px] font-semibold tracking-tight text-foreground" style={{ fontFamily: "var(--font-display)" }}>
-              Selamat datang kembali
+              Welcome back
             </h2>
             <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">
-              Masuk untuk mengelola konten portfolio Anda.
+              Log in to manage your portfolio content.
             </p>
 
             {error ? (
@@ -219,7 +218,7 @@ export default function AdminLoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-2 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-alt hover:text-foreground"
                   >
                     {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -228,7 +227,7 @@ export default function AdminLoginPage() {
               </Field>
 
               <PrimaryButton type="submit" loading={loading} fullWidth className="py-3.5! text-[15px]">
-                {loading ? "Menghubungkan..." : "Masuk ke Dashboard"}
+                {loading ? "Connecting..." : "Sign In to Dashboard"}
                 {!loading ? <ArrowRight size={17} /> : null}
               </PrimaryButton>
             </form>
@@ -236,7 +235,7 @@ export default function AdminLoginPage() {
           </GlowBorderCard>
 
           <p className="mt-6 text-center font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            Area khusus pemilik · Akses tidak sah dilarang
+            Owner access only · Unauthorized access is prohibited
           </p>
         </motion.div>
       </main>

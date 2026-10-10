@@ -117,7 +117,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
           handleUnauthorized();
           return;
         }
-        setError(err instanceof Error ? err.message : "Gagal memuat data.");
+        setError(err instanceof Error ? err.message : "Failed to load data.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -164,7 +164,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
         return;
       }
       patchRow(row.key, {
-        imageError: err instanceof Error ? err.message : "Upload gagal.",
+        imageError: err instanceof Error ? err.message : "Upload failed.",
         imagePreview: row.imageUrl.trim() === "" ? null : row.imageUrl,
       });
     } finally {
@@ -180,12 +180,12 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
     // Skip rows the admin left completely blank (e.g. an unused extra row).
     const usable = rows.filter((r) => r.title.trim() || r.issuer.trim());
     if (usable.length === 0) {
-      setBulkError("Isi minimal satu sertifikat.");
+      setBulkError("Enter at least one certificate.");
       return;
     }
     const invalid = usable.some((r) => !r.title.trim() || !r.issuer.trim());
     if (invalid) {
-      setBulkError("Judul dan penerbit wajib diisi di setiap baris.");
+      setBulkError("Title and issuer are required on every row.");
       return;
     }
 
@@ -209,7 +209,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
         handleUnauthorized();
         return;
       }
-      setBulkError(err instanceof Error ? err.message : "Gagal menyimpan data.");
+      setBulkError(err instanceof Error ? err.message : "Failed to save data.");
     } finally {
       setBulkSaving(false);
     }
@@ -250,7 +250,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
         handleUnauthorized();
         return;
       }
-      setEditImageError(err instanceof Error ? err.message : "Upload gagal.");
+      setEditImageError(err instanceof Error ? err.message : "Upload failed.");
       setEditImagePreview(editForm.imageUrl.trim() === "" ? null : editForm.imageUrl);
     } finally {
       URL.revokeObjectURL(localPreview);
@@ -279,14 +279,14 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
         handleUnauthorized();
         return;
       }
-      setEditError(err instanceof Error ? err.message : "Gagal menyimpan data.");
+      setEditError(err instanceof Error ? err.message : "Failed to save data.");
     } finally {
       setEditSaving(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Hapus sertifikat ini?")) return;
+    if (!window.confirm("Delete this certificate?")) return;
     try {
       await deleteCertificate(token, id);
       setItems(await loadItems());
@@ -295,7 +295,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
         handleUnauthorized();
         return;
       }
-      window.alert(err instanceof Error ? err.message : "Gagal menghapus data.");
+      window.alert(err instanceof Error ? err.message : "Failed to delete data.");
     }
   }
 
@@ -304,12 +304,12 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
   return (
     <div>
       <PageHeader
-        title="Sertifikat"
-        subtitle="Kelola sertifikat & pencapaian yang ditampilkan di halaman publik."
+        title="Certificates"
+        subtitle="Manage the certificates & achievements shown on the public page."
         action={
           <PrimaryButton onClick={openBulk}>
             <Plus size={16} />
-            Tambah
+            Add
           </PrimaryButton>
         }
       />
@@ -326,11 +326,11 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
           <table className="w-full text-left">
             <thead className="border-b border-border bg-surface">
               <tr>
-                <Th>Foto</Th>
-                <Th>Judul</Th>
-                <Th>Penerbit</Th>
-                <Th className="text-center">Tahun</Th>
-                <Th className="text-right">Aksi</Th>
+                <Th>Photo</Th>
+                <Th>Title</Th>
+                <Th>Issuer</Th>
+                <Th className="text-center">Year</Th>
+                <Th className="text-right">Action</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -344,7 +344,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                   </td>
                   <td className="px-5 py-[14px] text-sm text-muted">{cert.issuer}</td>
                   <td className="px-5 py-[14px] text-center text-sm text-muted">
-                    {cert.year ?? "—"}
+                    {cert.year ?? "-"}
                   </td>
                   <td className="px-5 py-[14px]">
                     <div className="flex justify-end gap-2">
@@ -352,7 +352,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                         <Pencil size={15} />
                       </IconButton>
                       <IconButton
-                        label="Hapus"
+                        label="Delete"
                         variant="danger"
                         onClick={() => handleDelete(cert.id)}
                       >
@@ -392,7 +392,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                     <Pencil size={15} />
                   </IconButton>
                   <IconButton
-                    label="Hapus"
+                    label="Delete"
                     variant="danger"
                     onClick={() => handleDelete(cert.id)}
                   >
@@ -410,12 +410,12 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
         <div className="mt-6">
           <EmptyState
             icon={<Award size={22} />}
-            title="Belum ada data sertifikat."
-            description="Sertifikat Anda akan tampil di sini setelah ditambahkan."
+            title="No certificates yet."
+            description="Your certificates will appear here once added."
             action={
               <PrimaryButton onClick={openBulk}>
                 <Plus size={16} />
-                Tambah Sertifikat
+                Add Certificate
               </PrimaryButton>
             }
           />
@@ -426,12 +426,12 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
       <Modal
         open={bulkOpen}
         onClose={closeBulk}
-        title="Tambah Sertifikat"
+        title="Add Certificate"
         footer={
           <>
-            <OutlineButton onClick={closeBulk}>Batal</OutlineButton>
+            <OutlineButton onClick={closeBulk}>Cancel</OutlineButton>
             <PrimaryButton form="certificate-bulk-form" type="submit" loading={bulkSaving}>
-              Simpan {rows.length > 1 ? `(${rows.length})` : ""}
+              Save {rows.length > 1 ? `(${rows.length})` : ""}
             </PrimaryButton>
           </>
         }
@@ -453,50 +453,50 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                   className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted"
                   style={{ fontFamily: "var(--font-mono-jb)" }}
                 >
-                  Sertifikat {String(i + 1).padStart(2, "0")}
+                  Certificate {String(i + 1).padStart(2, "0")}
                 </span>
                 {rows.length > 1 ? (
                   <button
                     type="button"
                     onClick={() => removeRow(row.key)}
-                    aria-label={`Hapus baris ${i + 1}`}
+                    aria-label={`Remove row ${i + 1}`}
                     className="text-xs font-medium text-danger transition-colors hover:text-danger/80"
                   >
-                    Hapus baris
+                    Remove row
                   </button>
                 ) : null}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Judul *" className="sm:col-span-2">
+                <Field label="Title *" className="sm:col-span-2">
                   <TextInput
                     required={i === 0}
                     value={row.title}
                     onChange={(e) => patchRow(row.key, { title: e.target.value })}
-                    placeholder="cth: AWS Certified Cloud Practitioner"
+                    placeholder="e.g. AWS Certified Cloud Practitioner"
                   />
                 </Field>
 
-                <Field label="Penerbit *">
+                <Field label="Issuer *">
                   <TextInput
                     required={i === 0}
                     value={row.issuer}
                     onChange={(e) => patchRow(row.key, { issuer: e.target.value })}
-                    placeholder="cth: Amazon Web Services"
+                    placeholder="e.g. Amazon Web Services"
                   />
                 </Field>
 
-                <Field label="Tahun">
+                <Field label="Year">
                   <TextInput
                     type="number"
                     inputMode="numeric"
                     value={row.year}
                     onChange={(e) => patchRow(row.key, { year: e.target.value })}
-                    placeholder="cth: 2026"
+                    placeholder="e.g. 2026"
                   />
                 </Field>
 
-                <Field label="URL Kredensial" className="sm:col-span-2">
+                <Field label="Credential URL" className="sm:col-span-2">
                   <TextInput
                     type="url"
                     value={row.credentialUrl}
@@ -505,7 +505,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                   />
                 </Field>
 
-                <Field label="Foto Sertifikat" className="sm:col-span-2">
+                <Field label="Certificate Photo" className="sm:col-span-2">
                   <label
                     className={`admin-dropzone ${
                       row.uploadingImage ? "pointer-events-none opacity-60" : ""
@@ -540,10 +540,10 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                     )}
                     <span className="text-sm font-medium">
                       {row.uploadingImage
-                        ? "Mengupload..."
+                        ? "Uploading..."
                         : row.imagePreview
-                          ? "Ganti foto"
-                          : "Ketuk untuk unggah foto"}
+                          ? "Change photo"
+                          : "Tap to upload photo"}
                     </span>
                   </label>
                   {row.imageError ? (
@@ -556,7 +556,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
           <OutlineButton type="button" onClick={addRow} className="w-full">
             <Plus size={15} />
-            Tambah Sertifikat Lain
+            Add Another Certificate
           </OutlineButton>
         </form>
       </Modal>
@@ -565,16 +565,16 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
       <Modal
         open={editingCert !== null}
         onClose={closeEdit}
-        title="Edit Sertifikat"
+        title="Edit Certificate"
         footer={
           <>
-            <OutlineButton onClick={closeEdit}>Batal</OutlineButton>
+            <OutlineButton onClick={closeEdit}>Cancel</OutlineButton>
             <PrimaryButton
               form="certificate-edit-form"
               type="submit"
               loading={editSaving || editUploading}
             >
-              Simpan Perubahan
+              Save Changes
             </PrimaryButton>
           </>
         }
@@ -587,36 +587,36 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
         <form id="certificate-edit-form" onSubmit={handleEditSubmit} className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Judul *" className="sm:col-span-2">
+            <Field label="Title *" className="sm:col-span-2">
               <TextInput
                 required
                 autoFocus
                 value={editForm.title}
                 onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="cth: AWS Certified Cloud Practitioner"
+                placeholder="e.g. AWS Certified Cloud Practitioner"
               />
             </Field>
 
-            <Field label="Penerbit *">
+            <Field label="Issuer *">
               <TextInput
                 required
                 value={editForm.issuer}
                 onChange={(e) => setEditForm((f) => ({ ...f, issuer: e.target.value }))}
-                placeholder="cth: Amazon Web Services"
+                placeholder="e.g. Amazon Web Services"
               />
             </Field>
 
-            <Field label="Tahun">
+            <Field label="Year">
               <TextInput
                 type="number"
                 inputMode="numeric"
                 value={editForm.year}
                 onChange={(e) => setEditForm((f) => ({ ...f, year: e.target.value }))}
-                placeholder="cth: 2026"
+                placeholder="e.g. 2026"
               />
             </Field>
 
-            <Field label="URL Kredensial" className="sm:col-span-2">
+            <Field label="Credential URL" className="sm:col-span-2">
               <TextInput
                 type="url"
                 value={editForm.credentialUrl}
@@ -627,7 +627,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
               />
             </Field>
 
-            <Field label="Foto Sertifikat" className="sm:col-span-2">
+            <Field label="Certificate Photo" className="sm:col-span-2">
               <label
                 className={`flex min-h-[150px] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-[1.5px] border-dashed border-muted-light bg-surface text-muted transition-all hover:border-accent-hover hover:bg-accent/[0.05] hover:text-foreground ${
                   editUploading ? "pointer-events-none opacity-60" : "cursor-pointer"
@@ -659,7 +659,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                     ) : (
                       <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-background/85 py-1.5 text-xs font-medium">
                         <Upload size={12} />
-                        Ganti foto
+                        Change photo
                       </div>
                     )}
                   </div>
@@ -668,7 +668,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                 ) : (
                   <>
                     <ImageIcon size={22} />
-                    <span className="text-sm font-medium">Ketuk untuk unggah foto</span>
+                    <span className="text-sm font-medium">Tap to upload photo</span>
                   </>
                 )}
               </label>
