@@ -155,16 +155,16 @@ export const GlowBorderCard = React.forwardRef<HTMLDivElement, GlowBorderCardPro
                 <div
                     className={cn(
                         "absolute -z-10",
-                        // Inset logic handled by style or arbitrary values if fixed
-                        "border-solid rounded-[inherit]",
-                        // The Gradient Animation Class
-                        "glow-conic",
+                        "rounded-[inherit]",
+                        // The Gradient Animation Class (+ ring mask: only the
+                        // padding band shows, center stays transparent)
+                        "glow-conic glow-ring",
                         // Pause State
                         paused && "[animation-play-state:paused]"
                     )}
                     style={{
                         inset: inset,
-                        borderWidth: borderWidth,
+                        padding: borderWidth,
                         filter: `blur(${blurAmount})`
                     }}
                 />

@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
-import { GlowBorderCard } from "@/components/effects/glow-border-card";
-import { ArrowUpRight, ExternalLink, FolderGit2, PackageOpen, Trophy, X } from "lucide-react";
+import { FeaturedHoverStrip } from "@/components/FeaturedHoverStrip";
+import { ProjectDetailModal } from "@/components/ProjectDetailModal";
+import { ArrowUpRight, ExternalLink, FolderGit2, PackageOpen, Trophy } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 
 interface ProjectsProps {
@@ -17,12 +17,6 @@ interface ProjectsProps {
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-
-/** Lime aurora palette for the featured-card glow ring (Vengeance GlowBorderCard). */
-const LIME_GLOW = [
-  "#c7f23c", "#e9ff9e", "#9ccb1e", "#f7f3e9", "#c7f23c",
-  "#9ccb1e", "#e9ff9e", "#c7f23c", "#9ccb1e", "#e9ff9e",
-];
 
 type WorkTab = "SEMUA" | "PROJECT" | "COMPETITION";
 
@@ -38,24 +32,26 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
 
   function renderProjectsBlock() {
     if (projects.length === 0) return null;
+    const STRIP_N = Math.min(5, projects.length);
+    const rest = projects.slice(STRIP_N);
     return (
       <div>
         <Reveal>
           <Subhead count={projects.length} label="Project Pilihan" />
         </Reveal>
-        {/* Featured + grid */}
-        <div className="mt-7 grid gap-5 lg:grid-cols-2">
-          {projects.slice(0, 1).map((p, i) => (
-            <Reveal key={p.id} delay={i * 80} className="lg:col-span-2">
-              <FeaturedProjectCard project={p} />
-            </Reveal>
-          ))}
-          {projects.slice(1).map((p, i) => (
-            <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
-              <ProjectCard project={p} />
-            </Reveal>
-          ))}
-        </div>
+        {/* Hover-expand strip (Skiper-52) + grid sisa */}
+        <Reveal className="mt-7">
+          <FeaturedHoverStrip projects={projects} maxPanels={5} />
+        </Reveal>
+        {rest.length > 0 ? (
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            {rest.map((p, i) => (
+              <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
+                <ProjectCard project={p} />
+              </Reveal>
+            ))}
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -211,154 +207,6 @@ function Subhead({ count, label, dark = false }: { count: number; label: string;
       </span>
       <span className="h-px flex-1 bg-border" aria-hidden />
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------
-   Featured project — wide editorial card
-------------------------------------------------------------------- */
-
-function FeaturedProjectCard({ project }: { project: Project }) {
-  const [detailOpen, setDetailOpen] = useState(false);
-
-  return (
-    <>
-      <GlowBorderCard
-        width="100%"
-        height="auto"
-        borderRadius="28px"
-        animationDuration={7}
-        borderWidth="2px"
-        blurAmount="16px"
-        inset="-3px"
-        gradientColors={LIME_GLOW}
-        className="transition-transform duration-300 hover:-translate-y-1"
-      >
-      <article
-        role="button"
-        tabIndex={0}
-        onClick={() => setDetailOpen(true)}
-        onKeyDown={(e) => {
-          if (e.target !== e.currentTarget) return;
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setDetailOpen(true);
-          }
-        }}
-        className="group relative block min-h-[480px] w-full cursor-pointer overflow-hidden rounded-[28px] border border-border bg-dark shadow-[0_10px_40px_rgba(21,20,15,0.08)] transition-shadow duration-300 hover:shadow-[0_32px_72px_rgba(21,20,15,0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent sm:min-h-[520px]"
-      >
-        {/* Backdrop foto full-bleed */}
-        {project.imageUrl ? (
-          <Image
-            src={project.imageUrl}
-            alt={project.title}
-            fill
-            sizes="100vw"
-            className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-dark-surface">
-            <FolderGit2 size={72} className="text-white/10" strokeWidth={1} />
-          </div>
-        )}
-        {/* Cinematic grade */}
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to top, rgba(10,10,6,0.92) 0%, rgba(10,10,6,0.55) 42%, rgba(10,10,6,0.12) 70%, rgba(10,10,6,0.35) 100%)",
-          }}
-        />
-
-        {/* Baris atas: pill + tahun */}
-        <div className="absolute inset-x-0 top-0 flex items-center justify-between p-6 sm:p-8">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-1.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-accent-ink shadow-[0_8px_28px_rgba(199,242,60,0.45)]" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            <Sparkle />
-            Featured
-          </span>
-          {project.year ? (
-            <span className="glass-dark rounded-full px-3.5 py-1.5 font-mono text-[11px] font-bold text-background" style={{ fontFamily: "var(--font-mono-jb)" }}>
-              {project.year}
-            </span>
-          ) : null}
-        </div>
-
-        {/* Nomor raksasa */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -right-2 top-16 select-none font-display text-[110px] font-bold leading-none tracking-tight sm:text-[150px]"
-          style={{
-            fontFamily: "var(--font-display)",
-            WebkitTextStroke: "1.5px rgba(247,243,233,0.28)",
-            color: "transparent",
-          }}
-        >
-          01
-        </span>
-
-        {/* Konten bawah */}
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-accent" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            {project.techStack.slice(0, 3).join("  ·  ")}
-          </p>
-          <h4 className="mt-3 max-w-[20ch] font-display text-[30px] font-bold leading-[1.02] tracking-tight text-white sm:text-[44px]" style={{ fontFamily: "var(--font-display)" }}>
-            {project.title}
-          </h4>
-          <p className="mt-3 line-clamp-2 max-w-[62ch] text-[14.5px] leading-relaxed text-white/75">
-            {project.description}
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="btn btn-primary btn-sm px-5! py-3!">
-              Lihat Detail
-              <ArrowUpRight size={15} />
-            </span>
-            {project.demoUrl ? (
-              <a
-                href={project.demoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Buka demo ${project.title}`}
-                title="Buka demo"
-                onClick={(e) => e.stopPropagation()}
-                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-accent hover:text-accent"
-              >
-                <ExternalLink size={15} />
-              </a>
-            ) : null}
-            {project.repoUrl ? (
-              <a
-                href={project.repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Lihat repository ${project.title}`}
-                title="Lihat repository"
-                onClick={(e) => e.stopPropagation()}
-                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-accent hover:text-accent"
-              >
-                <SocialIcon name="github" className="size-4" />
-              </a>
-            ) : null}
-          </div>
-        </div>
-      </article>
-      </GlowBorderCard>
-
-      <AnimatePresence>
-        {detailOpen ? (
-          <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
-        ) : null}
-      </AnimatePresence>
-    </>
-  );
-}
-
-function Sparkle() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z" />
-    </svg>
   );
 }
 
@@ -547,129 +395,3 @@ function CompetitionCard({ project }: { project: Project }) {
   );
 }
 
-/* ------------------------------------------------------------------
-   Detail modal — spring entrance, blurred backdrop
-------------------------------------------------------------------- */
-
-function ProjectDetailModal({ project, onClose }: { project: Project; onClose: () => void }) {
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    closeButtonRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [onClose]);
-
-  const isCompetition = project.type === "COMPETITION";
-  const HeaderIcon = isCompetition ? Trophy : FolderGit2;
-  const typeLabel = isCompetition ? "Kompetisi" : "Project";
-  const hasLinks = Boolean(project.demoUrl || project.repoUrl);
-
-  return createPortal(
-    <motion.div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-dark/70 p-4 backdrop-blur-md sm:p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="project-modal-title"
-      onClick={onClose}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.22 }}
-    >
-      <motion.div
-        className="flex max-h-[88vh] w-full max-w-[520px] flex-col overflow-hidden rounded-[28px] border border-border bg-background shadow-[0_40px_100px_rgba(0,0,0,0.45)]"
-        onClick={(e) => e.stopPropagation()}
-        initial={{ opacity: 0, y: 44, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 28, scale: 0.96 }}
-        transition={{ duration: 0.4, ease: EASE }}
-      >
-        <div className="relative h-[210px] w-full shrink-0 overflow-hidden sm:h-[250px]">
-          {project.imageUrl ? (
-            <Image
-              src={project.imageUrl}
-              alt={project.title}
-              fill
-              sizes="(max-width: 640px) 100vw, 520px"
-              className="object-cover"
-            />
-          ) : (
-            <div className={`flex h-full items-center justify-center ${isCompetition ? "bg-dark-surface" : "bg-surface-alt"}`}>
-              <HeaderIcon size={36} strokeWidth={1.25} className={isCompetition ? "text-accent" : "text-muted"} />
-            </div>
-          )}
-          <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(21,20,15,0.5), transparent 55%)" }} />
-          <span className="glass-dark absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-background" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            <HeaderIcon size={11} className="text-accent" />
-            {typeLabel}
-          </span>
-          <button
-            ref={closeButtonRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Tutup"
-            className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg backdrop-blur-sm transition-all duration-150 hover:rotate-90 hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8">
-          <h3 id="project-modal-title" className="font-display text-[23px] font-semibold leading-snug tracking-tight text-foreground" style={{ fontFamily: "var(--font-display)" }}>
-            {project.title}
-          </h3>
-          {(project.result || project.year) && (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {project.result ? (
-                <span className="badge-success"><Trophy size={12} />{project.result}</span>
-              ) : null}
-              {project.year ? (
-                <span className="font-mono text-[12.5px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>{project.year}</span>
-              ) : null}
-            </div>
-          )}
-          <p className="mt-4 text-[14.5px] leading-relaxed text-muted">{project.description}</p>
-          {project.techStack.length > 0 && (
-            <div className="mt-6">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-muted-light" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                Tech Stack
-              </p>
-              <div className="mt-2.5 flex flex-wrap gap-2">
-                {project.techStack.map((tech, i) => (
-                  <span key={`${tech}-${i}`} className="tag tag-light">{tech}</span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {hasLinks ? (
-          <div className="flex shrink-0 gap-2.5 border-t border-border bg-background p-5 sm:px-8">
-            {project.demoUrl ? (
-              <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className={`btn btn-primary ${project.repoUrl ? "flex-1" : "w-full"}`}>
-                <ExternalLink size={14} />
-                Buka Demo
-              </a>
-            ) : null}
-            {project.repoUrl ? (
-              <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className={`btn btn-outline ${project.demoUrl ? "flex-1" : "w-full"}`}>
-                <SocialIcon name="github" className="size-3.5" />
-                Lihat Repo
-              </a>
-            ) : null}
-          </div>
-        ) : null}
-      </motion.div>
-    </motion.div>,
-    document.body,
-  );
-}

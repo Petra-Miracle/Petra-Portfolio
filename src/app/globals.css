@@ -273,6 +273,17 @@ body {
   }
 }
 
+/* True ring: only the `padding` band shows, center always stays
+   transparent — a full-bleed blob becomes impossible. */
+.glow-conic.glow-ring {
+  border: 0 solid transparent;
+  background-clip: border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .glow-conic {
     animation: none;
