@@ -245,63 +245,101 @@ function FeaturedProjectCard({ project }: { project: Project }) {
             setDetailOpen(true);
           }
         }}
-        className="group grid w-full cursor-pointer overflow-hidden rounded-[28px] border border-border bg-surface shadow-[0_10px_40px_rgba(21,20,15,0.08)] transition-shadow duration-300 hover:shadow-[0_32px_72px_rgba(21,20,15,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent md:grid-cols-[1.15fr_1fr]"
+        className="group relative block min-h-[480px] w-full cursor-pointer overflow-hidden rounded-[28px] border border-border bg-dark shadow-[0_10px_40px_rgba(21,20,15,0.08)] transition-shadow duration-300 hover:shadow-[0_32px_72px_rgba(21,20,15,0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent sm:min-h-[520px]"
       >
-        <div className="relative min-h-[260px] overflow-hidden bg-surface-alt md:min-h-[340px]">
-          {project.imageUrl ? (
-            <Image
-              src={project.imageUrl}
-              alt={project.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 60vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-            />
-          ) : (
-            <div className="flex h-full min-h-[260px] items-center justify-center">
-              <FolderGit2 size={36} className="text-muted-light" strokeWidth={1} />
-            </div>
-          )}
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-dark/30 via-transparent to-transparent opacity-60" />
-          <span className="glass-dark absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-accent" style={{ fontFamily: "var(--font-mono-jb)" }}>
+        {/* Backdrop foto full-bleed */}
+        {project.imageUrl ? (
+          <Image
+            src={project.imageUrl}
+            alt={project.title}
+            fill
+            sizes="100vw"
+            className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-dark-surface">
+            <FolderGit2 size={72} className="text-white/10" strokeWidth={1} />
+          </div>
+        )}
+        {/* Cinematic grade */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(10,10,6,0.92) 0%, rgba(10,10,6,0.55) 42%, rgba(10,10,6,0.12) 70%, rgba(10,10,6,0.35) 100%)",
+          }}
+        />
+
+        {/* Baris atas: pill + tahun */}
+        <div className="absolute inset-x-0 top-0 flex items-center justify-between p-6 sm:p-8">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-1.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-accent-ink shadow-[0_8px_28px_rgba(199,242,60,0.45)]" style={{ fontFamily: "var(--font-mono-jb)" }}>
             <Sparkle />
             Featured
           </span>
+          {project.year ? (
+            <span className="glass-dark rounded-full px-3.5 py-1.5 font-mono text-[11px] font-bold text-background" style={{ fontFamily: "var(--font-mono-jb)" }}>
+              {project.year}
+            </span>
+          ) : null}
         </div>
 
-        <div className="flex flex-col p-7 sm:p-9">
-          <div className="flex items-center gap-2 font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            {project.year ? <span>{project.year}</span> : null}
-            {project.year && project.techStack.length > 0 ? <span aria-hidden>·</span> : null}
-            {project.techStack.slice(0, 2).join(" · ")}
-          </div>
-          <h4 className="mt-3 font-display text-[26px] font-semibold leading-tight tracking-tight text-foreground sm:text-[30px]" style={{ fontFamily: "var(--font-display)" }}>
+        {/* Nomor raksasa */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-2 top-16 select-none font-display text-[110px] font-bold leading-none tracking-tight sm:text-[150px]"
+          style={{
+            fontFamily: "var(--font-display)",
+            WebkitTextStroke: "1.5px rgba(247,243,233,0.28)",
+            color: "transparent",
+          }}
+        >
+          01
+        </span>
+
+        {/* Konten bawah */}
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-accent" style={{ fontFamily: "var(--font-mono-jb)" }}>
+            {project.techStack.slice(0, 3).join("  ·  ")}
+          </p>
+          <h4 className="mt-3 max-w-[20ch] font-display text-[30px] font-bold leading-[1.02] tracking-tight text-white sm:text-[44px]" style={{ fontFamily: "var(--font-display)" }}>
             {project.title}
           </h4>
-          <p className="mt-3 line-clamp-3 text-[14.5px] leading-relaxed text-muted">
+          <p className="mt-3 line-clamp-2 max-w-[62ch] text-[14.5px] leading-relaxed text-white/75">
             {project.description}
           </p>
-          {project.techStack.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-1.5">
-              {project.techStack.slice(0, 4).map((tech, i) => (
-                <span key={`${project.id}-${i}`} className="tag tag-light">
-                  {tech}
-                </span>
-              ))}
-              {project.techStack.length > 4 && (
-                <span className="tag tag-light">+{project.techStack.length - 4}</span>
-              )}
-            </div>
-          )}
-          <div className="mt-auto flex items-center gap-3 pt-7">
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <span className="btn btn-primary btn-sm px-5! py-3!">
               Lihat Detail
               <ArrowUpRight size={15} />
             </span>
-            {(project.demoUrl || project.repoUrl) && (
-              <span className="font-mono text-[11.5px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                + demo & repo tersedia
-              </span>
-            )}
+            {project.demoUrl ? (
+              <a
+                href={project.demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Buka demo ${project.title}`}
+                title="Buka demo"
+                onClick={(e) => e.stopPropagation()}
+                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-accent hover:text-accent"
+              >
+                <ExternalLink size={15} />
+              </a>
+            ) : null}
+            {project.repoUrl ? (
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Lihat repository ${project.title}`}
+                title="Lihat repository"
+                onClick={(e) => e.stopPropagation()}
+                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-accent hover:text-accent"
+              >
+                <SocialIcon name="github" className="size-4" />
+              </a>
+            ) : null}
           </div>
         </div>
       </article>
