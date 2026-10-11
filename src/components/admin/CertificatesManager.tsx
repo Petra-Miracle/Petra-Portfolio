@@ -21,6 +21,7 @@ import {
   updateCertificate,
   uploadImage,
 } from "@/lib/admin-api";
+import { renderPdfFirstPageToImageFile } from "@/lib/pdf-thumbnail";
 import {
   EmptyState,
   ErrorBanner,
@@ -51,7 +52,7 @@ interface BulkRow {
   credentialUrl: string;
   imageUrl: string;
   imagePreview: string | null;
-  imageIsPdf: boolean;
+  converting: boolean;
   uploadingImage: boolean;
   imageError: string | null;
 }
@@ -65,17 +66,19 @@ function emptyRow(): BulkRow {
     credentialUrl: "",
     imageUrl: "",
     imagePreview: null,
-    imageIsPdf: false,
+    converting: false,
     uploadingImage: false,
     imageError: null,
   };
 }
 
 /**
- * Admins can upload either a photo or a PDF of the certificate — the public
- * card always just presents it as "the certificate photo", so we only need
- * to know internally when to render a PDF-style placeholder instead of an
- * <img> (next/image and <img> can't preview PDF bytes).
+ * Admins can upload either a photo or a PDF of the certificate. A PDF never
+ * gets stored as-is: `renderPdfFirstPageToImageFile` turns it into an actual
+ * photo of its first page before it's ever uploaded, so everything the app
+ * stores and displays is a real image. This only remains to gracefully show
+ * certificates saved before that conversion existed, whose imageUrl may
+ * still point straight at a raw PDF.
  */
 function isPdfUrl(url: string | null | undefined): boolean {
   return !!url && url.toLowerCase().split("?")[0].endsWith(".pdf");
@@ -115,6 +118,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
   const [editForm, setEditForm] = useState(EMPTY_EDIT_FORM);
   const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
   const [editImageIsPdf, setEditImageIsPdf] = useState(false);
+  const [editConverting, setEditConverting] = useState(false);
   const [editUploading, setEditUploading] = useState(false);
   const [editImageError, setEditImageError] = useState<string | null>(null);
   const [editSaving, setEditSaving] = useState(false);
@@ -177,17 +181,30 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
   }
 
   async function handleRowImageChange(key: string, file: File) {
-    const localPreview = URL.createObjectURL(file);
-    const isPdf = file.type === "application/pdf";
+    let uploadFile = file;
+    if (file.type === "application/pdf") {
+      patchRow(key, { converting: true, imageError: null });
+      try {
+        uploadFile = await renderPdfFirstPageToImageFile(file);
+      } catch (err) {
+        patchRow(key, {
+          converting: false,
+          imageError: err instanceof Error ? err.message : "Could not read this PDF.",
+        });
+        return;
+      }
+      patchRow(key, { converting: false });
+    }
+
+    const localPreview = URL.createObjectURL(uploadFile);
     patchRow(key, {
       imagePreview: localPreview,
-      imageIsPdf: isPdf,
       imageError: null,
       uploadingImage: true,
     });
     try {
-      const { url } = await uploadImage(token, file);
-      patchRow(key, { imageUrl: url, imagePreview: url, imageIsPdf: isPdf });
+      const { url } = await uploadImage(token, uploadFile);
+      patchRow(key, { imageUrl: url, imagePreview: url });
     } catch (err) {
       if (isUnauthorized(err)) {
         handleUnauthorized();
@@ -200,7 +217,6 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                 ...r,
                 imageError: err instanceof Error ? err.message : "Upload failed.",
                 imagePreview: r.imageUrl.trim() === "" ? null : r.imageUrl,
-                imageIsPdf: isPdfUrl(r.imageUrl),
               }
             : r,
         ),
@@ -247,7 +263,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
   async function handleBulkSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (rows.some((r) => r.uploadingImage)) return;
+    if (rows.some((r) => r.uploadingImage || r.converting)) return;
 
     // Skip rows the admin left completely blank (e.g. an unused extra row).
     const usable = rows.filter((r) => r.title.trim() || r.issuer.trim());
@@ -305,22 +321,35 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
   }
 
   function closeEdit() {
-    if (editSaving || editUploading) return;
+    if (editSaving || editUploading || editConverting) return;
     setEditingId(null);
   }
 
   async function handleEditImageChange(file: File) {
-    const localPreview = URL.createObjectURL(file);
-    const isPdf = file.type === "application/pdf";
+    let uploadFile = file;
+    if (file.type === "application/pdf") {
+      setEditConverting(true);
+      setEditImageError(null);
+      try {
+        uploadFile = await renderPdfFirstPageToImageFile(file);
+      } catch (err) {
+        setEditConverting(false);
+        setEditImageError(err instanceof Error ? err.message : "Could not read this PDF.");
+        return;
+      }
+      setEditConverting(false);
+    }
+
+    const localPreview = URL.createObjectURL(uploadFile);
     setEditImagePreview(localPreview);
-    setEditImageIsPdf(isPdf);
+    setEditImageIsPdf(false);
     setEditImageError(null);
     setEditUploading(true);
     try {
-      const { url } = await uploadImage(token, file);
+      const { url } = await uploadImage(token, uploadFile);
       setEditForm((f) => ({ ...f, imageUrl: url }));
       setEditImagePreview(url);
-      setEditImageIsPdf(isPdf);
+      setEditImageIsPdf(false);
     } catch (err) {
       if (isUnauthorized(err)) {
         handleUnauthorized();
@@ -337,7 +366,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
   async function handleEditSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!editingId || editUploading) return;
+    if (!editingId || editUploading || editConverting) return;
     setEditSaving(true);
     setEditError(null);
     try {
@@ -587,13 +616,13 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                   className="sm:col-span-2"
                   hint={
                     i === 0
-                      ? "Tip: select multiple files at once to add several certificates in one go."
+                      ? "Tip: select multiple files at once to add several certificates in one go. A PDF is automatically converted into a photo of its first page."
                       : undefined
                   }
                 >
                   <label
                     className={`admin-dropzone ${
-                      row.uploadingImage ? "pointer-events-none opacity-60" : ""
+                      row.uploadingImage || row.converting ? "pointer-events-none opacity-60" : ""
                     }`}
                   >
                     <input
@@ -601,19 +630,14 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                       accept="image/*,application/pdf"
                       multiple
                       className="hidden"
-                      disabled={row.uploadingImage}
+                      disabled={row.uploadingImage || row.converting}
                       onChange={(e) => {
                         const files = Array.from(e.target.files ?? []);
                         if (files.length > 0) handleRowFilesSelected(row.key, files);
                         e.target.value = "";
                       }}
                     />
-                    {row.imagePreview && row.imageIsPdf ? (
-                      <span className="flex h-[86px] w-[110px] shrink-0 flex-col items-center justify-center gap-1 rounded-xl border border-border bg-surface-alt text-muted">
-                        <FileText size={20} />
-                        <span className="font-mono text-[9px] font-bold uppercase tracking-wider">PDF</span>
-                      </span>
-                    ) : row.imagePreview ? (
+                    {row.imagePreview ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={row.imagePreview}
@@ -622,7 +646,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                       />
                     ) : (
                       <span className="admin-thumb h-9 w-9">
-                        {row.uploadingImage ? (
+                        {row.uploadingImage || row.converting ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : (
                           <ImageIcon size={16} />
@@ -630,11 +654,13 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                       </span>
                     )}
                     <span className="text-sm font-medium">
-                      {row.uploadingImage
-                        ? "Uploading..."
-                        : row.imagePreview
-                          ? "Change photo"
-                          : "Tap to upload photo"}
+                      {row.converting
+                        ? "Rendering PDF..."
+                        : row.uploadingImage
+                          ? "Uploading..."
+                          : row.imagePreview
+                            ? "Change photo"
+                            : "Tap to upload photo"}
                     </span>
                   </label>
                   {row.imageError ? (
@@ -663,7 +689,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
             <PrimaryButton
               form="certificate-edit-form"
               type="submit"
-              loading={editSaving || editUploading}
+              loading={editSaving || editUploading || editConverting}
             >
               Save Changes
             </PrimaryButton>
@@ -718,24 +744,33 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
               />
             </Field>
 
-            <Field label="Certificate Photo" className="sm:col-span-2">
+            <Field
+              label="Certificate Photo"
+              className="sm:col-span-2"
+              hint="A PDF is automatically converted into a photo of its first page."
+            >
               <label
                 className={`flex min-h-[150px] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-[1.5px] border-dashed border-muted-light bg-surface text-muted transition-all hover:border-accent-hover hover:bg-accent/[0.05] hover:text-foreground ${
-                  editUploading ? "pointer-events-none opacity-60" : "cursor-pointer"
+                  editUploading || editConverting ? "pointer-events-none opacity-60" : "cursor-pointer"
                 }`}
               >
                 <input
                   type="file"
                   accept="image/*,application/pdf"
                   className="hidden"
-                  disabled={editUploading}
+                  disabled={editUploading || editConverting}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleEditImageChange(file);
                     e.target.value = "";
                   }}
                 />
-                {editImagePreview && editImageIsPdf ? (
+                {editConverting ? (
+                  <>
+                    <Loader2 size={22} className="animate-spin" />
+                    <span className="text-sm font-medium">Rendering PDF...</span>
+                  </>
+                ) : editImagePreview && editImageIsPdf ? (
                   <div className="relative flex h-full min-h-[150px] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-surface-alt text-muted">
                     <FileText size={28} />
                     <span className="font-mono text-[10px] font-bold uppercase tracking-wider">PDF file</span>

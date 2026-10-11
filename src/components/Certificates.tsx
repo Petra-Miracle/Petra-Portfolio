@@ -9,10 +9,11 @@ interface CertificatesProps {
 }
 
 /**
- * Admins can upload either a photo or a PDF of the certificate — this card
- * always just reads as "the certificate photo" either way. A PDF can't be
- * decoded by next/image, so it gets a document-style tile instead of a
- * broken image.
+ * The admin form now converts any uploaded PDF into an actual photo of its
+ * first page before it's ever saved, so every certificate's imageUrl is a
+ * real image. This only remains as a safe fallback for certificates saved
+ * before that conversion existed, whose imageUrl may still point straight
+ * at a raw PDF (next/image can't decode PDF bytes).
  */
 function isPdfUrl(url: string | null): boolean {
   return !!url && url.toLowerCase().split("?")[0].endsWith(".pdf");
@@ -113,9 +114,9 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
         <p className="mt-2 font-mono text-[12px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
           {[certificate.issuer, certificate.year ? String(certificate.year) : null].filter(Boolean).join("  ·  ")}
         </p>
-        {certificate.credentialUrl || isPdf ? (
+        {certificate.credentialUrl ? (
           <span className="mt-auto inline-flex items-center gap-1.5 pt-5 font-mono text-[12.5px] font-bold text-lime-deep" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            {certificate.credentialUrl ? "View Credential" : "View PDF"}
+            View Credential
             <ExternalLink size={13} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </span>
         ) : null}
@@ -126,8 +127,7 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
   const cls =
     "group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-border bg-surface shadow-[0_8px_28px_rgba(21,20,15,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-border-strong hover:shadow-[0_28px_64px_rgba(21,20,15,0.14)]";
 
-  // No separate credential link? A PDF upload is still openable on its own.
-  const linkHref = certificate.credentialUrl ?? (isPdf ? certificate.imageUrl : null);
+  const linkHref = certificate.credentialUrl ?? null;
 
   return linkHref ? (
     <a href={linkHref} target="_blank" rel="noopener noreferrer" aria-label={`View certificate: ${certificate.title}`} className={cls}>
