@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { PackageOpen } from "lucide-react";
 import type { GalleryItem } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
+import { GalleryLightbox } from "@/components/GalleryLightbox";
 // Perspective 3D carousel by Vengeance UI (free, via shadcn registry)
 import { PerspectiveCarousel } from "@/components/ui/perspective-carousel";
 
@@ -15,6 +17,7 @@ interface GalleryProps {
 export function Gallery({ items }: GalleryProps) {
   const photos = items.filter((item) => item.imageUrl.trim() !== "");
   const [active, setActive] = useState(0);
+  const [lightbox, setLightbox] = useState<number | null>(null);
   const current =
     photos.length > 0 ? photos[active % photos.length] : null;
 
@@ -41,7 +44,7 @@ export function Gallery({ items }: GalleryProps) {
         ) : (
           <>
             <Reveal className="mt-14">
-              <div className="h-[380px] sm:h-[420px]">
+              <div className="h-[400px] sm:h-[440px]">
                 <PerspectiveCarousel
                   items={photos.map((item) => ({
                     src: item.imageUrl,
@@ -52,23 +55,40 @@ export function Gallery({ items }: GalleryProps) {
                   slideWidth={300}
                   rotationStep={45}
                   onActiveIndexChange={setActive}
-                  labelClassName="whitespace-normal px-3 text-center text-[13px] font-semibold text-foreground"
+                  onActiveClick={(i) => setLightbox(i)}
+                  labelClassName="mx-auto mb-16 line-clamp-2 max-w-[280px] whitespace-normal px-3 text-center text-[13px] font-semibold text-foreground"
                   controlsClassName="border-white/10 bg-dark/70 text-background"
                 />
               </div>
             </Reveal>
             {current ? (
               <Reveal className="mt-4">
-                <div className="mx-auto flex max-w-xl items-center justify-center gap-2 px-6 text-center font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
+                <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-2 px-6 text-center font-mono text-[11px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
                   <span className="font-bold text-lime-deep">
                     {String((active % photos.length) + 1).padStart(2, "0")}
                   </span>
                   /
                   {String(photos.length).padStart(2, "0")}
                   {current.year ? <span>· {current.year}</span> : null}
+                  <span className="text-muted/70">· klik foto aktif untuk zoom</span>
                 </div>
               </Reveal>
             ) : null}
+
+            <AnimatePresence>
+              {lightbox !== null && photos[lightbox] ? (
+                <GalleryLightbox
+                  item={photos[lightbox]}
+                  index={lightbox}
+                  total={photos.length}
+                  onClose={() => setLightbox(null)}
+                  onPrev={() =>
+                    setLightbox((lightbox - 1 + photos.length) % photos.length)
+                  }
+                  onNext={() => setLightbox((lightbox + 1) % photos.length)}
+                />
+              ) : null}
+            </AnimatePresence>
           </>
         )}
       </div>

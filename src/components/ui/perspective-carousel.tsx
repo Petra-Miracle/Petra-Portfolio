@@ -20,6 +20,8 @@ export interface PerspectiveCarouselProps
   activeIndex?: number;
   defaultActiveIndex?: number;
   onActiveIndexChange?: (index: number) => void;
+  /** Called when the already-active slide is clicked (e.g. open a lightbox). Added by consumer. */
+  onActiveClick?: (index: number) => void;
   loop?: boolean;
   slideWidth?: number;
   rotationStep?: number;
@@ -47,6 +49,7 @@ export function PerspectiveCarousel({
   activeIndex,
   defaultActiveIndex = 0,
   onActiveIndexChange,
+  onActiveClick,
   loop = false,
   slideWidth = 200,
   rotationStep = 60,
@@ -157,13 +160,18 @@ export function PerspectiveCarousel({
                 >
                   <button
                     type="button"
-                    aria-label={`Show ${item.title}`}
+                    aria-label={isActive ? `Perbesar ${item.title}` : `Show ${item.title}`}
                     aria-current={isActive ? "true" : undefined}
                     className={cn(
-                      "aspect-[4/3] w-full cursor-pointer rounded-xl transition-shadow",
-                      isActive && "ring-2 ring-accent/70 ring-offset-2 ring-offset-transparent"
+                      "aspect-[4/3] w-full rounded-xl transition-shadow",
+                      isActive
+                        ? "cursor-zoom-in ring-2 ring-accent/70 ring-offset-2 ring-offset-transparent"
+                        : "cursor-pointer"
                     )}
-                    onClick={() => selectSlide(index)}
+                    onClick={() => {
+                      if (isActive) onActiveClick?.(index);
+                      else selectSlide(index);
+                    }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
