@@ -6,7 +6,7 @@ import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ProjectDetailModal } from "@/components/ProjectDetailModal";
-import { ProjectBentoGrid } from "@/components/ProjectBento";
+import { ProjectCommunityGrid } from "@/components/ProjectCommunity";
 import { PackageOpen, Trophy } from "lucide-react";
 
 interface ProjectsProps {
@@ -35,9 +35,9 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
         <Reveal>
           <Subhead count={projects.length} label="Featured Projects" />
         </Reveal>
-        {/* Bento grid: live data-driven visuals per project */}
+        {/* Community cards (HeroUI Card + Avatar) per project */}
         <Reveal className="mt-7">
-          <ProjectBentoGrid projects={projects} />
+          <ProjectCommunityGrid projects={projects} />
         </Reveal>
       </div>
     );
