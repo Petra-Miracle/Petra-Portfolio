@@ -20,7 +20,6 @@
     "pdfjs-dist": "^6.4.299",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "swiper": "^14.3.0",
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
