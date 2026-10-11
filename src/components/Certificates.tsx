@@ -1,11 +1,21 @@
 import Image from "next/image";
-import { Award, BadgeCheck, ExternalLink, PackageOpen } from "lucide-react";
+import { Award, BadgeCheck, ExternalLink, FileText, PackageOpen } from "lucide-react";
 import type { Certificate } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
 
 interface CertificatesProps {
   certificates: Certificate[];
+}
+
+/**
+ * Admins can upload either a photo or a PDF of the certificate — this card
+ * always just reads as "the certificate photo" either way. A PDF can't be
+ * decoded by next/image, so it gets a document-style tile instead of a
+ * broken image.
+ */
+function isPdfUrl(url: string | null): boolean {
+  return !!url && url.toLowerCase().split("?")[0].endsWith(".pdf");
 }
 
 export function Certificates({ certificates }: CertificatesProps) {
@@ -58,10 +68,23 @@ export function Certificates({ certificates }: CertificatesProps) {
 }
 
 function CertificateCard({ certificate }: { certificate: Certificate }) {
+  const isPdf = isPdfUrl(certificate.imageUrl);
   const inner = (
     <>
       <div className="relative h-[180px] shrink-0 overflow-hidden bg-surface-alt">
-        {certificate.imageUrl ? (
+        {certificate.imageUrl && isPdf ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 bg-dark">
+            <span className="flex size-14 items-center justify-center rounded-2xl bg-dark-surface text-accent">
+              <FileText size={26} strokeWidth={1.5} />
+            </span>
+            <span
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-dark-muted"
+              style={{ fontFamily: "var(--font-mono-jb)" }}
+            >
+              PDF Certificate
+            </span>
+          </div>
+        ) : certificate.imageUrl ? (
           <Image
             src={certificate.imageUrl}
             alt={certificate.title}
@@ -90,9 +113,9 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
         <p className="mt-2 font-mono text-[12px] text-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
           {[certificate.issuer, certificate.year ? String(certificate.year) : null].filter(Boolean).join("  ·  ")}
         </p>
-        {certificate.credentialUrl ? (
+        {certificate.credentialUrl || isPdf ? (
           <span className="mt-auto inline-flex items-center gap-1.5 pt-5 font-mono text-[12.5px] font-bold text-lime-deep" style={{ fontFamily: "var(--font-mono-jb)" }}>
-            View Credential
+            {certificate.credentialUrl ? "View Credential" : "View PDF"}
             <ExternalLink size={13} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </span>
         ) : null}
@@ -103,8 +126,11 @@ function CertificateCard({ certificate }: { certificate: Certificate }) {
   const cls =
     "group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-border bg-surface shadow-[0_8px_28px_rgba(21,20,15,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-border-strong hover:shadow-[0_28px_64px_rgba(21,20,15,0.14)]";
 
-  return certificate.credentialUrl ? (
-    <a href={certificate.credentialUrl} target="_blank" rel="noopener noreferrer" aria-label={`View certificate: ${certificate.title}`} className={cls}>
+  // No separate credential link? A PDF upload is still openable on its own.
+  const linkHref = certificate.credentialUrl ?? (isPdf ? certificate.imageUrl : null);
+
+  return linkHref ? (
+    <a href={linkHref} target="_blank" rel="noopener noreferrer" aria-label={`View certificate: ${certificate.title}`} className={cls}>
       {inner}
     </a>
   ) : (

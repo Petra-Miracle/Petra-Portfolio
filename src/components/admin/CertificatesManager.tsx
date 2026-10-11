@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
   Award,
+  FileText,
   Image as ImageIcon,
   Loader2,
   Pencil,
@@ -50,6 +51,7 @@ interface BulkRow {
   credentialUrl: string;
   imageUrl: string;
   imagePreview: string | null;
+  imageIsPdf: boolean;
   uploadingImage: boolean;
   imageError: string | null;
 }
@@ -63,9 +65,30 @@ function emptyRow(): BulkRow {
     credentialUrl: "",
     imageUrl: "",
     imagePreview: null,
+    imageIsPdf: false,
     uploadingImage: false,
     imageError: null,
   };
+}
+
+/**
+ * Admins can upload either a photo or a PDF of the certificate — the public
+ * card always just presents it as "the certificate photo", so we only need
+ * to know internally when to render a PDF-style placeholder instead of an
+ * <img> (next/image and <img> can't preview PDF bytes).
+ */
+function isPdfUrl(url: string | null | undefined): boolean {
+  return !!url && url.toLowerCase().split("?")[0].endsWith(".pdf");
+}
+
+/** Turns "aws-cloud-practitioner.pdf" into "aws cloud practitioner" so a bulk
+ *  multi-file upload can prefill a sensible starting title per row. */
+function titleFromFilename(filename: string): string {
+  return filename
+    .replace(/\.[^./]+$/, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 const EMPTY_EDIT_FORM = {
@@ -91,6 +114,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState(EMPTY_EDIT_FORM);
   const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
+  const [editImageIsPdf, setEditImageIsPdf] = useState(false);
   const [editUploading, setEditUploading] = useState(false);
   const [editImageError, setEditImageError] = useState<string | null>(null);
   const [editSaving, setEditSaving] = useState(false);
@@ -152,25 +176,73 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
     setRows((prev) => (prev.length > 1 ? prev.filter((r) => r.key !== key) : prev));
   }
 
-  async function handleRowImageChange(row: BulkRow, file: File) {
+  async function handleRowImageChange(key: string, file: File) {
     const localPreview = URL.createObjectURL(file);
-    patchRow(row.key, { imagePreview: localPreview, imageError: null, uploadingImage: true });
+    const isPdf = file.type === "application/pdf";
+    patchRow(key, {
+      imagePreview: localPreview,
+      imageIsPdf: isPdf,
+      imageError: null,
+      uploadingImage: true,
+    });
     try {
       const { url } = await uploadImage(token, file);
-      patchRow(row.key, { imageUrl: url, imagePreview: url });
+      patchRow(key, { imageUrl: url, imagePreview: url, imageIsPdf: isPdf });
     } catch (err) {
       if (isUnauthorized(err)) {
         handleUnauthorized();
         return;
       }
-      patchRow(row.key, {
-        imageError: err instanceof Error ? err.message : "Upload failed.",
-        imagePreview: row.imageUrl.trim() === "" ? null : row.imageUrl,
-      });
+      setRows((prev) =>
+        prev.map((r) =>
+          r.key === key
+            ? {
+                ...r,
+                imageError: err instanceof Error ? err.message : "Upload failed.",
+                imagePreview: r.imageUrl.trim() === "" ? null : r.imageUrl,
+                imageIsPdf: isPdfUrl(r.imageUrl),
+              }
+            : r,
+        ),
+      );
     } finally {
       URL.revokeObjectURL(localPreview);
-      patchRow(row.key, { uploadingImage: false });
+      patchRow(key, { uploadingImage: false });
     }
+  }
+
+  /**
+   * Lets the admin pick several files at once in a single row's upload
+   * field: the first file fills that row, and every extra file spawns a
+   * new row right after it (title prefilled from the filename) so one
+   * file-picker action can add a whole batch of certificates.
+   */
+  function handleRowFilesSelected(key: string, files: File[]) {
+    if (files.length === 0) return;
+    const [first, ...rest] = files;
+
+    setRows((prev) =>
+      prev.map((r) =>
+        r.key === key && !r.title.trim() ? { ...r, title: titleFromFilename(first.name) } : r,
+      ),
+    );
+    handleRowImageChange(key, first);
+
+    if (rest.length === 0) return;
+
+    const newRows = rest.map(() => emptyRow());
+    setRows((prev) => {
+      const idx = prev.findIndex((r) => r.key === key);
+      if (idx === -1) return [...prev, ...newRows];
+      return [...prev.slice(0, idx + 1), ...newRows, ...prev.slice(idx + 1)];
+    });
+    newRows.forEach((newRow, i) => {
+      const file = rest[i];
+      setRows((prev) =>
+        prev.map((r) => (r.key === newRow.key ? { ...r, title: titleFromFilename(file.name) } : r)),
+      );
+      handleRowImageChange(newRow.key, file);
+    });
   }
 
   async function handleBulkSubmit(event: FormEvent<HTMLFormElement>) {
@@ -227,6 +299,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
       imageUrl: cert.imageUrl ?? "",
     });
     setEditImagePreview(cert.imageUrl ?? null);
+    setEditImageIsPdf(isPdfUrl(cert.imageUrl));
     setEditImageError(null);
     setEditError(null);
   }
@@ -238,13 +311,16 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
 
   async function handleEditImageChange(file: File) {
     const localPreview = URL.createObjectURL(file);
+    const isPdf = file.type === "application/pdf";
     setEditImagePreview(localPreview);
+    setEditImageIsPdf(isPdf);
     setEditImageError(null);
     setEditUploading(true);
     try {
       const { url } = await uploadImage(token, file);
       setEditForm((f) => ({ ...f, imageUrl: url }));
       setEditImagePreview(url);
+      setEditImageIsPdf(isPdf);
     } catch (err) {
       if (isUnauthorized(err)) {
         handleUnauthorized();
@@ -252,6 +328,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
       }
       setEditImageError(err instanceof Error ? err.message : "Upload failed.");
       setEditImagePreview(editForm.imageUrl.trim() === "" ? null : editForm.imageUrl);
+      setEditImageIsPdf(isPdfUrl(editForm.imageUrl));
     } finally {
       URL.revokeObjectURL(localPreview);
       setEditUploading(false);
@@ -505,7 +582,15 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                   />
                 </Field>
 
-                <Field label="Certificate Photo" className="sm:col-span-2">
+                <Field
+                  label="Certificate Photo"
+                  className="sm:col-span-2"
+                  hint={
+                    i === 0
+                      ? "Tip: select multiple files at once to add several certificates in one go."
+                      : undefined
+                  }
+                >
                   <label
                     className={`admin-dropzone ${
                       row.uploadingImage ? "pointer-events-none opacity-60" : ""
@@ -513,16 +598,22 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                   >
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,application/pdf"
+                      multiple
                       className="hidden"
                       disabled={row.uploadingImage}
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleRowImageChange(row, file);
+                        const files = Array.from(e.target.files ?? []);
+                        if (files.length > 0) handleRowFilesSelected(row.key, files);
                         e.target.value = "";
                       }}
                     />
-                    {row.imagePreview ? (
+                    {row.imagePreview && row.imageIsPdf ? (
+                      <span className="flex h-[86px] w-[110px] shrink-0 flex-col items-center justify-center gap-1 rounded-xl border border-border bg-surface-alt text-muted">
+                        <FileText size={20} />
+                        <span className="font-mono text-[9px] font-bold uppercase tracking-wider">PDF</span>
+                      </span>
+                    ) : row.imagePreview ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={row.imagePreview}
@@ -635,7 +726,7 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
               >
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   className="hidden"
                   disabled={editUploading}
                   onChange={(e) => {
@@ -644,7 +735,22 @@ export function CertificatesManager({ token }: CertificatesManagerProps) {
                     e.target.value = "";
                   }}
                 />
-                {editImagePreview ? (
+                {editImagePreview && editImageIsPdf ? (
+                  <div className="relative flex h-full min-h-[150px] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-surface-alt text-muted">
+                    <FileText size={28} />
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider">PDF file</span>
+                    {editUploading ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/70">
+                        <Loader2 size={20} className="animate-spin text-foreground" />
+                      </div>
+                    ) : (
+                      <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-background/85 py-1.5 text-xs font-medium text-foreground">
+                        <Upload size={12} />
+                        Change photo
+                      </div>
+                    )}
+                  </div>
+                ) : editImagePreview ? (
                   <div className="relative h-full min-h-[150px] w-full overflow-hidden rounded-2xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -705,6 +811,13 @@ function Th({
 }
 
 function Thumb({ cert }: { cert: { imageUrl: string | null } }) {
+  if (cert.imageUrl && isPdfUrl(cert.imageUrl)) {
+    return (
+      <span className="admin-thumb">
+        <FileText size={17} />
+      </span>
+    );
+  }
   if (cert.imageUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
