@@ -5,9 +5,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
-import { ProjectDetailModal } from "@/components/ProjectDetailModal";
-import { ProjectCommunityGrid } from "@/components/ProjectCommunity";
-import { PackageOpen, Trophy } from "lucide-react";
+import { MarqueeRow } from "@/components/MarqueeRow";
+import { ShowcaseCard } from "@/components/ShowcaseCard";
+import { PackageOpen } from "lucide-react";
 
 interface ProjectsProps {
   projects: Project[];
@@ -35,10 +35,7 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
         <Reveal>
           <Subhead count={projects.length} label="Featured Projects" />
         </Reveal>
-        {/* Community cards (HeroUI Card + Avatar) per project */}
-        <Reveal className="mt-7">
-          <ProjectCommunityGrid projects={projects} />
-        </Reveal>
+        <ShowcaseRow items={projects} />
       </div>
     );
   }
@@ -50,14 +47,37 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
         <Reveal>
               <Subhead count={competitions.length} label="Competitions & Contests" />
         </Reveal>
-        <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {competitions.map((p, i) => (
-            <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
-              <CompetitionCard project={p} />
-            </Reveal>
+        <ShowcaseRow items={competitions} reversed />
+      </div>
+    );
+  }
+
+  /**
+   * Horizontal lineup. Auto-loops (infinite marquee) once the admin
+   * has added more than 5 items, otherwise a plain snap row.
+   */
+  function ShowcaseRow({ items, reversed = false }: { items: Project[]; reversed?: boolean }) {
+    if (items.length > 5) {
+      return (
+        <Reveal className="mt-7">
+          <MarqueeRow reversed={reversed}>
+            {items.map((p) => (
+              <div key={p.id} className="mr-5 flex shrink-0">
+                <ShowcaseCard project={p} />
+              </div>
+            ))}
+          </MarqueeRow>
+        </Reveal>
+      );
+    }
+    return (
+      <Reveal className="mt-7">
+        <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3">
+          {items.map((p) => (
+            <ShowcaseCard key={p.id} project={p} />
           ))}
         </div>
-      </div>
+      </Reveal>
     );
   }
 
@@ -195,80 +215,6 @@ function Subhead({ count, label }: { count: number; label: string }) {
       </span>
       <span className="h-px flex-1 bg-white/10" aria-hidden />
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------
-   Competition card
-------------------------------------------------------------------- */
-
-function CompetitionCard({ project }: { project: Project }) {
-  const [detailOpen, setDetailOpen] = useState(false);
-
-  return (
-    <>
-      <article
-        role="button"
-        tabIndex={0}
-        onClick={() => setDetailOpen(true)}
-        onKeyDown={(e) => {
-          if (e.target !== e.currentTarget) return;
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setDetailOpen(true);
-          }
-        }}
-        className="group gradient-border relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[24px] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_28px_64px_rgba(0,0,0,0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ background: "radial-gradient(100% 70% at 50% 0%, rgba(199,242,60,0.10), transparent 65%)" }}
-        />
-        <div className="relative flex items-center justify-between">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-accent text-accent-ink shadow-[0_8px_28px_rgba(199,242,60,0.35)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-            <Trophy size={20} />
-          </span>
-          {project.result ? (
-            <span className="badge-success rounded-full! px-3.5! py-1.5!">
-              <Trophy size={12} />
-              {project.result}
-            </span>
-          ) : null}
-        </div>
-
-        <h4 className="relative mt-5 font-display text-[19px] font-semibold leading-snug tracking-tight text-background" style={{ fontFamily: "var(--font-display)" }}>
-          {project.title}
-        </h4>
-        <p className="relative mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-background/70">
-          {project.description}
-        </p>
-
-        <div className="relative mt-auto flex flex-wrap items-center gap-1.5 pt-5">
-          {project.techStack.slice(0, 2).map((tech, i) => (
-            <span key={`${project.id}-${i}`} className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 font-mono text-[11px] text-background/75" style={{ fontFamily: "var(--font-mono-jb)" }}>
-              {tech}
-            </span>
-          ))}
-          {project.techStack.length > 2 && (
-            <span className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 font-mono text-[11px] text-background/75" style={{ fontFamily: "var(--font-mono-jb)" }}>
-              +{project.techStack.length - 2}
-            </span>
-          )}
-          {project.year ? (
-            <span className="ml-auto font-mono text-[11px] text-background/45" style={{ fontFamily: "var(--font-mono-jb)" }}>
-              {project.year}
-            </span>
-          ) : null}
-        </div>
-      </article>
-
-      <AnimatePresence>
-        {detailOpen ? (
-          <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
-        ) : null}
-      </AnimatePresence>
-    </>
   );
 }
 
