@@ -1,16 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ProjectDetailModal } from "@/components/ProjectDetailModal";
-// Coverflow 3D carousel by Skiper UI (free, https://skiper-ui.com/v1/skiper47)
-import { Carousel_001 } from "@/components/ui/skiper-ui/skiper47";
-import { ArrowUpRight, ExternalLink, FolderGit2, PackageOpen, Trophy } from "lucide-react";
-import { SocialIcon } from "@/components/SocialIcon";
+import { ProjectBentoGrid } from "@/components/ProjectBento";
+import { PackageOpen, Trophy } from "lucide-react";
 
 interface ProjectsProps {
   projects: Project[];
@@ -38,19 +35,9 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
         <Reveal>
           <Subhead count={projects.length} label="Featured Projects" />
         </Reveal>
-        {/* Coverflow 3D (Skiper-47); simple grid when data < 3 */}
+        {/* Bento grid: live data-driven visuals per project */}
         <Reveal className="mt-7">
-          {projects.length >= 3 ? (
-            <ProjectCoverflow projects={projects} />
-          ) : (
-            <div className="grid gap-5 lg:grid-cols-2">
-              {projects.map((p, i) => (
-                <Reveal key={p.id} delay={Math.min(i, 5) * 70}>
-                  <ProjectCard project={p} />
-                </Reveal>
-              ))}
-            </div>
-          )}
+          <ProjectBentoGrid projects={projects} />
         </Reveal>
       </div>
     );
@@ -197,61 +184,6 @@ export function ProjectsSection({ projects, competitions }: ProjectsProps) {
   );
 }
 
-/* ------------------------------------------------------------------
-    Project coverflow: Skiper-47 Carousel_001 + caption bar + modal
-------------------------------------------------------------------- */
-
-function ProjectCoverflow({ projects }: { projects: Project[] }) {
-  const [active, setActive] = useState(0);
-  const [detail, setDetail] = useState<Project | null>(null);
-  const current = projects.length > 0 ? projects[active % projects.length] : null;
-
-  return (
-    <>
-      <div className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.03] px-1 pb-2 pt-7 shadow-[0_24px_64px_rgba(0,0,0,0.4)] sm:px-4">
-        <Carousel_001
-          className="mx-auto w-full max-w-4xl"
-          images={projects.map((p) => ({ src: p.imageUrl ?? "", alt: p.title }))}
-          showPagination
-          loop={projects.length > 2}
-          autoplay={projects.length > 1}
-          onActiveChange={setActive}
-          onSlideClick={(i) => {
-            const p = projects[i];
-            if (p) setDetail(p);
-          }}
-        />
-        {current ? (
-          <div className="mx-auto flex max-w-xl flex-col items-center gap-1.5 px-6 pb-5 text-center">
-            <span
-              key={current.id}
-              className="animate-fade-in-up font-display text-[19px] font-semibold tracking-tight text-background"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              {current.title}
-            </span>
-            <span className="flex flex-wrap items-center justify-center gap-2 font-mono text-[11px] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-              <span className="font-bold text-accent">
-                {String((active % projects.length) + 1).padStart(2, "0")}
-              </span>
-              /
-              {String(projects.length).padStart(2, "0")}
-              {current.year ? <span>· {current.year}</span> : null}
-              <span className="text-dark-muted/70">· click photo for details</span>
-            </span>
-          </div>
-        ) : null}
-      </div>
-
-      <AnimatePresence>
-        {detail ? (
-          <ProjectDetailModal project={detail} onClose={() => setDetail(null)} />
-        ) : null}
-      </AnimatePresence>
-    </>
-  );
-}
-
 function Subhead({ count, label }: { count: number; label: string }) {
   return (
     <div className="flex items-center gap-3.5">
@@ -263,117 +195,6 @@ function Subhead({ count, label }: { count: number; label: string }) {
       </span>
       <span className="h-px flex-1 bg-white/10" aria-hidden />
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------
-    Project card: standard grid
-------------------------------------------------------------------- */
-
-function ProjectCard({ project }: { project: Project }) {
-  const [detailOpen, setDetailOpen] = useState(false);
-
-  return (
-    <>
-      <article
-        role="button"
-        tabIndex={0}
-        onClick={() => setDetailOpen(true)}
-        onKeyDown={(e) => {
-          if (e.target !== e.currentTarget) return;
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setDetailOpen(true);
-          }
-        }}
-        className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.04] transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/40 hover:shadow-[0_28px_64px_rgba(0,0,0,0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-      >
-        <div className="relative h-[210px] shrink-0 overflow-hidden bg-white/[0.04]">
-          {project.imageUrl ? (
-            <Image
-              src={project.imageUrl}
-              alt={project.title}
-              fill
-              sizes="(max-width: 1024px) 100vw, 40vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <FolderGit2 size={30} className="text-dark-muted" strokeWidth={1} />
-            </div>
-          )}
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-dark/35 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-          <span className="absolute right-4 top-4 flex size-10 translate-y-1 items-center justify-center rounded-full bg-accent text-accent-ink opacity-0 shadow-[0_8px_24px_rgba(199,242,60,0.5)] transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <ArrowUpRight size={17} />
-          </span>
-          {project.year ? (
-            <span className="glass-dark absolute left-4 top-4 rounded-full px-3 py-1 font-mono text-[10.5px] font-bold text-background" style={{ fontFamily: "var(--font-mono-jb)" }}>
-              {project.year}
-            </span>
-          ) : null}
-        </div>
-
-        <div className="flex flex-1 flex-col p-6">
-          <h4 className="font-display text-[19px] font-semibold leading-snug tracking-tight text-background" style={{ fontFamily: "var(--font-display)" }}>
-            {project.title}
-          </h4>
-          <p className="mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-dark-muted">
-            {project.description}
-          </p>
-          {project.techStack.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {project.techStack.slice(0, 3).map((tech, i) => (
-                <span key={`${project.id}-${i}`} className="rounded-lg border border-white/10 bg-white/[0.06] px-2.5 py-1 font-mono text-[11px] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                  {tech}
-                </span>
-              ))}
-              {project.techStack.length > 3 && (
-                <span className="rounded-lg border border-white/10 bg-white/[0.06] px-2.5 py-1 font-mono text-[11px] text-dark-muted" style={{ fontFamily: "var(--font-mono-jb)" }}>
-                  +{project.techStack.length - 3}
-                </span>
-              )}
-            </div>
-          )}
-          <div className="mt-auto flex items-center gap-2 pt-5">
-            {project.demoUrl ? (
-              <ActionIcon href={project.demoUrl} label={`Open demo: ${project.title}`}>
-                <ExternalLink size={14} />
-              </ActionIcon>
-            ) : null}
-            {project.repoUrl ? (
-              <ActionIcon href={project.repoUrl} label={`View repository: ${project.title}`}>
-                <SocialIcon name="github" className="size-3.5" />
-              </ActionIcon>
-            ) : null}
-            <span className="ml-auto font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-dark-muted opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ fontFamily: "var(--font-mono-jb)" }}>
-              Detail →
-            </span>
-          </div>
-        </div>
-      </article>
-
-      <AnimatePresence>
-        {detailOpen ? (
-          <ProjectDetailModal project={project} onClose={() => setDetailOpen(false)} />
-        ) : null}
-      </AnimatePresence>
-    </>
-  );
-}
-
-function ActionIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={label}
-      title={label}
-      onClick={(e) => e.stopPropagation()}
-      className="btn btn-icon rounded-full! border border-white/15 text-background transition-all hover:border-accent! hover:text-accent!"
-    >
-      {children}
-    </a>
   );
 }
 
