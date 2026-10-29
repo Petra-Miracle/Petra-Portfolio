@@ -26,7 +26,7 @@ export const siteConfig = {
   socials: [
     // TODO: Replace with real links
     { label: "GitHub", href: "https://github.com/Petra-Miracle", icon: "github" },
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/petra-lenggu-538226319/", icon: "linkedin" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/petra-miracle-me-lenggu-538226319/", icon: "linkedin" },
     { label: "Twitter / X", href: "https://x.com/SmkindEzz", icon: "twitter" },
     { label: "Instagram", href: "https://instagram.com/", icon: "instagram" },
   ],
